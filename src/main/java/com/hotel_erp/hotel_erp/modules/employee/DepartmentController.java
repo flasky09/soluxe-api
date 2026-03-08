@@ -1,0 +1,42 @@
+package com.hotel_erp.hotel_erp.modules.employee;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/departments")
+@RequiredArgsConstructor
+public class DepartmentController {
+
+    private final DepartmentService departmentService;
+
+    @GetMapping
+    public List<DepartmentDTO> getAllDepartments() {
+        return departmentService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(departmentService.findById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<DepartmentDTO> createDepartment(@RequestBody DepartmentDTO departmentDTO) {
+        return ResponseEntity.ok(departmentService.save(departmentDTO));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DepartmentDTO> updateDepartment(@PathVariable Long id, @RequestBody DepartmentDTO departmentDTO) {
+        departmentDTO.setId(id);
+        return ResponseEntity.ok(departmentService.save(departmentDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
+        departmentService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+}

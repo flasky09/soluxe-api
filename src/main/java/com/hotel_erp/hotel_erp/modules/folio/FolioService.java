@@ -1,0 +1,19 @@
+package com.hotel_erp.hotel_erp.modules.folio;
+
+import com.hotel_erp.hotel_erp.shared.BaseService;
+import java.util.List;
+
+public interface FolioService extends BaseService<FolioEntity, Long> {
+    FolioDTO createFolioForStay(Long stayId);
+    FolioChargeDTO addCharge(Long folioId, FolioChargeDTO chargeDto, Long userId);
+    
+    List<PaymentMethodDTO> getAllPaymentMethods();
+    PaymentMethodDTO createPaymentMethod(PaymentMethodDTO dto);
+    PaymentMethodDTO updatePaymentMethod(Long id, PaymentMethodDTO dto);
+    FolioPaymentDTO addPayment(Long folioId, FolioPaymentDTO paymentDto, Long userId);
+    FolioDTO closeFolio(Long folioId, Long userId);
+
+    List<FolioReceiptDTO> getAllReceipts();
+    FolioReceiptDTO getReceiptByPaymentId(Long paymentId);
+    List<FolioReceiptDTO> getReceiptsByFolioId(Long folioId);
+}
