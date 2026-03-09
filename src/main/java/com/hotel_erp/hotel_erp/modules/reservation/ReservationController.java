@@ -20,15 +20,6 @@ public class ReservationController {
                 .toList();
     }
 
-    @PostMapping("/{reservationIdentifier}/check-in")
-    public ReservationDTO checkInReservation(@PathVariable Long reservationIdentifier, @RequestParam Long roomId) {
-        return reservationService.checkIn(reservationIdentifier, roomId);
-    }
-
-    @PostMapping("/{reservationIdentifier}/check-out")
-    public ReservationDTO checkOutReservation(@PathVariable Long reservationIdentifier) {
-        return reservationService.checkOut(reservationIdentifier);
-    }
 
     @PostMapping("/{reservationIdentifier}/cancel")
     public ReservationDTO cancelReservation(@PathVariable Long reservationIdentifier) {
@@ -38,6 +29,11 @@ public class ReservationController {
     @PostMapping
     public ReservationDTO createReservation(@RequestBody ReservationDTO reservationDTO) {
         return reservationService.createFromDto(reservationDTO);
+    }
+
+    @PutMapping("/{reservationIdentifier}")
+    public ReservationDTO updateReservation(@PathVariable Long reservationIdentifier, @RequestBody ReservationDTO reservationDTO) {
+        return reservationService.updateReservation(reservationIdentifier, reservationDTO);
     }
 
     @GetMapping("/{reservationIdentifier}")

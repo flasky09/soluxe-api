@@ -3,6 +3,8 @@ package com.hotel_erp.hotel_erp.modules.housekeeping;
 import com.hotel_erp.hotel_erp.modules.room.RoomEntity;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
+import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
+import com.hotel_erp.hotel_erp.modules.stay.StayStatus;
 import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import java.util.List;
 public class HousekeepingService {
     private final HousekeepingLogRepository housekeepingLogRepository;
     private final RoomRepository roomRepository;
+    private final StayRepository stayRepository;
 
     public List<RoomEntity> getRoomsNeedingAttention() {
         // Tenant isolation is handled automatically by Hibernate filters
@@ -54,7 +57,11 @@ public class HousekeepingService {
     private void updateRoomStatus(RoomEntity room, HousekeepingAction action) {
         switch (action) {
             case CLEANED:
-                room.setStatus(RoomStatus.AVAILABLE);
+                if (stayRepository.countByRoomIdAndStatus(room.getId(), StayStatus.ACTIVE) > 0) {
+                    room.setStatus(RoomStatus.OCCUPIED);
+                } else {
+                    room.setStatus(RoomStatus.AVAILABLE);
+                }
                 break;
             case MAINTENANCE_REQUESTED:
                 room.setStatus(RoomStatus.MAINTENANCE);

@@ -20,6 +20,14 @@ public class GuestController {
         return guestMapper.toDto(savedGuest);
     }
 
+    @PutMapping("/{id}")
+    public GuestDTO updateGuest(@PathVariable Long id, @RequestBody GuestDTO guestDTO) {
+        GuestEntity guestEntity = guestMapper.toEntity(guestDTO);
+        guestEntity.setId(id);
+        GuestEntity savedGuest = guestService.save(guestEntity);
+        return guestMapper.toDto(savedGuest);
+    }
+
     @GetMapping("/{guestIdentifier}")
     public GuestDTO getGuestById(@PathVariable Long guestIdentifier) {
         GuestEntity guestEntity = guestService.findById(guestIdentifier)

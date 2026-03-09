@@ -13,6 +13,11 @@ public class MenuItemServiceImpl implements MenuItemService {
     private final MenuItemRepository menuItemRepository;
 
     @Override
+    public List<MenuItemEntity> findAll() {
+        return menuItemRepository.findAll();
+    }
+
+    @Override
     public Optional<MenuItemEntity> findById(Long id) {
         return menuItemRepository.findById(id);
     }

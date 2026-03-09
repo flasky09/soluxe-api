@@ -18,6 +18,11 @@ public class RestaurantTableServiceImpl implements RestaurantTableService {
     }
 
     @Override
+    public List<RestaurantTableEntity> findAll() {
+        return restaurantTableRepository.findAll();
+    }
+
+    @Override
     public RestaurantTableEntity save(RestaurantTableEntity table) {
         return restaurantTableRepository.save(table);
     }

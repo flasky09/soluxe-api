@@ -61,6 +61,19 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
 
     @Override
     @Transactional
+    public FolioDTO createFolioForDining(Long sessionId) {
+        FolioEntity folio = new FolioEntity();
+        folio.setDiningSessionId(sessionId);
+        folio.setFolioType(FolioType.DINING);
+        folio.setStatus(FolioStatus.OPEN);
+        folio.setOpenedAt(LocalDateTime.now());
+        folio.setTotalAmount(BigDecimal.ZERO);
+        
+        return folioMapper.toDto(repository.save(folio));
+    }
+
+    @Override
+    @Transactional
     public FolioChargeDTO addCharge(Long folioId, FolioChargeDTO chargeDto, Long userId) {
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));

@@ -12,17 +12,22 @@ import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
 import com.hotel_erp.hotel_erp.modules.room.RoomEntity;
 
+import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
+import com.hotel_erp.hotel_erp.modules.stay.StayStatus;
+
 @Service
 public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, Long, ReservationRepository> implements ReservationService {
     
     private final GuestRepository guestRepository;
     private final RoomRepository roomRepository;
+    private final StayRepository stayRepository;
     private final ReservationMapper reservationMapper;
 
-    public ReservationServiceImpl(ReservationRepository repository, GuestRepository guestRepository, RoomRepository roomRepository, ReservationMapper reservationMapper) {
+    public ReservationServiceImpl(ReservationRepository repository, GuestRepository guestRepository, RoomRepository roomRepository, StayRepository stayRepository, ReservationMapper reservationMapper) {
         super(repository);
         this.guestRepository = guestRepository;
         this.roomRepository = roomRepository;
+        this.stayRepository = stayRepository;
         this.reservationMapper = reservationMapper;
     }
 
@@ -54,43 +59,6 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
         return reservationMapper.toDto(repository.save(entity));
     }
 
-    @Override
-    @Transactional
-    public ReservationDTO checkIn(Long reservationId, Long roomId) {
-        ReservationEntity reservation = repository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-        
-        RoomEntity room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
-
-        if (room.getStatus() != RoomStatus.AVAILABLE) {
-            throw new RuntimeException("Room is not available for check-in");
-        }
-
-        reservation.setStatus(ReservationStatus.CHECKED_IN);
-        reservation.setRoomId(roomId);
-        room.setStatus(RoomStatus.OCCUPIED);
-        
-        roomRepository.save(room);
-        return reservationMapper.toDto(repository.save(reservation));
-    }
-
-    @Override
-    @Transactional
-    public ReservationDTO checkOut(Long reservationId) {
-        ReservationEntity reservation = repository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
-
-        if (reservation.getRoomId() != null) {
-            roomRepository.findById(reservation.getRoomId()).ifPresent(room -> {
-                room.setStatus(RoomStatus.DIRTY);
-                roomRepository.save(room);
-            });
-        }
-
-        reservation.setStatus(ReservationStatus.CHECKED_OUT);
-        return reservationMapper.toDto(repository.save(reservation));
-    }
 
     @Override
     @Transactional
@@ -100,5 +68,50 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
 
         reservation.setStatus(ReservationStatus.CANCELLED);
         return reservationMapper.toDto(repository.save(reservation));
+    }
+
+    @Override
+    @Transactional
+    public ReservationDTO updateReservation(Long id, ReservationDTO dto) {
+        ReservationEntity existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+
+        if (existing.getDateOut() != null && dto.getDateOut() != null && !existing.getDateOut().equals(dto.getDateOut())) {
+            stayRepository.findByReservationIdAndStatus(id, StayStatus.ACTIVE)
+                    .ifPresent(stay -> {
+                        stay.setDateOut(dto.getDateOut().atStartOfDay());
+                        stayRepository.save(stay);
+                    });
+        }
+
+        if (dto.getRoomTypeId() != null) existing.setRoomTypeId(dto.getRoomTypeId());
+        if (dto.getDateIn() != null) existing.setDateIn(dto.getDateIn());
+        if (dto.getDateOut() != null) existing.setDateOut(dto.getDateOut());
+        existing.setAdults(dto.getAdults());
+        existing.setChildren(dto.getChildren());
+        if (dto.getTableId() != null) existing.setTableId(dto.getTableId());
+        if (dto.getTableReservationTime() != null) existing.setTableReservationTime(dto.getTableReservationTime());
+        if (dto.getTablePax() != null) existing.setTablePax(dto.getTablePax());
+        if (dto.getEta() != null && !dto.getEta().isEmpty()) existing.setEta(java.time.LocalTime.parse(dto.getEta()));
+        if (dto.getEtd() != null && !dto.getEtd().isEmpty()) existing.setEtd(java.time.LocalTime.parse(dto.getEtd()));
+        if (dto.getSpecialRequests() != null) existing.setSpecialRequests(dto.getSpecialRequests());
+
+        if (dto.getGuestId() != null) {
+            existing.setGuestId(dto.getGuestId());
+            guestRepository.findById(dto.getGuestId()).ifPresent(guest -> {
+                if (dto.getNationality() != null) guest.setNationality(dto.getNationality());
+                if (dto.getIdType() != null) {
+                    try { guest.setIdType(IdType.valueOf(dto.getIdType())); } catch (Exception ignored) {}
+                }
+                if (dto.getIdNumber() != null) guest.setIdNumber(dto.getIdNumber());
+                if (dto.getPreferences() != null) guest.setPreferences(dto.getPreferences());
+                if (dto.getVehicleRegistration() != null) guest.setVehicleRegistration(dto.getVehicleRegistration());
+                if (dto.getEmergencyContactName() != null) guest.setEmergencyContactName(dto.getEmergencyContactName());
+                if (dto.getEmergencyContactPhone() != null) guest.setEmergencyContactPhone(dto.getEmergencyContactPhone());
+                guestRepository.save(guest);
+            });
+        }
+
+        return reservationMapper.toDto(repository.save(existing));
     }
 }

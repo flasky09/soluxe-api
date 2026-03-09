@@ -26,6 +26,13 @@ public class InventoryItemController {
         return inventoryItemMapper.toDto(inventoryItemService.save(entity));
     }
 
+    @PutMapping("/{id}")
+    public InventoryItemDTO updateItem(@PathVariable Long id, @RequestBody InventoryItemDTO itemDto) {
+        InventoryItemEntity entity = inventoryItemMapper.toEntity(itemDto);
+        entity.setId(id);
+        return inventoryItemMapper.toDto(inventoryItemService.save(entity));
+    }
+
     @GetMapping("/{id}")
     public InventoryItemDTO getItemById(@PathVariable Long id) {
         return inventoryItemService.findById(id)

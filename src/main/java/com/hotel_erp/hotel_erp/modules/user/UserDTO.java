@@ -12,4 +12,5 @@ public class UserDTO {
     private boolean isActive;
     private Long departmentId;
     private String role;
+    private String password;
 }

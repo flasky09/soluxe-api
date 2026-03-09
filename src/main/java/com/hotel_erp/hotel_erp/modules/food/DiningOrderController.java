@@ -11,20 +11,26 @@ import java.util.List;
 public class DiningOrderController {
 
     private final DiningOrderService diningOrderService;
+    private final DiningOrderMapper diningOrderMapper;
 
     @GetMapping("/session/{sessionId}")
-    public List<DiningOrderEntity> getOrdersBySession(@PathVariable Long sessionId) {
-        return diningOrderService.findBySessionId(sessionId);
+    public List<DiningOrderDTO> getOrdersBySession(@PathVariable Long sessionId) {
+        return diningOrderService.findBySessionId(sessionId).stream()
+                .map(diningOrderMapper::toDto)
+                .toList();
     }
 
     @PostMapping
-    public DiningOrderEntity createOrder(@RequestBody DiningOrderEntity order) {
-        return diningOrderService.save(order);
+    public DiningOrderDTO createOrder(@RequestBody DiningOrderDTO orderDto) {
+        DiningOrderEntity entity = diningOrderMapper.toEntity(orderDto);
+        return diningOrderMapper.toDto(diningOrderService.save(entity));
     }
 
     @GetMapping("/{id}")
-    public DiningOrderEntity getOrderById(@PathVariable Long id) {
-        return diningOrderService.findById(id).orElseThrow(() -> new RuntimeException("DiningOrder not found"));
+    public DiningOrderDTO getOrderById(@PathVariable Long id) {
+        return diningOrderService.findById(id)
+                .map(diningOrderMapper::toDto)
+                .orElseThrow(() -> new RuntimeException("DiningOrder not found"));
     }
 
     @DeleteMapping("/{id}")

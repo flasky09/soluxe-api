@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,13 @@ public class VenueController {
     @PostMapping
     public VenueDTO createVenue(@RequestBody VenueDTO venueDto) {
         VenueEntity entity = venueMapper.toEntity(venueDto);
+        return venueMapper.toDto(venueService.save(entity));
+    }
+
+    @PutMapping("/{id}")
+    public VenueDTO updateVenue(@PathVariable Long id, @RequestBody VenueDTO venueDto) {
+        VenueEntity entity = venueMapper.toEntity(venueDto);
+        entity.setId(id);
         return venueMapper.toDto(venueService.save(entity));
     }
 

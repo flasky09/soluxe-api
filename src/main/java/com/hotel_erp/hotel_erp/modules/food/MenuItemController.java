@@ -12,6 +12,11 @@ public class MenuItemController {
 
     private final MenuItemService menuItemService;
 
+    @GetMapping
+    public List<MenuItemEntity> getAllMenuItems() {
+        return menuItemService.findAll();
+    }
+
     @PostMapping
     public MenuItemEntity createMenuItem(@RequestBody MenuItemEntity item) {
         return menuItemService.save(item);

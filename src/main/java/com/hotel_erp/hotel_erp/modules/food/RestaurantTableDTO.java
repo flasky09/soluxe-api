@@ -7,8 +7,8 @@ public class RestaurantTableDTO {
     private Long id;
     private String tableName;
     private int capacity;
-
     private TableLocation location;
     private boolean isVip;
     private String notes;
+    private TableStatus status;
 }

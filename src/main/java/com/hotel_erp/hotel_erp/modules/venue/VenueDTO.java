@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 public class VenueDTO {
     private Long id;
     private String name;
-    private VenueType type;
+    private String type;
     private Integer capacity;
     private BigDecimal ratePerHour;
     private BigDecimal ratePerDay;

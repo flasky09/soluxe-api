@@ -17,17 +17,20 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     private final StayMapper stayMapper;
     private final com.hotel_erp.hotel_erp.modules.folio.FolioService folioService;
     private final com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository;
+    private final com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository;
 
     public StayServiceImpl(StayRepository repository,
                            ReservationRepository reservationRepository,
                            StayMapper stayMapper,
                            com.hotel_erp.hotel_erp.modules.folio.FolioService folioService,
-                           com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository) {
+                           com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository,
+                           com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository) {
         super(repository);
         this.reservationRepository = reservationRepository;
         this.stayMapper = stayMapper;
         this.folioService = folioService;
         this.folioRepository = folioRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -45,13 +48,24 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setGuestId(reservation.getGuestId());
         stay.setRoomId(roomId);
         stay.setDateIn(LocalDateTime.now());
+        stay.setDateOut(reservation.getDateOut() != null ? reservation.getDateOut().atStartOfDay() : null);
+        stay.setAdults(reservation.getAdults());
+        stay.setChildren(reservation.getChildren());
         stay.setStatus(StayStatus.ACTIVE);
         stay.setCheckedInBy(userId);
         
         stay = repository.save(stay);
         
+        // Update Reservation Status
         reservation.setStatus(ReservationStatus.CHECKED_IN);
+        reservation.setRoomId(roomId);
         reservationRepository.save(reservation);
+
+        // Update Room Status
+        roomRepository.findById(roomId).ifPresent(room -> {
+            room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.OCCUPIED);
+            roomRepository.save(room);
+        });
 
         // Create Folio for the Stay
         folioService.createFolioForStay(stay.getId());
@@ -75,13 +89,39 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
         stay = repository.save(stay);
 
-        // Close Folio
+        // Update Room Status to DIRTY
+        if (stay.getRoomId() != null) {
+            roomRepository.findById(stay.getRoomId()).ifPresent(room -> {
+                room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.DIRTY);
+                roomRepository.save(room);
+            });
+        }
+
+        // Update Reservation Status (if exists)
+        reservationRepository.findById(stay.getReservationId()).ifPresent(res -> {
+            res.setStatus(ReservationStatus.CHECKED_OUT);
+            reservationRepository.save(res);
+        });
+
+        // Close Folio via Service for rule enforcement
         folioRepository.findByStayId(stayId).ifPresent(folio -> {
-            folio.setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus.CLOSED);
-            folio.setClosedAt(LocalDateTime.now());
-            folioRepository.save(folio);
+            if (folio.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, 
+                    "Cannot check out. Outstanding folio balance: " + folio.getTotalAmount()
+                );
+            }
+            folioService.closeFolio(folio.getId(), userId);
         });
 
         return stayMapper.toDto(stay);
+    }
+
+    @Override
+    @Transactional
+    public StayDTO checkOutByReservationId(Long reservationId, Long userId) {
+        StayEntity stay = repository.findByReservationIdAndStatus(reservationId, StayStatus.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("Active Stay not found for this reservation"));
+        return checkOut(stay.getId(), userId);
     }
 }

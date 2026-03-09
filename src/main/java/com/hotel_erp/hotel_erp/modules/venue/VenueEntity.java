@@ -16,8 +16,7 @@ import java.math.BigDecimal;
 public class VenueEntity extends BaseEntity {
     private String name;
     
-    @Enumerated(EnumType.STRING)
-    private VenueType type;
+    private String type;
     
     private Integer capacity;
     private BigDecimal ratePerHour;

@@ -11,15 +11,38 @@ import java.util.List;
 public class DiningSessionController {
 
     private final DiningSessionService diningSessionService;
+    private final DiningSessionMapper diningSessionMapper;
+
+    @GetMapping
+    public List<DiningSessionDTO> getAllSessions() {
+        return diningSessionService.findAll().stream()
+                .map(diningSessionMapper::toDto)
+                .toList();
+    }
+
+    @GetMapping("/active")
+    public List<DiningSessionDTO> getActiveSessions() {
+        return diningSessionService.findActive().stream()
+                .map(diningSessionMapper::toDto)
+                .toList();
+    }
 
     @PostMapping
-    public DiningSessionEntity createSession(@RequestBody DiningSessionEntity session) {
-        return diningSessionService.save(session);
+    public DiningSessionDTO createSession(@RequestBody DiningSessionDTO sessionDto) {
+        DiningSessionEntity entity = diningSessionMapper.toEntity(sessionDto);
+        return diningSessionMapper.toDto(diningSessionService.save(entity));
     }
 
     @GetMapping("/{id}")
-    public DiningSessionEntity getSessionById(@PathVariable Long id) {
-        return diningSessionService.findById(id).orElseThrow(() -> new RuntimeException("DiningSession not found"));
+    public DiningSessionDTO getSessionById(@PathVariable Long id) {
+        return diningSessionService.findById(id)
+                .map(diningSessionMapper::toDto)
+                .orElseThrow(() -> new RuntimeException("DiningSession not found"));
+    }
+
+    @PatchMapping("/{id}/close")
+    public DiningSessionDTO closeSession(@PathVariable Long id) {
+        return diningSessionMapper.toDto(diningSessionService.closeSession(id));
     }
 
     @DeleteMapping("/{id}")

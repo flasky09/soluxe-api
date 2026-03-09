@@ -11,15 +11,33 @@ import java.util.List;
 public class RestaurantTableController {
 
     private final RestaurantTableService restaurantTableService;
+    private final RestaurantTableMapper restaurantTableMapper;
+
+    @GetMapping
+    public List<RestaurantTableDTO> getAllTables() {
+        return restaurantTableService.findAll().stream()
+                .map(restaurantTableMapper::toDto)
+                .toList();
+    }
 
     @PostMapping
-    public RestaurantTableEntity createTable(@RequestBody RestaurantTableEntity table) {
-        return restaurantTableService.save(table);
+    public RestaurantTableDTO createTable(@RequestBody RestaurantTableDTO tableDto) {
+        RestaurantTableEntity entity = restaurantTableMapper.toEntity(tableDto);
+        return restaurantTableMapper.toDto(restaurantTableService.save(entity));
+    }
+
+    @PutMapping("/{id}")
+    public RestaurantTableDTO updateTable(@PathVariable Long id, @RequestBody RestaurantTableDTO tableDto) {
+        RestaurantTableEntity entity = restaurantTableMapper.toEntity(tableDto);
+        entity.setId(id);
+        return restaurantTableMapper.toDto(restaurantTableService.save(entity));
     }
 
     @GetMapping("/{id}")
-    public RestaurantTableEntity getTableById(@PathVariable Long id) {
-        return restaurantTableService.findById(id).orElseThrow(() -> new RuntimeException("RestaurantTable not found"));
+    public RestaurantTableDTO getTableById(@PathVariable Long id) {
+        return restaurantTableService.findById(id)
+                .map(restaurantTableMapper::toDto)
+                .orElseThrow(() -> new RuntimeException("RestaurantTable not found"));
     }
 
     @DeleteMapping("/{id}")

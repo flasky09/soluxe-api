@@ -12,6 +12,5 @@ public interface RestaurantTableMapper {
 
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "status", ignore = true)
     RestaurantTableEntity toEntity(RestaurantTableDTO dto);
 }

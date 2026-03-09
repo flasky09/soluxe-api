@@ -10,6 +10,14 @@ import org.springframework.web.bind.annotation.*;
 public class StayController {
 
     private final StayService stayService;
+    private final StayMapper stayMapper;
+
+    @GetMapping
+    public java.util.List<StayDTO> getAllStays() {
+        return stayService.findAll().stream()
+                .map(stayMapper::toDto)
+                .toList();
+    }
 
     @PostMapping("/check-in")
     public StayDTO checkIn(@RequestBody CheckInRequest request) {
@@ -19,6 +27,11 @@ public class StayController {
     @PostMapping("/{id}/check-out")
     public StayDTO checkOut(@PathVariable Long id, @RequestParam Long userId) {
         return stayService.checkOut(id, userId);
+    }
+
+    @PostMapping("/checkout-by-reservation/{reservationId}")
+    public StayDTO checkOutByReservationId(@PathVariable Long reservationId, @RequestParam Long userId) {
+        return stayService.checkOutByReservationId(reservationId, userId);
     }
 
     @Data
