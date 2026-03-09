@@ -1,0 +1,641 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.hotel-erp:hotel-erp >-----------------------
+[INFO] Building hotel-erp 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ hotel-erp ---
+[INFO] Deleting /home/bony/Projects/hotel-crm/hotel-erp/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ hotel-erp ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ hotel-erp ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 247 source files with javac [debug parameters release 21] to target/classes
+[INFO] Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/reservation/ReservationService.java:[8,20] method updateReservation(java.lang.Long,com.hotel_erp.hotel_erp.modules.reservation.ReservationDTO) is already defined in interface com.hotel_erp.hotel_erp.modules.reservation.ReservationService
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/TestLombok.java:[9,10] cannot find symbol
+  symbol:   method setName(java.lang.String)
+  location: variable t of type TestLombok
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/TestLombok.java:[10,29] cannot find symbol
+  symbol:   method getName()
+  location: variable t of type TestLombok
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/auth/AuthController.java:[24,69] cannot find symbol
+  symbol:   method getUsername()
+  location: variable loginRequest of type com.hotel_erp.hotel_erp.modules.auth.LoginRequest
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/auth/AuthController.java:[24,97] cannot find symbol
+  symbol:   method getPassword()
+  location: variable loginRequest of type com.hotel_erp.hotel_erp.modules.auth.LoginRequest
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/auth/AuthController.java:[36,28] cannot find symbol
+  symbol:   method getId()
+  location: variable userDetails of type com.hotel_erp.hotel_erp.security.UserDetailsImpl
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/dashboard/DashboardService.java:[31,35] cannot find symbol
+  symbol:   method builder()
+  location: class com.hotel_erp.hotel_erp.modules.dashboard.DashboardSummaryDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/DepartmentController.java:[33,22] cannot find symbol
+  symbol:   method setId(java.lang.Long)
+  location: variable departmentDTO of type com.hotel_erp.hotel_erp.modules.employee.DepartmentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/EmployeeController.java:[44,27] cannot find symbol
+  symbol:   method setId(java.lang.Long)
+  location: variable entity of type com.hotel_erp.hotel_erp.modules.employee.EmployeeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[53,14] cannot find symbol
+  symbol:   method setStayId(java.lang.Long)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[54,14] cannot find symbol
+  symbol:   method setFolioType(com.hotel_erp.hotel_erp.modules.folio.FolioType)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[55,14] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[56,14] cannot find symbol
+  symbol:   method setOpenedAt(java.time.LocalDateTime)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[57,14] cannot find symbol
+  symbol:   method setTotalAmount(java.math.BigDecimal)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[66,14] cannot find symbol
+  symbol:   method setDiningSessionId(java.lang.Long)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[67,14] cannot find symbol
+  symbol:   method setFolioType(com.hotel_erp.hotel_erp.modules.folio.FolioType)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[68,14] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[69,14] cannot find symbol
+  symbol:   method setOpenedAt(java.time.LocalDateTime)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[70,14] cannot find symbol
+  symbol:   method setTotalAmount(java.math.BigDecimal)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[81,18] cannot find symbol
+  symbol:   method getStatus()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[86,15] cannot find symbol
+  symbol:   method setFolioId(java.lang.Long)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[87,15] cannot find symbol
+  symbol:   method setChargedAt(java.time.LocalDateTime)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[88,15] cannot find symbol
+  symbol:   method setAddedBy(java.lang.Long)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[90,35] cannot find symbol
+  symbol:   method getQuantity()
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[90,65] cannot find symbol
+  symbol:   method getUnitPrice()
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[91,15] cannot find symbol
+  symbol:   method setTotalAmount(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[95,35] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[95,63] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[112,15] cannot find symbol
+  symbol:   method setActive(boolean)
+  location: variable entity of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[122,27] cannot find symbol
+  symbol:   method getName()
+  location: variable dto of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[123,29] cannot find symbol
+  symbol:   method isActive()
+  location: variable dto of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[134,18] cannot find symbol
+  symbol:   method getStatus()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[139,16] cannot find symbol
+  symbol:   method setFolioId(java.lang.Long)
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[140,16] cannot find symbol
+  symbol:   method setRecordedAt(java.time.LocalDateTime)
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[141,16] cannot find symbol
+  symbol:   method setRecordedBy(java.lang.Long)
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[149,35] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[149,69] cannot find symbol
+  symbol:   method getAmount()
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[161,18] cannot find symbol
+  symbol:   method getStatus()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[167,18] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[168,95] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[171,14] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[172,14] cannot find symbol
+  symbol:   method setClosedAt(java.time.LocalDateTime)
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[200,37] cannot find symbol
+  symbol:   method getId()
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[201,35] cannot find symbol
+  symbol:   method getFolioId()
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[202,34] cannot find symbol
+  symbol:   method getAmount()
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[203,16] cannot find symbol
+  symbol:   method setIssuedAt(java.time.LocalDateTime)
+  location: variable receipt of type com.hotel_erp.hotel_erp.modules.folio.FolioReceiptEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[204,36] cannot find symbol
+  symbol:   method getRecordedBy()
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[205,85] cannot find symbol
+  symbol:   method getId()
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[32,43] cannot find symbol
+  symbol:   method getSessionId()
+  location: variable savedOrder of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[40,35] cannot find symbol
+  symbol:   method getSessionId()
+  location: variable order of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[49,28] cannot find symbol
+  symbol:   method getUnitPrice()
+  location: variable o of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[49,73] cannot find symbol
+  symbol:   method getQuantity()
+  location: variable o of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[50,42] incompatible types: invalid method reference
+    no suitable method found for add(java.lang.Object,java.lang.Object)
+        method java.math.BigDecimal.add(java.math.BigDecimal,java.math.MathContext) is not applicable
+          (argument mismatch; java.lang.Object cannot be converted to java.math.BigDecimal)
+        method java.math.BigDecimal.add(long,long) is not applicable
+          (argument mismatch; java.lang.Object cannot be converted to long)
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[53,20] cannot find symbol
+  symbol:   method setTotalAmount(java.math.BigDecimal)
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[43,36] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[43,71] cannot find symbol
+  symbol:   method getTotalAmount()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[44,30] cannot find symbol
+  symbol:   method getServedBy()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[44,62] cannot find symbol
+  symbol:   method getServedBy()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[48,24] cannot find symbol
+  symbol:   method getBillingType()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[48,82] cannot find symbol
+  symbol:   method getStay()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[49,53] cannot find symbol
+  symbol:   method getStay()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[51,27] cannot find symbol
+  symbol:   method setChargeType(com.hotel_erp.hotel_erp.modules.folio.ChargeType)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[52,27] cannot find symbol
+  symbol:   method setDescription(java.lang.String)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[53,27] cannot find symbol
+  symbol:   method setQuantity(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[54,27] cannot find symbol
+  symbol:   method setUnitPrice(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[55,27] cannot find symbol
+  symbol:   method setTotalAmount(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[58,31] cannot find symbol
+  symbol:   method getBillingType()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[62,23] cannot find symbol
+  symbol:   method setChargeType(com.hotel_erp.hotel_erp.modules.folio.ChargeType)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[63,23] cannot find symbol
+  symbol:   method setDescription(java.lang.String)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[64,23] cannot find symbol
+  symbol:   method setQuantity(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[65,23] cannot find symbol
+  symbol:   method setUnitPrice(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[66,23] cannot find symbol
+  symbol:   method setTotalAmount(java.math.BigDecimal)
+  location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[67,45] cannot find symbol
+  symbol:   method getId()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[70,24] cannot find symbol
+  symbol:   method setAmount(java.math.BigDecimal)
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[71,24] cannot find symbol
+  symbol:   method setReferenceNumber(java.lang.String)
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[72,24] cannot find symbol
+  symbol:   method setPaymentMethodId(java.lang.Object)
+  location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[72,111] cannot find symbol
+  symbol:   method getId()
+  location: variable p of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[73,46] cannot find symbol
+  symbol:   method getId()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[75,46] cannot find symbol
+  symbol:   method getId()
+  location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[79,16] cannot find symbol
+  symbol:   method setStatus(session.ge[...]ILLED)
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[79,34] cannot find symbol
+  symbol:   method getBillingType()
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[80,16] cannot find symbol
+  symbol:   method setClosedAt(java.time.LocalDateTime)
+  location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/RestaurantTableController.java:[32,15] cannot find symbol
+  symbol:   method setId(java.lang.Long)
+  location: variable entity of type com.hotel_erp.hotel_erp.modules.food.RestaurantTableEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/guest/GuestController.java:[26,20] cannot find symbol
+  symbol:   method setId(java.lang.Long)
+  location: variable guestEntity of type com.hotel_erp.hotel_erp.modules.guest.GuestEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[34,60] cannot find symbol
+  symbol:   method getRoomId()
+  location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[40,41] cannot find symbol
+  symbol:   method getId()
+  location: variable userDetails of type com.hotel_erp.hotel_erp.security.UserDetailsImpl
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[43,27] cannot find symbol
+  symbol:   method getId()
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[44,32] cannot find symbol
+  symbol:   method getAction()
+  location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[45,31] cannot find symbol
+  symbol:   method getNotes()
+  location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[46,12] cannot find symbol
+  symbol:   method setPerformedBy(java.lang.Long)
+  location: variable log of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingLogEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[47,12] cannot find symbol
+  symbol:   method setPerformedAt(java.time.LocalDateTime)
+  location: variable log of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingLogEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[52,41] cannot find symbol
+  symbol:   method getAction()
+  location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[60,63] cannot find symbol
+  symbol:   method getId()
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[61,25] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[63,25] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[67,21] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[70,21] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[73,21] cannot find symbol
+  symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+  location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/InventoryItemController.java:[32,15] cannot find symbol
+  symbol:   method setId(java.lang.Long)
+  location: variable entity of type com.hotel_erp.hotel_erp.modules.inventory.InventoryItemEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/report/ReportService.java:[30,22] invalid method reference
+  cannot find symbol
+    symbol:   method getTotalAmount()
+    location: class com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.292 s
+[INFO] Finished at: 2026-03-09T05:47:53+03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project hotel-erp: Compilation failure: Compilation failure: 
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/reservation/ReservationService.java:[8,20] method updateReservation(java.lang.Long,com.hotel_erp.hotel_erp.modules.reservation.ReservationDTO) is already defined in interface com.hotel_erp.hotel_erp.modules.reservation.ReservationService
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/TestLombok.java:[9,10] cannot find symbol
+[ERROR]   symbol:   method setName(java.lang.String)
+[ERROR]   location: variable t of type TestLombok
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/TestLombok.java:[10,29] cannot find symbol
+[ERROR]   symbol:   method getName()
+[ERROR]   location: variable t of type TestLombok
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/auth/AuthController.java:[24,69] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable loginRequest of type com.hotel_erp.hotel_erp.modules.auth.LoginRequest
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/auth/AuthController.java:[24,97] cannot find symbol
+[ERROR]   symbol:   method getPassword()
+[ERROR]   location: variable loginRequest of type com.hotel_erp.hotel_erp.modules.auth.LoginRequest
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/auth/AuthController.java:[36,28] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable userDetails of type com.hotel_erp.hotel_erp.security.UserDetailsImpl
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/dashboard/DashboardService.java:[31,35] cannot find symbol
+[ERROR]   symbol:   method builder()
+[ERROR]   location: class com.hotel_erp.hotel_erp.modules.dashboard.DashboardSummaryDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/DepartmentController.java:[33,22] cannot find symbol
+[ERROR]   symbol:   method setId(java.lang.Long)
+[ERROR]   location: variable departmentDTO of type com.hotel_erp.hotel_erp.modules.employee.DepartmentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/EmployeeController.java:[44,27] cannot find symbol
+[ERROR]   symbol:   method setId(java.lang.Long)
+[ERROR]   location: variable entity of type com.hotel_erp.hotel_erp.modules.employee.EmployeeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[53,14] cannot find symbol
+[ERROR]   symbol:   method setStayId(java.lang.Long)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[54,14] cannot find symbol
+[ERROR]   symbol:   method setFolioType(com.hotel_erp.hotel_erp.modules.folio.FolioType)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[55,14] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[56,14] cannot find symbol
+[ERROR]   symbol:   method setOpenedAt(java.time.LocalDateTime)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[57,14] cannot find symbol
+[ERROR]   symbol:   method setTotalAmount(java.math.BigDecimal)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[66,14] cannot find symbol
+[ERROR]   symbol:   method setDiningSessionId(java.lang.Long)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[67,14] cannot find symbol
+[ERROR]   symbol:   method setFolioType(com.hotel_erp.hotel_erp.modules.folio.FolioType)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[68,14] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[69,14] cannot find symbol
+[ERROR]   symbol:   method setOpenedAt(java.time.LocalDateTime)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[70,14] cannot find symbol
+[ERROR]   symbol:   method setTotalAmount(java.math.BigDecimal)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[81,18] cannot find symbol
+[ERROR]   symbol:   method getStatus()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[86,15] cannot find symbol
+[ERROR]   symbol:   method setFolioId(java.lang.Long)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[87,15] cannot find symbol
+[ERROR]   symbol:   method setChargedAt(java.time.LocalDateTime)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[88,15] cannot find symbol
+[ERROR]   symbol:   method setAddedBy(java.lang.Long)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[90,35] cannot find symbol
+[ERROR]   symbol:   method getQuantity()
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[90,65] cannot find symbol
+[ERROR]   symbol:   method getUnitPrice()
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[91,15] cannot find symbol
+[ERROR]   symbol:   method setTotalAmount(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[95,35] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[95,63] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[112,15] cannot find symbol
+[ERROR]   symbol:   method setActive(boolean)
+[ERROR]   location: variable entity of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[122,27] cannot find symbol
+[ERROR]   symbol:   method getName()
+[ERROR]   location: variable dto of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[123,29] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable dto of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[134,18] cannot find symbol
+[ERROR]   symbol:   method getStatus()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[139,16] cannot find symbol
+[ERROR]   symbol:   method setFolioId(java.lang.Long)
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[140,16] cannot find symbol
+[ERROR]   symbol:   method setRecordedAt(java.time.LocalDateTime)
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[141,16] cannot find symbol
+[ERROR]   symbol:   method setRecordedBy(java.lang.Long)
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[149,35] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[149,69] cannot find symbol
+[ERROR]   symbol:   method getAmount()
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[161,18] cannot find symbol
+[ERROR]   symbol:   method getStatus()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[167,18] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[168,95] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[171,14] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.folio.FolioStatus)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[172,14] cannot find symbol
+[ERROR]   symbol:   method setClosedAt(java.time.LocalDateTime)
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[200,37] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[201,35] cannot find symbol
+[ERROR]   symbol:   method getFolioId()
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[202,34] cannot find symbol
+[ERROR]   symbol:   method getAmount()
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[203,16] cannot find symbol
+[ERROR]   symbol:   method setIssuedAt(java.time.LocalDateTime)
+[ERROR]   location: variable receipt of type com.hotel_erp.hotel_erp.modules.folio.FolioReceiptEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[204,36] cannot find symbol
+[ERROR]   symbol:   method getRecordedBy()
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioServiceImpl.java:[205,85] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[32,43] cannot find symbol
+[ERROR]   symbol:   method getSessionId()
+[ERROR]   location: variable savedOrder of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[40,35] cannot find symbol
+[ERROR]   symbol:   method getSessionId()
+[ERROR]   location: variable order of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[49,28] cannot find symbol
+[ERROR]   symbol:   method getUnitPrice()
+[ERROR]   location: variable o of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[49,73] cannot find symbol
+[ERROR]   symbol:   method getQuantity()
+[ERROR]   location: variable o of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[50,42] incompatible types: invalid method reference
+[ERROR]     no suitable method found for add(java.lang.Object,java.lang.Object)
+[ERROR]         method java.math.BigDecimal.add(java.math.BigDecimal,java.math.MathContext) is not applicable
+[ERROR]           (argument mismatch; java.lang.Object cannot be converted to java.math.BigDecimal)
+[ERROR]         method java.math.BigDecimal.add(long,long) is not applicable
+[ERROR]           (argument mismatch; java.lang.Object cannot be converted to long)
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[53,20] cannot find symbol
+[ERROR]   symbol:   method setTotalAmount(java.math.BigDecimal)
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[43,36] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[43,71] cannot find symbol
+[ERROR]   symbol:   method getTotalAmount()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[44,30] cannot find symbol
+[ERROR]   symbol:   method getServedBy()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[44,62] cannot find symbol
+[ERROR]   symbol:   method getServedBy()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[48,24] cannot find symbol
+[ERROR]   symbol:   method getBillingType()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[48,82] cannot find symbol
+[ERROR]   symbol:   method getStay()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[49,53] cannot find symbol
+[ERROR]   symbol:   method getStay()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[51,27] cannot find symbol
+[ERROR]   symbol:   method setChargeType(com.hotel_erp.hotel_erp.modules.folio.ChargeType)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[52,27] cannot find symbol
+[ERROR]   symbol:   method setDescription(java.lang.String)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[53,27] cannot find symbol
+[ERROR]   symbol:   method setQuantity(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[54,27] cannot find symbol
+[ERROR]   symbol:   method setUnitPrice(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[55,27] cannot find symbol
+[ERROR]   symbol:   method setTotalAmount(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[58,31] cannot find symbol
+[ERROR]   symbol:   method getBillingType()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[62,23] cannot find symbol
+[ERROR]   symbol:   method setChargeType(com.hotel_erp.hotel_erp.modules.folio.ChargeType)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[63,23] cannot find symbol
+[ERROR]   symbol:   method setDescription(java.lang.String)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[64,23] cannot find symbol
+[ERROR]   symbol:   method setQuantity(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[65,23] cannot find symbol
+[ERROR]   symbol:   method setUnitPrice(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[66,23] cannot find symbol
+[ERROR]   symbol:   method setTotalAmount(java.math.BigDecimal)
+[ERROR]   location: variable charge of type com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[67,45] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[70,24] cannot find symbol
+[ERROR]   symbol:   method setAmount(java.math.BigDecimal)
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[71,24] cannot find symbol
+[ERROR]   symbol:   method setReferenceNumber(java.lang.String)
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[72,24] cannot find symbol
+[ERROR]   symbol:   method setPaymentMethodId(java.lang.Object)
+[ERROR]   location: variable payment of type com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[72,111] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable p of type com.hotel_erp.hotel_erp.modules.folio.PaymentMethodDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[73,46] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[75,46] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable folio of type com.hotel_erp.hotel_erp.modules.folio.FolioDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[79,16] cannot find symbol
+[ERROR]   symbol:   method setStatus(session.ge[...]ILLED)
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[79,34] cannot find symbol
+[ERROR]   symbol:   method getBillingType()
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionServiceImpl.java:[80,16] cannot find symbol
+[ERROR]   symbol:   method setClosedAt(java.time.LocalDateTime)
+[ERROR]   location: variable session of type com.hotel_erp.hotel_erp.modules.food.DiningSessionEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/RestaurantTableController.java:[32,15] cannot find symbol
+[ERROR]   symbol:   method setId(java.lang.Long)
+[ERROR]   location: variable entity of type com.hotel_erp.hotel_erp.modules.food.RestaurantTableEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/guest/GuestController.java:[26,20] cannot find symbol
+[ERROR]   symbol:   method setId(java.lang.Long)
+[ERROR]   location: variable guestEntity of type com.hotel_erp.hotel_erp.modules.guest.GuestEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[34,60] cannot find symbol
+[ERROR]   symbol:   method getRoomId()
+[ERROR]   location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[40,41] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable userDetails of type com.hotel_erp.hotel_erp.security.UserDetailsImpl
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[43,27] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[44,32] cannot find symbol
+[ERROR]   symbol:   method getAction()
+[ERROR]   location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[45,31] cannot find symbol
+[ERROR]   symbol:   method getNotes()
+[ERROR]   location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[46,12] cannot find symbol
+[ERROR]   symbol:   method setPerformedBy(java.lang.Long)
+[ERROR]   location: variable log of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingLogEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[47,12] cannot find symbol
+[ERROR]   symbol:   method setPerformedAt(java.time.LocalDateTime)
+[ERROR]   location: variable log of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingLogEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[52,41] cannot find symbol
+[ERROR]   symbol:   method getAction()
+[ERROR]   location: variable actionDTO of type com.hotel_erp.hotel_erp.modules.housekeeping.HousekeepingActionDTO
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[60,63] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[61,25] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[63,25] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[67,21] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[70,21] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/housekeeping/HousekeepingService.java:[73,21] cannot find symbol
+[ERROR]   symbol:   method setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus)
+[ERROR]   location: variable room of type com.hotel_erp.hotel_erp.modules.room.RoomEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/InventoryItemController.java:[32,15] cannot find symbol
+[ERROR]   symbol:   method setId(java.lang.Long)
+[ERROR]   location: variable entity of type com.hotel_erp.hotel_erp.modules.inventory.InventoryItemEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/report/ReportService.java:[30,22] invalid method reference
+[ERROR]   cannot find symbol
+[ERROR]     symbol:   method getTotalAmount()
+[ERROR]     location: class com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

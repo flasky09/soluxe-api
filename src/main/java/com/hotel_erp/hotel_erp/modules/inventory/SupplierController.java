@@ -26,6 +26,13 @@ public class SupplierController {
         return supplierMapper.toDto(supplierService.save(entity));
     }
 
+    @PutMapping("/{id}")
+    public SupplierDTO updateSupplier(@PathVariable Long id, @RequestBody SupplierDTO supplierDto) {
+        SupplierEntity entity = supplierMapper.toEntity(supplierDto);
+        entity.setId(id);
+        return supplierMapper.toDto(supplierService.save(entity));
+    }
+
     @GetMapping("/{id}")
     public SupplierDTO getSupplierById(@PathVariable Long id) {
         return supplierService.findById(id)

@@ -1,0 +1,56 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.hotel-erp:hotel-erp >-----------------------
+[INFO] Building hotel-erp 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ hotel-erp ---
+[INFO] Deleting /home/bony/Projects/hotel-crm/hotel-erp/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ hotel-erp ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ hotel-erp ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 247 source files with javac [debug parameters release 21] to target/classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/reservation/ReservationMapper.java:[11,20] Unmapped target properties: "nationality, idType, idNumber, preferences, vehicleRegistration, emergencyContactName, emergencyContactPhone".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/purchaseorder/PurchaseOrderMapper.java:[12,25] Unmapped target properties: "createdAt, updatedAt".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/attendance/AttendanceRecordMapper.java:[14,28] Unmapped target properties: "createdAt, updatedAt".
+[INFO] 3 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[32,43] cannot find symbol
+  symbol:   method getSessionId()
+  location: variable savedOrder of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[40,35] cannot find symbol
+  symbol:   method getSessionId()
+  location: variable order of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[INFO] 2 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  15.307 s
+[INFO] Finished at: 2026-03-09T06:01:49+03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project hotel-erp: Compilation failure: Compilation failure: 
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[32,43] cannot find symbol
+[ERROR]   symbol:   method getSessionId()
+[ERROR]   location: variable savedOrder of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderServiceImpl.java:[40,35] cannot find symbol
+[ERROR]   symbol:   method getSessionId()
+[ERROR]   location: variable order of type com.hotel_erp.hotel_erp.modules.food.DiningOrderEntity
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

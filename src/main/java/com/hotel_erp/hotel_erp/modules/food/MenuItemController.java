@@ -22,6 +22,12 @@ public class MenuItemController {
         return menuItemService.save(item);
     }
 
+    @PutMapping("/{id}")
+    public MenuItemEntity updateMenuItem(@PathVariable Long id, @RequestBody MenuItemEntity item) {
+        item.setId(id);
+        return menuItemService.save(item);
+    }
+
     @GetMapping("/{id}")
     public MenuItemEntity getMenuItemById(@PathVariable Long id) {
         return menuItemService.findById(id).orElseThrow(() -> new RuntimeException("MenuItem not found"));

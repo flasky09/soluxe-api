@@ -12,8 +12,19 @@ public class InventoryCategoryController {
 
     private final InventoryCategoryRepository inventoryCategoryRepository;
 
+    @GetMapping
+    public List<InventoryCategoryEntity> getAllCategories() {
+        return inventoryCategoryRepository.findAll();
+    }
+
     @PostMapping
     public InventoryCategoryEntity createCategory(@RequestBody InventoryCategoryEntity category) {
+        return inventoryCategoryRepository.save(category);
+    }
+
+    @PutMapping("/{id}")
+    public InventoryCategoryEntity updateCategory(@PathVariable Long id, @RequestBody InventoryCategoryEntity category) {
+        category.setId(id);
         return inventoryCategoryRepository.save(category);
     }
 
