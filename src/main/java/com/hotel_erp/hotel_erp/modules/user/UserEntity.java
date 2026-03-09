@@ -24,7 +24,8 @@ public class UserEntity extends BaseEntity {
     @Column(unique = true)
     private String email;
 
-    private boolean isActive = true;
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")

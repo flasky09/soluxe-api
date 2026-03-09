@@ -1,5 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.user;
 
+import com.hotel_erp.hotel_erp.modules.employee.DepartmentEntity;
+import com.hotel_erp.hotel_erp.modules.employee.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,25 +15,37 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DepartmentRepository departmentRepository;
 
-    public UserEntity save(UserEntity user, String rawPassword) {
+    public UserEntity save(UserEntity user, String rawPassword, Long departmentId) {
         if (rawPassword != null && !rawPassword.isEmpty()) {
             user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        }
+        if (departmentId != null) {
+            user.setDepartment(departmentRepository.findById(departmentId).orElse(null));
         }
         return userRepository.save(user);
     }
 
     public UserEntity update(UserEntity existingUser, UserDTO updateDto) {
+        if (updateDto.getUsername() != null && !updateDto.getUsername().isEmpty()) {
+            existingUser.setUsername(updateDto.getUsername());
+        }
         existingUser.setFullName(updateDto.getFullName());
         existingUser.setEmail(updateDto.getEmail());
         existingUser.setPhoneNumber(updateDto.getPhoneNumber());
         existingUser.setActive(updateDto.isActive());
-        if (updateDto.getRole() != null) {
+        if (updateDto.getRole() != null && !updateDto.getRole().isEmpty()) {
             existingUser.setRole(Role.valueOf(updateDto.getRole()));
         }
-        
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
             existingUser.setPasswordHash(passwordEncoder.encode(updateDto.getPassword()));
+        }
+        
+        if (updateDto.getDepartmentId() != null) {
+            existingUser.setDepartment(departmentRepository.findById(updateDto.getDepartmentId()).orElse(null));
+        } else {
+            existingUser.setDepartment(null);
         }
         
         return userRepository.save(existingUser);

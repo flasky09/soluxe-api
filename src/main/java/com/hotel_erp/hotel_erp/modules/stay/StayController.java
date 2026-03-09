@@ -24,6 +24,11 @@ public class StayController {
         return stayService.checkIn(request.getReservationId(), request.getRoomId(), request.getUserId());
     }
 
+    @PostMapping("/walk-in")
+    public StayDTO walkIn(@RequestBody WalkInRequest request) {
+        return stayService.walkInCheckIn(request.getGuestId(), request.getRoomId(), request.getAdults(), request.getChildren(), request.getUserId());
+    }
+
     @PostMapping("/{id}/check-out")
     public StayDTO checkOut(@PathVariable Long id, @RequestParam Long userId) {
         return stayService.checkOut(id, userId);
@@ -38,6 +43,15 @@ public class StayController {
     public static class CheckInRequest {
         private Long reservationId;
         private Long roomId;
+        private Long userId;
+    }
+
+    @Data
+    public static class WalkInRequest {
+        private Long guestId;
+        private Long roomId;
+        private Integer adults;
+        private Integer children;
         private Long userId;
     }
 }

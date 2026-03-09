@@ -119,9 +119,41 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     @Transactional
+    public StayDTO walkInCheckIn(Long guestId, Long roomId, Integer adults, Integer children, Long userId) {
+        var room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
+        if (room.getStatus() != com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE) {
+            throw new RuntimeException("Room " + room.getRoomNumber() + " is not available for check-in.");
+        }
+
+        StayEntity stay = new StayEntity();
+        stay.setReservationId(null);
+        stay.setGuestId(guestId);
+        stay.setRoomId(roomId);
+        stay.setDateIn(LocalDateTime.now());
+        stay.setAdults(adults != null ? adults : 1);
+        stay.setChildren(children != null ? children : 0);
+        stay.setStatus(StayStatus.ACTIVE);
+        stay.setCheckedInBy(userId);
+
+        stay = repository.save(stay);
+
+        // Update Room Status to OCCUPIED
+        room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.OCCUPIED);
+        roomRepository.save(room);
+
+        // Create Folio for the Stay
+        folioService.createFolioForStay(stay.getId());
+
+        return stayMapper.toDto(stay);
+    }
+
+    @Override
+    @Transactional
     public StayDTO checkOutByReservationId(Long reservationId, Long userId) {
         StayEntity stay = repository.findByReservationIdAndStatus(reservationId, StayStatus.ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Active Stay not found for this reservation"));
         return checkOut(stay.getId(), userId);
     }
 }
+

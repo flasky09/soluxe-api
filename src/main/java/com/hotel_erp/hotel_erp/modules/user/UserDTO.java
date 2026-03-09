@@ -9,7 +9,7 @@ public class UserDTO {
     private String fullName;
     private String phoneNumber;
     private String email;
-    private boolean isActive;
+    private boolean active;
     private Long departmentId;
     private String role;
     private String password;

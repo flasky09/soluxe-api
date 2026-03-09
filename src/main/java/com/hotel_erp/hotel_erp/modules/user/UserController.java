@@ -18,7 +18,7 @@ public class UserController {
     @PreAuthorize("hasRole('HOTEL_ADMIN')")
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         UserEntity userEntity = userMapper.toEntity(userDTO);
-        UserEntity savedUser = userService.save(userEntity, userDTO.getPassword());
+        UserEntity savedUser = userService.save(userEntity, userDTO.getPassword(), userDTO.getDepartmentId());
         return userMapper.toDto(savedUser);
     }
 
