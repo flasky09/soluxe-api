@@ -13,7 +13,7 @@ public class RoomEntity extends BaseEntity {
     private String roomNumber;
     private String floor;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_type_id", nullable = false)
     private RoomTypeEntity roomType;
 
