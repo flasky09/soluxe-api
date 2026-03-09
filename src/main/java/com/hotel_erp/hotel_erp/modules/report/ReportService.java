@@ -47,4 +47,35 @@ public class ReportService {
                 .revenueByChargeType(revenueByChargeType)
                 .build();
     }
+
+    public RevenueReportDTO getRevenueReport(LocalDate startDate, LocalDate endDate) {
+        // Fetch all charges for the given date range
+        List<FolioChargeEntity> dailyCharges = folioChargeRepository.findAllByDateRange(
+                startDate.atStartOfDay(),
+                endDate.plusDays(1).atStartOfDay()
+        );
+
+        // Calculate total revenue
+        BigDecimal totalRevenue = dailyCharges.stream()
+                .map(FolioChargeEntity::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Group revenue by charge type
+        Map<String, BigDecimal> revenueByChargeType = dailyCharges.stream()
+                .collect(Collectors.groupingBy(
+                        charge -> charge.getChargeType().name(),
+                        Collectors.reducing(
+                                BigDecimal.ZERO,
+                                FolioChargeEntity::getTotalAmount,
+                                BigDecimal::add
+                        )
+                ));
+
+        return RevenueReportDTO.builder()
+                .startDate(startDate)
+                .endDate(endDate)
+                .totalRevenue(totalRevenue)
+                .revenueByChargeType(revenueByChargeType)
+                .build();
+    }
 }

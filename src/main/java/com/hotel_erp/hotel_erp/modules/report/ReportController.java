@@ -23,4 +23,11 @@ public class ReportController {
         }
         return ResponseEntity.ok(reportService.getDailyRevenue(date));
     }
+
+    @GetMapping("/revenue-report")
+    public ResponseEntity<RevenueReportDTO> getRevenueReport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(reportService.getRevenueReport(startDate, endDate));
+    }
 }
