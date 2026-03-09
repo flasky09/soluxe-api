@@ -16,5 +16,7 @@ import lombok.NoArgsConstructor;
 public class DailyRevenueDTO {
     private LocalDate reportDate;
     private BigDecimal totalRevenue;
+    private BigDecimal netRevenue;
+    private BigDecimal taxCollected;
     private Map<String, BigDecimal> revenueByChargeType;
 }

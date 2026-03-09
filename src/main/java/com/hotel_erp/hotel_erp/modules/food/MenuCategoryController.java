@@ -17,6 +17,11 @@ public class MenuCategoryController {
         return menuCategoryService.save(category);
     }
 
+    @GetMapping
+    public List<MenuCategoryEntity> getAllCategories() {
+        return menuCategoryService.findAll();
+    }
+
     @GetMapping("/{id}")
     public MenuCategoryEntity getCategoryById(@PathVariable Long id) {
         return menuCategoryService.findById(id).orElseThrow(() -> new RuntimeException("MenuCategory not found"));

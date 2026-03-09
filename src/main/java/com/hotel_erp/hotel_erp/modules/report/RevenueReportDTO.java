@@ -17,5 +17,7 @@ public class RevenueReportDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal totalRevenue;
+    private BigDecimal netRevenue;
+    private BigDecimal taxCollected;
     private Map<String, BigDecimal> revenueByChargeType;
 }

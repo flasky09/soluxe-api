@@ -10,13 +10,6 @@ public class MenuItemDTO {
     private String description;
     private BigDecimal price;
     private Long categoryId;
-    private String nameZh;
-    private String descriptionZh;
-    private SpiceLevel spiceLevel;
-    private String allergens;
-    private boolean isSignature;
-    private Integer prepTimeMins;
-    private Integer sortOrder;
     private boolean available;
-
+    private Integer prepTimeMins;
 }

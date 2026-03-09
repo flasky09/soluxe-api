@@ -45,4 +45,10 @@ public class UserController {
             .map(userMapper::toDto)
             .toList();
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteById(id);
+    }
 }

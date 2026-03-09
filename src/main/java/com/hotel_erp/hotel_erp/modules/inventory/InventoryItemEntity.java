@@ -15,12 +15,7 @@ public class InventoryItemEntity extends BaseEntity {
     @JoinColumn(name = "category_id")
     private InventoryCategoryEntity category;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_id")
-    private SupplierEntity defaultSupplier;
-    
     private String name;
-    private String nameZh;
     private BigDecimal unitCost;
 
     
@@ -28,6 +23,5 @@ public class InventoryItemEntity extends BaseEntity {
     private InventoryUnit unit;
     
     private BigDecimal currentStock;
-    private BigDecimal minimumStock;
     private String notes;
 }

@@ -23,6 +23,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
     }
 
     @Override
+    public List<MenuCategoryEntity> findAll() {
+        return menuCategoryRepository.findAll();
+    }
+
+    @Override
     public void deleteById(Long id) {
         menuCategoryRepository.deleteById(id);
     }

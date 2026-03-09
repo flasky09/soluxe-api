@@ -48,4 +48,8 @@ public class UserService {
     public Optional<UserEntity> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
 }

@@ -1,6 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.folio;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -87,8 +88,20 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         charge.setChargedAt(LocalDateTime.now());
         charge.setAddedBy(userId);
         
-        BigDecimal amount = charge.getQuantity().multiply(charge.getUnitPrice());
-        charge.setTotalAmount(amount); 
+        BigDecimal quantity = charge.getQuantity();
+        BigDecimal unitPrice = charge.getUnitPrice();
+        BigDecimal discountPct = charge.getDiscountPct() != null ? charge.getDiscountPct() : BigDecimal.ZERO;
+        BigDecimal taxPct = charge.getTaxPct() != null ? charge.getTaxPct() : BigDecimal.ZERO;
+
+        // Subtotal = Quantity * UnitPrice * (1 - Discount/100)
+        BigDecimal discountFactor = BigDecimal.ONE.subtract(discountPct.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
+        BigDecimal subtotal = quantity.multiply(unitPrice).multiply(discountFactor);
+
+        // Total = Subtotal * (1 + Tax/100)
+        BigDecimal taxFactor = BigDecimal.ONE.add(taxPct.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
+        BigDecimal totalAmount = subtotal.multiply(taxFactor).setScale(2, RoundingMode.HALF_UP);
+
+        charge.setTotalAmount(totalAmount);
         
         charge = folioChargeRepository.save(charge);
         

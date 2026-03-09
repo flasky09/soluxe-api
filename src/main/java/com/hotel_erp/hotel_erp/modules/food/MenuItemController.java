@@ -11,26 +11,33 @@ import java.util.List;
 public class MenuItemController {
 
     private final MenuItemService menuItemService;
+    private final MenuItemMapper menuItemMapper;
 
     @GetMapping
-    public List<MenuItemEntity> getAllMenuItems() {
-        return menuItemService.findAll();
+    public List<MenuItemDTO> getAllMenuItems() {
+        return menuItemService.findAll().stream()
+                .map(menuItemMapper::toDto)
+                .toList();
     }
 
     @PostMapping
-    public MenuItemEntity createMenuItem(@RequestBody MenuItemEntity item) {
-        return menuItemService.save(item);
+    public MenuItemDTO createMenuItem(@RequestBody MenuItemDTO itemDto) {
+        MenuItemEntity entity = menuItemMapper.toEntity(itemDto);
+        return menuItemMapper.toDto(menuItemService.save(entity));
     }
 
     @PutMapping("/{id}")
-    public MenuItemEntity updateMenuItem(@PathVariable Long id, @RequestBody MenuItemEntity item) {
-        item.setId(id);
-        return menuItemService.save(item);
+    public MenuItemDTO updateMenuItem(@PathVariable Long id, @RequestBody MenuItemDTO itemDto) {
+        MenuItemEntity entity = menuItemMapper.toEntity(itemDto);
+        entity.setId(id);
+        return menuItemMapper.toDto(menuItemService.save(entity));
     }
 
     @GetMapping("/{id}")
-    public MenuItemEntity getMenuItemById(@PathVariable Long id) {
-        return menuItemService.findById(id).orElseThrow(() -> new RuntimeException("MenuItem not found"));
+    public MenuItemDTO getMenuItemById(@PathVariable Long id) {
+        return menuItemService.findById(id)
+                .map(menuItemMapper::toDto)
+                .orElseThrow(() -> new RuntimeException("MenuItem not found"));
     }
 
     @DeleteMapping("/{id}")
