@@ -1,6 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.inventory;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,13 +22,13 @@ public class SupplierController {
     }
 
     @PostMapping
-    public SupplierDTO createSupplier(@RequestBody SupplierDTO supplierDto) {
+    public SupplierDTO createSupplier(@Valid @RequestBody SupplierDTO supplierDto) {
         SupplierEntity entity = supplierMapper.toEntity(supplierDto);
         return supplierMapper.toDto(supplierService.save(entity));
     }
 
     @PutMapping("/{id}")
-    public SupplierDTO updateSupplier(@PathVariable Long id, @RequestBody SupplierDTO supplierDto) {
+    public SupplierDTO updateSupplier(@PathVariable Long id, @Valid @RequestBody SupplierDTO supplierDto) {
         SupplierEntity entity = supplierMapper.toEntity(supplierDto);
         entity.setId(id);
         return supplierMapper.toDto(supplierService.save(entity));

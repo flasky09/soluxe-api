@@ -1,6 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.guest;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +19,12 @@ public class GuestController {
     }
 
     @PostMapping
-    public GuestDTO createGuest(@RequestBody GuestDTO dto) {
+    public GuestDTO createGuest(@Valid @RequestBody GuestDTO dto) {
         return guestService.saveGuest(dto);
     }
 
     @PutMapping("/{id}")
-    public GuestDTO updateGuest(@PathVariable Long id, @RequestBody GuestDTO dto) {
+    public GuestDTO updateGuest(@PathVariable Long id, @Valid @RequestBody GuestDTO dto) {
         dto.setId(id);
         return guestService.saveGuest(dto);
     }

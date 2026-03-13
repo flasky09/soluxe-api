@@ -1,6 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.user;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -16,7 +17,7 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('HOTEL_ADMIN')")
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
+    public UserDTO createUser(@Valid @RequestBody UserDTO userDTO) {
         UserEntity userEntity = userMapper.toEntity(userDTO);
         UserEntity savedUser = userService.save(userEntity, userDTO.getPassword(), userDTO.getDepartmentId());
         return userMapper.toDto(savedUser);
@@ -24,7 +25,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('HOTEL_ADMIN')")
-    public UserDTO updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public UserDTO updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         UserEntity existingUser = userService.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserEntity updatedUser = userService.update(existingUser, userDTO);

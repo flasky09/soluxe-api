@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,6 +20,7 @@ public class RestaurantTableEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TableLocation location;
 
+    @JsonProperty("isVip")
     private boolean isVip;
     private String notes;
 

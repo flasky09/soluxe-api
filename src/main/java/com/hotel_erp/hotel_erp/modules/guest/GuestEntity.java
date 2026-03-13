@@ -12,7 +12,11 @@ import java.time.LocalDate;
 @Table(name = "guests")
 public class GuestEntity extends BaseEntity {
     private String fullName;
+
+    @Column(unique = true)
     private String phone;
+
+    @Column(unique = true)
     private String email;
     private String nationality;
     private String address;
@@ -25,6 +29,7 @@ public class GuestEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_type_entity_id")
     private IdTypeEntity idType;
+    @Column(unique = true)
     private String idNumber;
 
     private String preferences;

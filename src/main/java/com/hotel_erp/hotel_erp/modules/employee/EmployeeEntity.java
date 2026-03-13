@@ -17,7 +17,11 @@ import com.hotel_erp.hotel_erp.modules.guest.IdTypeEntity;
 @Table(name = "employees")
 public class EmployeeEntity extends BaseEntity {
     private String fullName;
+
+    @Column(unique = true, nullable = false)
     private String phone;
+
+    @Column(unique = true, nullable = false)
     private String email;
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,6 +38,8 @@ public class EmployeeEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_type_entity_id")
     private IdTypeEntity idType;
+
+    @Column(unique = true, nullable = false)
     private String idNumber;
     
     private boolean isActive = true;
