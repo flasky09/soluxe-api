@@ -18,8 +18,9 @@ public class FolioChargeEntity extends BaseEntity {
     @Column(nullable = false)
     private Long folioId;
 
-    @Enumerated(EnumType.STRING)
-    private ChargeType chargeType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charge_type_id")
+    private ChargeTypeEntity chargeType;
 
     private String description;
     private BigDecimal quantity;

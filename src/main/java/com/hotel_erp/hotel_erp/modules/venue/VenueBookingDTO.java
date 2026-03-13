@@ -9,6 +9,7 @@ import java.time.LocalTime;
 public class VenueBookingDTO {
     private Long id;
     private Long venueId;
+    private String venueName;
     private String clientName;
     private String clientPhone;
     private String clientNameZh;

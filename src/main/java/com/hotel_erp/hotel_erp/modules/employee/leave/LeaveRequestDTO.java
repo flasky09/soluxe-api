@@ -8,7 +8,8 @@ import java.time.LocalDate;
 public class LeaveRequestDTO {
     private Long id;
     private Long employeeId;
-    private LeaveType leaveType;
+    private Long leaveTypeId;
+    private String leaveTypeName;
     private LocalDate dateFrom;
     private LocalDate dateTo;
     private String reason;

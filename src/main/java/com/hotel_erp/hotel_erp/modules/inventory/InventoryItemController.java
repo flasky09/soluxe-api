@@ -11,32 +11,26 @@ import java.util.List;
 public class InventoryItemController {
 
     private final InventoryItemService inventoryItemService;
-    private final InventoryItemMapper inventoryItemMapper;
 
     @GetMapping
     public List<InventoryItemDTO> getAllItems() {
-        return inventoryItemService.findAll().stream()
-                .map(inventoryItemMapper::toDto)
-                .toList();
+        return inventoryItemService.findAllItems();
     }
 
     @PostMapping
     public InventoryItemDTO createItem(@RequestBody InventoryItemDTO itemDto) {
-        InventoryItemEntity entity = inventoryItemMapper.toEntity(itemDto);
-        return inventoryItemMapper.toDto(inventoryItemService.save(entity));
+        return inventoryItemService.saveItem(itemDto);
     }
 
     @PutMapping("/{id}")
     public InventoryItemDTO updateItem(@PathVariable Long id, @RequestBody InventoryItemDTO itemDto) {
-        InventoryItemEntity entity = inventoryItemMapper.toEntity(itemDto);
-        entity.setId(id);
-        return inventoryItemMapper.toDto(inventoryItemService.save(entity));
+        itemDto.setId(id);
+        return inventoryItemService.saveItem(itemDto);
     }
 
     @GetMapping("/{id}")
     public InventoryItemDTO getItemById(@PathVariable Long id) {
-        return inventoryItemService.findById(id)
-                .map(inventoryItemMapper::toDto)
+        return inventoryItemService.findItemById(id)
                 .orElseThrow(() -> new RuntimeException("InventoryItem not found"));
     }
 

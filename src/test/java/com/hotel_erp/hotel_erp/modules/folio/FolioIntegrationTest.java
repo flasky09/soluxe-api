@@ -25,11 +25,27 @@ public class FolioIntegrationTest {
 
     @Autowired
     private FolioChargeRepository folioChargeRepository;
+
+    @Autowired
+    private ChargeTypeRepository chargeTypeRepository;
     
     private FolioEntity testFolio;
+    private Long roomChargeTypeId;
+    private Long foodChargeTypeId;
 
     @BeforeEach
     void setUp() {
+        // Create charge types
+        ChargeTypeEntity roomType = new ChargeTypeEntity();
+        roomType.setName("ROOM");
+        roomType = chargeTypeRepository.save(roomType);
+        roomChargeTypeId = roomType.getId();
+
+        ChargeTypeEntity foodType = new ChargeTypeEntity();
+        foodType.setName("FOOD");
+        foodType = chargeTypeRepository.save(foodType);
+        foodChargeTypeId = foodType.getId();
+
         // Create an open Folio
         testFolio = new FolioEntity();
         testFolio.setStayId(1L);
@@ -46,7 +62,7 @@ public class FolioIntegrationTest {
         
         // Prepare Charge
         FolioChargeDTO chargeDto = FolioChargeDTO.builder()
-                .chargeType(ChargeType.ROOM)
+                .chargeTypeId(roomChargeTypeId)
                 .description("Room charge night 1")
                 .quantity(BigDecimal.ONE)
                 .unitPrice(new BigDecimal("150.00"))
@@ -61,16 +77,16 @@ public class FolioIntegrationTest {
         assertNotNull(savedCharge.getId());
         assertEquals(testFolio.getId(), savedCharge.getFolioId());
         
-        // Verify Total Amount calculation (Qty * UnitPrice for now)
-        assertEquals(new BigDecimal("150.00"), savedCharge.getTotalAmount());
+        // Verify Total Amount calculation (Qty * UnitPrice * (1 + Tax/100))
+        assertEquals(new BigDecimal("174.00"), savedCharge.getTotalAmount());
         
         // Verify Folio Total Amount was updated
         FolioEntity updatedFolio = folioRepository.findById(testFolio.getId()).get();
-        assertEquals(new BigDecimal("150.00"), updatedFolio.getTotalAmount());
+        assertEquals(new BigDecimal("174.00"), updatedFolio.getTotalAmount());
         
         // Add second charge
         FolioChargeDTO foodCharge = FolioChargeDTO.builder()
-                .chargeType(ChargeType.FOOD)
+                .chargeTypeId(foodChargeTypeId)
                 .description("Breakfast")
                 .quantity(new BigDecimal("2"))
                 .unitPrice(new BigDecimal("20.00"))
@@ -80,9 +96,9 @@ public class FolioIntegrationTest {
                 
         folioService.addCharge(testFolio.getId(), foodCharge, userId);
         
-        // Verify Total Amount aggregates correctly (150 + 40 = 190)
+        // Verify Total Amount aggregates correctly (174.00 + 46.40 = 220.40)
         FolioEntity finalFolio = folioRepository.findById(testFolio.getId()).get();
-        assertEquals(new BigDecimal("190.00"), finalFolio.getTotalAmount());
+        assertEquals(new BigDecimal("220.40"), finalFolio.getTotalAmount());
     }
 
     @Test
@@ -92,7 +108,7 @@ public class FolioIntegrationTest {
         folioRepository.save(testFolio);
         
         FolioChargeDTO chargeDto = FolioChargeDTO.builder()
-                .chargeType(ChargeType.ROOM)
+                .chargeTypeId(roomChargeTypeId)
                 .description("Late charge")
                 .quantity(BigDecimal.ONE)
                 .unitPrice(new BigDecimal("50.00"))

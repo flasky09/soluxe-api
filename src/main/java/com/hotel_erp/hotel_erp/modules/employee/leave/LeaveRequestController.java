@@ -13,17 +13,17 @@ public class LeaveRequestController {
     private final LeaveRequestService leaveRequestService;
 
     @GetMapping("/employee/{employeeId}")
-    public List<LeaveRequestEntity> getRequestsByEmployee(@PathVariable Long employeeId) {
+    public List<LeaveRequestDTO> getRequestsByEmployee(@PathVariable Long employeeId) {
         return leaveRequestService.findByEmployeeId(employeeId);
     }
 
     @PostMapping
-    public LeaveRequestEntity createRequest(@RequestBody LeaveRequestEntity request) {
-        return leaveRequestService.save(request);
+    public LeaveRequestDTO createRequest(@RequestBody LeaveRequestDTO dto) {
+        return leaveRequestService.save(dto);
     }
 
     @GetMapping("/{id}")
-    public LeaveRequestEntity getRequestById(@PathVariable Long id) {
+    public LeaveRequestDTO getRequestById(@PathVariable Long id) {
         return leaveRequestService.findById(id).orElseThrow(() -> new RuntimeException("LeaveRequest not found"));
     }
 

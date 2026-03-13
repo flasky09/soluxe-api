@@ -1,6 +1,11 @@
 package com.hotel_erp.hotel_erp.modules.guest;
 
-import com.hotel_erp.hotel_erp.shared.BaseService;
+import java.util.List;
+import java.util.Optional;
 
-public interface GuestService extends BaseService<GuestEntity, Long> {
+public interface GuestService {
+    List<GuestDTO> findAllGuests();
+    Optional<GuestDTO> findGuestById(Long id);
+    GuestDTO saveGuest(GuestDTO dto);
+    void deleteById(Long id);
 }

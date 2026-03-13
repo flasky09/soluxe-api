@@ -8,8 +8,10 @@ public class InventoryItemDTO {
     private Long id;
     private Long categoryId;
     private String name;
-    private InventoryUnit unit;
+    private Long unitId;
+    private String unitName;
     private BigDecimal currentStock;
     private String notes;
     private BigDecimal unitCost;
+    private BigDecimal buyingPrice;
 }

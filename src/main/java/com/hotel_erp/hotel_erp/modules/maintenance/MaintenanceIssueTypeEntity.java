@@ -1,0 +1,17 @@
+package com.hotel_erp.hotel_erp.modules.maintenance;
+
+import com.hotel_erp.hotel_erp.shared.BaseEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@Entity
+@Table(name = "maintenance_issue_types")
+@EqualsAndHashCode(callSuper = true)
+public class MaintenanceIssueTypeEntity extends BaseEntity {
+    private String name;
+    private String description;
+    private boolean active = true;
+}

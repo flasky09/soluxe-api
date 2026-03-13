@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LeaveRequestService {
-    List<LeaveRequestEntity> findByEmployeeId(Long employeeId);
-    Optional<LeaveRequestEntity> findById(Long id);
-    LeaveRequestEntity save(LeaveRequestEntity request);
+    List<LeaveRequestDTO> findByEmployeeId(Long employeeId);
+    Optional<LeaveRequestDTO> findById(Long id);
+    LeaveRequestDTO save(LeaveRequestDTO dto);
     void deleteById(Long id);
 }

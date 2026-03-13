@@ -4,11 +4,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {RoomTypeMapper.class})
 public interface RoomMapper {
     RoomMapper INSTANCE = Mappers.getMapper(RoomMapper.class);
 
     @Mapping(target = "roomTypeId", source = "roomType.id")
+    @Mapping(target = "roomType", source = "roomType")
     RoomDTO toDto(RoomEntity entity);
 
     @Mapping(target = "roomType.id", source = "roomTypeId")

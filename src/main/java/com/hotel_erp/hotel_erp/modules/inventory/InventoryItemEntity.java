@@ -16,11 +16,13 @@ public class InventoryItemEntity extends BaseEntity {
     private InventoryCategoryEntity category;
     
     private String name;
-    private BigDecimal unitCost;
+    private BigDecimal unitCost; // Serving as Selling Price per user reference
+    private BigDecimal buyingPrice;
 
     
-    @Enumerated(EnumType.STRING)
-    private InventoryUnit unit;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id")
+    private InventoryUnitEntity unit;
     
     private BigDecimal currentStock;
     private String notes;

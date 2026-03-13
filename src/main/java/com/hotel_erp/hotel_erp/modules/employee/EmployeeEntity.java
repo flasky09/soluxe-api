@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
+import com.hotel_erp.hotel_erp.modules.guest.IdTypeEntity;
+
+
 @Getter
 @Setter
 @Entity
@@ -28,8 +31,9 @@ public class EmployeeEntity extends BaseEntity {
     
     private String nationality;
     
-    @Enumerated(EnumType.STRING)
-    private com.hotel_erp.hotel_erp.modules.guest.IdType idType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_type_entity_id")
+    private IdTypeEntity idType;
     private String idNumber;
     
     private boolean isActive = true;

@@ -11,8 +11,14 @@ public interface MenuItemMapper {
     @Mapping(target = "categoryId", source = "category.id")
     MenuItemDTO toDto(MenuItemEntity entity);
 
-    @Mapping(target = "category.id", source = "categoryId")
+    @Mapping(target = "category", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "nameZh", ignore = true)
+    @Mapping(target = "descriptionZh", ignore = true)
+    @Mapping(target = "spiceLevel", ignore = true)
+    @Mapping(target = "allergens", ignore = true)
+    @Mapping(target = "signature", ignore = true)
+    @Mapping(target = "sortOrder", ignore = true)
     MenuItemEntity toEntity(MenuItemDTO dto);
 }

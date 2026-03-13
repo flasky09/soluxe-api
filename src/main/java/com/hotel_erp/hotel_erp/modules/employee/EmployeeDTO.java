@@ -16,6 +16,7 @@ public class EmployeeDTO {
     private String languagesSpoken;
     private Long departmentId;
     private String nationality;
-    private String idType;
+    private Long idTypeId;
+    private String idTypeName;
     private String idNumber;
 }

@@ -8,10 +8,13 @@ import org.mapstruct.factory.Mappers;
 public interface FolioChargeMapper {
     FolioChargeMapper INSTANCE = Mappers.getMapper(FolioChargeMapper.class);
 
+    @Mapping(target = "chargeTypeId", source = "chargeType.id")
+    @Mapping(target = "chargeTypeName", source = "chargeType.name")
     FolioChargeDTO toDto(FolioChargeEntity entity);
 
     @Mapping(target = "voided", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "chargeType", ignore = true)
     FolioChargeEntity toEntity(FolioChargeDTO dto);
 }

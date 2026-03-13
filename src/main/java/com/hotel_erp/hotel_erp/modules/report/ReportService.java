@@ -60,7 +60,7 @@ public class ReportService {
         // Group revenue by charge type
         Map<String, BigDecimal> revenueByChargeType = dailyCharges.stream()
                 .collect(Collectors.groupingBy(
-                        charge -> charge.getChargeType().name(),
+                        charge -> charge.getChargeType() != null ? charge.getChargeType().getName() : "UNKNOWN",
                         Collectors.reducing(
                                 BigDecimal.ZERO,
                                 FolioChargeEntity::getTotalAmount,
@@ -102,7 +102,7 @@ public class ReportService {
 
         Map<String, BigDecimal> revenueByChargeType = dailyCharges.stream()
                 .collect(Collectors.groupingBy(
-                        charge -> charge.getChargeType().name(),
+                        charge -> charge.getChargeType() != null ? charge.getChargeType().getName() : "UNKNOWN",
                         Collectors.reducing(
                                 BigDecimal.ZERO,
                                 FolioChargeEntity::getTotalAmount,

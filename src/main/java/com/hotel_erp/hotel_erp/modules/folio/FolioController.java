@@ -31,6 +31,21 @@ public class FolioController {
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
     }
 
+    @GetMapping("/stay/{stayId}")
+    public FolioDTO getFolioByStayId(@PathVariable Long stayId) {
+        return folioService.getFolioByStayId(stayId);
+    }
+
+    @GetMapping("/{id}/charges")
+    public java.util.List<FolioChargeDTO> getChargesByFolioId(@PathVariable Long id) {
+        return folioService.getChargesByFolioId(id);
+    }
+
+    @GetMapping("/{id}/payments")
+    public java.util.List<FolioPaymentDTO> getPaymentsByFolioId(@PathVariable Long id) {
+        return folioService.getPaymentsByFolioId(id);
+    }
+
     @GetMapping("/payment-methods")
     public java.util.List<PaymentMethodDTO> getPaymentMethods() {
         return folioService.getAllPaymentMethods();

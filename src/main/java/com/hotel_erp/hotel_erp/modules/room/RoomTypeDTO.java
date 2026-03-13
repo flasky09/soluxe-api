@@ -9,4 +9,8 @@ public class RoomTypeDTO {
     private String name;
     private String description;
     private BigDecimal defaultRate;
+    private BigDecimal weekendRate;
+    private Integer capacity;
+    private String bedType;
+    private String amenities;
 }

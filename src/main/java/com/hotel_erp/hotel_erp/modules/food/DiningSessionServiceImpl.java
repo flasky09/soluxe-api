@@ -9,7 +9,8 @@ import com.hotel_erp.hotel_erp.modules.folio.FolioRepository;
 import com.hotel_erp.hotel_erp.modules.folio.FolioDTO;
 import com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO;
 import com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO;
-import com.hotel_erp.hotel_erp.modules.folio.ChargeType;
+import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
+import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class DiningSessionServiceImpl implements DiningSessionService {
     private final DiningSessionRepository diningSessionRepository;
     private final FolioService folioService;
     private final FolioRepository folioRepository;
+    private final ChargeTypeRepository chargeTypeRepository;
 
     @Override
     public Optional<DiningSessionEntity> findById(Long id) {
@@ -45,10 +47,12 @@ public class DiningSessionServiceImpl implements DiningSessionService {
 
         if (amount.compareTo(BigDecimal.ZERO) > 0) {
             String desc = "Restaurant Charge - Session " + id;
+            Long foodChargeTypeId = chargeTypeRepository.findByName("FOOD").map(ChargeTypeEntity::getId).orElse(null);
+
             if (session.getBillingType() == BillingType.CHARGE_TO_ROOM && session.getStay() != null) {
                 folioRepository.findByStayId(session.getStay().getId()).ifPresent(folio -> {
                     FolioChargeDTO charge = new FolioChargeDTO();
-                    charge.setChargeType(ChargeType.FOOD);
+                    charge.setChargeTypeId(foodChargeTypeId);
                     charge.setDescription(desc);
                     charge.setQuantity(BigDecimal.ONE);
                     charge.setUnitPrice(amount);
@@ -59,7 +63,7 @@ public class DiningSessionServiceImpl implements DiningSessionService {
                 FolioDTO folio = folioService.createFolioForDining(id);
                 
                 FolioChargeDTO charge = new FolioChargeDTO();
-                charge.setChargeType(ChargeType.FOOD);
+                charge.setChargeTypeId(foodChargeTypeId);
                 charge.setDescription(desc);
                 charge.setQuantity(BigDecimal.ONE);
                 charge.setUnitPrice(amount);

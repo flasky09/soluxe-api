@@ -19,9 +19,9 @@ public class LeaveRequestEntity extends BaseEntity {
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "leave_type")
-    private LeaveType leaveType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "leave_type_id")
+    private LeaveTypeEntity leaveType;
 
     @Column(name = "date_from")
     private LocalDate dateFrom;

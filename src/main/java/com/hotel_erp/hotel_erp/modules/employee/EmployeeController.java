@@ -12,40 +12,28 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final EmployeeMapper employeeMapper;
 
     @GetMapping
     public List<EmployeeDTO> getAllEmployees() {
-        return employeeService.findAll().stream()
-                .map(employeeMapper::toDto)
-                .toList();
+        return employeeService.findAllEmployees();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
-        return employeeService.findById(id)
-                .map(employeeMapper::toDto)
+        return employeeService.findEmployeeById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        EmployeeEntity entity = employeeMapper.toEntity(employeeDTO);
-        EmployeeEntity saved = employeeService.save(entity);
-        return ResponseEntity.ok(employeeMapper.toDto(saved));
+        return ResponseEntity.ok(employeeService.saveEmployee(employeeDTO));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
-        return employeeService.findById(id)
-                .map(existing -> {
-                    EmployeeEntity entity = employeeMapper.toEntity(employeeDTO);
-                    entity.setId(id);
-                    EmployeeEntity updated = employeeService.save(entity);
-                    return ResponseEntity.ok(employeeMapper.toDto(updated));
-                })
-                .orElse(ResponseEntity.notFound().build());
+        employeeDTO.setId(id);
+        return ResponseEntity.ok(employeeService.saveEmployee(employeeDTO));
     }
 
     @DeleteMapping("/{id}")

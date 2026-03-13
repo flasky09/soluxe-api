@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel_erp.hotel_erp.shared.BaseServiceImpl;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
 public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRepository> implements FolioService {
@@ -18,11 +17,12 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     private final FolioChargeRepository folioChargeRepository;
     private final FolioPaymentRepository folioPaymentRepository;
     private final PaymentMethodRepository paymentMethodRepository;
+    private final FolioReceiptRepository folioReceiptRepository;
+    private final ChargeTypeRepository chargeTypeRepository;
     private final FolioMapper folioMapper;
     private final FolioChargeMapper folioChargeMapper;
     private final FolioPaymentMapper folioPaymentMapper;
     private final PaymentMethodMapper paymentMethodMapper;
-    private final FolioReceiptRepository folioReceiptRepository;
     private final FolioReceiptMapper folioReceiptMapper;
 
     public FolioServiceImpl(FolioRepository repository,
@@ -30,6 +30,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                              FolioPaymentRepository folioPaymentRepository,
                              PaymentMethodRepository paymentMethodRepository,
                              FolioReceiptRepository folioReceiptRepository,
+                             ChargeTypeRepository chargeTypeRepository,
                              FolioMapper folioMapper,
                              FolioChargeMapper folioChargeMapper,
                              FolioPaymentMapper folioPaymentMapper,
@@ -40,6 +41,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         this.folioPaymentRepository = folioPaymentRepository;
         this.paymentMethodRepository = paymentMethodRepository;
         this.folioReceiptRepository = folioReceiptRepository;
+        this.chargeTypeRepository = chargeTypeRepository;
         this.folioMapper = folioMapper;
         this.folioChargeMapper = folioChargeMapper;
         this.folioPaymentMapper = folioPaymentMapper;
@@ -87,6 +89,11 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         charge.setFolioId(folioId);
         charge.setChargedAt(LocalDateTime.now());
         charge.setAddedBy(userId);
+
+        if (chargeDto.getChargeTypeId() != null) {
+            chargeTypeRepository.findById(chargeDto.getChargeTypeId())
+                    .ifPresent(charge::setChargeType);
+        }
         
         BigDecimal quantity = charge.getQuantity();
         BigDecimal unitPrice = charge.getUnitPrice();
@@ -218,5 +225,26 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         receipt.setReceiptNumber("REC-" + System.currentTimeMillis() + "-" + payment.getId());
         
         folioReceiptRepository.save(receipt);
+    }
+
+    @Override
+    public FolioDTO getFolioByStayId(Long stayId) {
+        return repository.findByStayId(stayId)
+                .map(folioMapper::toDto)
+                .orElseThrow(() -> new RuntimeException("Folio not found for Stay ID: " + stayId));
+    }
+
+    @Override
+    public List<FolioChargeDTO> getChargesByFolioId(Long folioId) {
+        return folioChargeRepository.findAllByFolioId(folioId).stream()
+                .map(folioChargeMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public List<FolioPaymentDTO> getPaymentsByFolioId(Long folioId) {
+        return folioPaymentRepository.findAllByFolioId(folioId).stream()
+                .map(folioPaymentMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

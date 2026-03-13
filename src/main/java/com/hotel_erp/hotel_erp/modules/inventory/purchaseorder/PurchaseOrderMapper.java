@@ -9,5 +9,7 @@ public interface PurchaseOrderMapper {
     PurchaseOrderDTO toDto(PurchaseOrderEntity entity);
 
     @Mapping(source = "supplierId", target = "supplier.id")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     PurchaseOrderEntity toEntity(PurchaseOrderDTO dto);
 }

@@ -8,5 +8,6 @@ public class RoomDTO {
     private String roomNumber;
     private String floor;
     private Long roomTypeId;
+    private RoomTypeDTO roomType;
     private String status;
 }

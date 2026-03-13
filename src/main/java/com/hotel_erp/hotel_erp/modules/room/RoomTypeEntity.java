@@ -3,6 +3,7 @@ package com.hotel_erp.hotel_erp.modules.room;
 import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,4 +17,11 @@ public class RoomTypeEntity extends BaseEntity {
     private String name;
     private String description;
     private BigDecimal defaultRate;
+    private BigDecimal weekendRate;
+    
+    private Integer capacity;
+    private String bedType;
+    
+    @Column(columnDefinition = "TEXT")
+    private String amenities;
 }

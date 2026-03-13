@@ -1,0 +1,28 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.hotel-erp:hotel-erp >-----------------------
+[INFO] Building hotel-erp 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ hotel-erp ---
+[INFO] Deleting /home/bony/Projects/hotel-crm/hotel-erp/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ hotel-erp ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ hotel-erp ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 268 source files with javac [debug parameters release 21] to target/classes
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/InventoryCategoryMapper.java:[12,29] Unmapped target property: "description".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/reservation/ReservationMapper.java:[11,20] Unmapped target properties: "nationality, idType, idNumber, preferences, vehicleRegistration, emergencyContactName, emergencyContactPhone".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/attendance/AttendanceRecordMapper.java:[14,28] Unmapped target properties: "createdAt, updatedAt".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/purchaseorder/PurchaseOrderMapper.java:[12,25] Unmapped target properties: "createdAt, updatedAt".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/MenuItemMapper.java:[17,20] Unmapped target properties: "nameZh, descriptionZh, spiceLevel, allergens, signature, sortOrder".
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  31.018 s
+[INFO] Finished at: 2026-03-12T21:35:25+03:00
+[INFO] ------------------------------------------------------------------------

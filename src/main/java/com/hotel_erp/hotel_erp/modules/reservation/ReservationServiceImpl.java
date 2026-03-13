@@ -5,12 +5,10 @@ import org.springframework.stereotype.Service;
 
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.guest.GuestEntity;
-import com.hotel_erp.hotel_erp.modules.guest.IdType;
+import com.hotel_erp.hotel_erp.modules.guest.IdTypeRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
-import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
-import com.hotel_erp.hotel_erp.modules.room.RoomEntity;
 
 import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
 import com.hotel_erp.hotel_erp.modules.stay.StayStatus;
@@ -22,13 +20,20 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     private final RoomRepository roomRepository;
     private final StayRepository stayRepository;
     private final ReservationMapper reservationMapper;
+    private final IdTypeRepository idTypeRepository;
 
-    public ReservationServiceImpl(ReservationRepository repository, GuestRepository guestRepository, RoomRepository roomRepository, StayRepository stayRepository, ReservationMapper reservationMapper) {
+    public ReservationServiceImpl(ReservationRepository repository, 
+                                  GuestRepository guestRepository, 
+                                  RoomRepository roomRepository, 
+                                  StayRepository stayRepository, 
+                                  ReservationMapper reservationMapper,
+                                  IdTypeRepository idTypeRepository) {
         super(repository);
         this.guestRepository = guestRepository;
         this.roomRepository = roomRepository;
         this.stayRepository = stayRepository;
         this.reservationMapper = reservationMapper;
+        this.idTypeRepository = idTypeRepository;
     }
 
     @Override
@@ -39,9 +44,8 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
             guestRepository.findById(dto.getGuestId()).ifPresent(guest -> {
                 if (dto.getNationality() != null) guest.setNationality(dto.getNationality());
                 if (dto.getIdType() != null) {
-                    try {
-                        guest.setIdType(IdType.valueOf(dto.getIdType()));
-                    } catch (IllegalArgumentException ignored) {}
+                    idTypeRepository.findByName(dto.getIdType())
+                            .ifPresent(guest::setIdType);
                 }
                 if (dto.getIdNumber() != null) guest.setIdNumber(dto.getIdNumber());
                 if (dto.getPreferences() != null) guest.setPreferences(dto.getPreferences());
@@ -101,7 +105,8 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
             guestRepository.findById(dto.getGuestId()).ifPresent(guest -> {
                 if (dto.getNationality() != null) guest.setNationality(dto.getNationality());
                 if (dto.getIdType() != null) {
-                    try { guest.setIdType(IdType.valueOf(dto.getIdType())); } catch (Exception ignored) {}
+                    idTypeRepository.findByName(dto.getIdType())
+                            .ifPresent(guest::setIdType);
                 }
                 if (dto.getIdNumber() != null) guest.setIdNumber(dto.getIdNumber());
                 if (dto.getPreferences() != null) guest.setPreferences(dto.getPreferences());

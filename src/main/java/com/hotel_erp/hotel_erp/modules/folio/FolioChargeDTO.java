@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 public class FolioChargeDTO {
     private Long id;
     private Long folioId;
-    private ChargeType chargeType;
+    private Long chargeTypeId;
+    private String chargeTypeName;
     private String description;
     private BigDecimal quantity;
     private BigDecimal unitPrice;

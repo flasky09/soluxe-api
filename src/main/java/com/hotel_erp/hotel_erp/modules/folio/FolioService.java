@@ -1,6 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.folio;
 
 import com.hotel_erp.hotel_erp.shared.BaseService;
+
 import java.util.List;
 
 public interface FolioService extends BaseService<FolioEntity, Long> {
@@ -17,4 +18,8 @@ public interface FolioService extends BaseService<FolioEntity, Long> {
     List<FolioReceiptDTO> getAllReceipts();
     FolioReceiptDTO getReceiptByPaymentId(Long paymentId);
     List<FolioReceiptDTO> getReceiptsByFolioId(Long folioId);
+
+    FolioDTO getFolioByStayId(Long stayId);
+    List<FolioChargeDTO> getChargesByFolioId(Long folioId);
+    List<FolioPaymentDTO> getPaymentsByFolioId(Long folioId);
 }

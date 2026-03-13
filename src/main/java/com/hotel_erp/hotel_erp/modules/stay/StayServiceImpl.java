@@ -83,10 +83,19 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             throw new RuntimeException("Stay is not ACTIVE");
         }
 
+        // ✅ VALIDATE FOLIO BALANCE FIRST — before any mutations
+        var folio = folioRepository.findByStayId(stayId).orElse(null);
+        if (folio != null && folio.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Cannot check out. Outstanding folio balance: " + folio.getTotalAmount()
+            );
+        }
+
+        // Mutate and persist stay
         stay.setStatus(StayStatus.CHECKED_OUT);
         stay.setActualDateOut(LocalDateTime.now());
         stay.setCheckedOutBy(userId);
-
         stay = repository.save(stay);
 
         // Update Room Status to DIRTY
@@ -97,22 +106,18 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             });
         }
 
-        // Update Reservation Status (if exists)
-        reservationRepository.findById(stay.getReservationId()).ifPresent(res -> {
-            res.setStatus(ReservationStatus.CHECKED_OUT);
-            reservationRepository.save(res);
-        });
+        // Update Reservation Status (if linked)
+        if (stay.getReservationId() != null) {
+            reservationRepository.findById(stay.getReservationId()).ifPresent(res -> {
+                res.setStatus(ReservationStatus.CHECKED_OUT);
+                reservationRepository.save(res);
+            });
+        }
 
-        // Close Folio via Service for rule enforcement
-        folioRepository.findByStayId(stayId).ifPresent(folio -> {
-            if (folio.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
-                throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST, 
-                    "Cannot check out. Outstanding folio balance: " + folio.getTotalAmount()
-                );
-            }
+        // Close Folio
+        if (folio != null) {
             folioService.closeFolio(folio.getId(), userId);
-        });
+        }
 
         return stayMapper.toDto(stay);
     }
