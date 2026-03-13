@@ -11,5 +11,7 @@ public interface StayAdditionalGuestMapper {
     StayAdditionalGuestDTO toDto(StayAdditionalGuestEntity entity);
 
     @Mapping(target = "idType", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     StayAdditionalGuestEntity toEntity(StayAdditionalGuestDTO dto);
 }
