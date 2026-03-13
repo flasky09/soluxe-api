@@ -4,7 +4,6 @@ import com.hotel_erp.hotel_erp.modules.reservation.ReservationEntity;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationStatus;
 import com.hotel_erp.hotel_erp.shared.BaseServiceImpl;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,7 +131,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     @Transactional
-    public StayDTO walkInCheckIn(Long guestId, Long roomId, Integer adults, Integer children, Long userId) {
+    public StayDTO walkInCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDateTime dateOut, Long userId) {
         var room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
         if (room.getStatus() != com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE) {
@@ -144,6 +143,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setGuestId(guestId);
         stay.setRoomId(roomId);
         stay.setDateIn(LocalDateTime.now());
+        stay.setDateOut(dateOut);
         stay.setAdults(adults != null ? adults : 1);
         stay.setChildren(children != null ? children : 0);
         stay.setStatus(StayStatus.ACTIVE);

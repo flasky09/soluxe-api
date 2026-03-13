@@ -26,7 +26,7 @@ public class StayController {
 
     @PostMapping("/walk-in")
     public StayDTO walkIn(@RequestBody WalkInRequest request) {
-        return stayService.walkInCheckIn(request.getGuestId(), request.getRoomId(), request.getAdults(), request.getChildren(), request.getUserId());
+        return stayService.walkInCheckIn(request.getGuestId(), request.getRoomId(), request.getAdults(), request.getChildren(), request.getDateOut(), request.getUserId());
     }
 
     @PostMapping("/{id}/check-out")
@@ -52,6 +52,7 @@ public class StayController {
         private Long roomId;
         private Integer adults;
         private Integer children;
+        private java.time.LocalDateTime dateOut;
         private Long userId;
     }
 }
