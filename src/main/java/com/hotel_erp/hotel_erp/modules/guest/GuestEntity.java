@@ -26,9 +26,8 @@ public class GuestEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_type_entity_id")
-    private IdTypeEntity idType;
+    @Enumerated(EnumType.STRING)
+    private IdType idType;
     @Column(unique = true)
     private String idNumber;
 

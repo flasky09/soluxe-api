@@ -1,38 +1,26 @@
 package com.hotel_erp.hotel_erp.modules.guest;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/id-types")
-@RequiredArgsConstructor
 public class IdTypeController {
-
-    private final IdTypeRepository repository;
 
     @GetMapping
     public List<IdTypeDTO> getAll() {
-        return repository.findAll().stream()
-                .map(entity -> {
+        return Arrays.stream(IdType.values())
+                .map(type -> {
                     IdTypeDTO dto = new IdTypeDTO();
-                    dto.setId(entity.getId());
-                    dto.setName(entity.getName());
-                    dto.setDescription(entity.getDescription());
+                    dto.setId((long) type.ordinal() + 1);
+                    dto.setName(type.name());
+                    dto.setDescription(type.name().replace("_", " "));
+                    dto.setActive(true);
                     return dto;
                 })
                 .collect(Collectors.toList());
-    }
-
-    @PostMapping
-    public IdTypeDTO create(@RequestBody IdTypeDTO dto) {
-        IdTypeEntity entity = new IdTypeEntity();
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity = repository.save(entity);
-        dto.setId(entity.getId());
-        return dto;
     }
 }

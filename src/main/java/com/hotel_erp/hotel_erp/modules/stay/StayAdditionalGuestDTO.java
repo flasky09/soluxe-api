@@ -7,7 +7,6 @@ public class StayAdditionalGuestDTO {
     private Long id;
     private Long stayId;
     private String fullName;
-    private Long idTypeId;
-    private String idTypeName;
+    private String idType;
     private String idNumber;
 }

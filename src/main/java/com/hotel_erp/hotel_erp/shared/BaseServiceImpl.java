@@ -13,7 +13,7 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, ID_TYPE, REPOSI
 
     @Override
     public List<ENTITY> findAll() {
-        return repository.findAll();
+        return repository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
     }
 
     @Override

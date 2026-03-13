@@ -28,8 +28,7 @@ public class EmployeeDTO {
     private String languagesSpoken;
     private Long departmentId;
     private String nationality;
-    private Long idTypeId;
-    private String idTypeName;
+    private String idType;
 
     @NotBlank(message = "ID number is required")
     private String idNumber;

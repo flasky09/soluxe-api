@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.hotel_erp.hotel_erp.modules.guest.IdTypeEntity;
+import com.hotel_erp.hotel_erp.modules.guest.IdType;
 
 @Getter
 @Setter
@@ -19,9 +19,8 @@ public class StayAdditionalGuestEntity extends BaseEntity {
     @Column(nullable = false)
     private String fullName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_type_entity_id")
-    private IdTypeEntity idType;
+    @Enumerated(EnumType.STRING)
+    private IdType idType;
 
     private String idNumber;
 }

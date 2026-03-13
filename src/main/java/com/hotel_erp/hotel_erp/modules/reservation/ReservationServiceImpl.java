@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.guest.GuestEntity;
-import com.hotel_erp.hotel_erp.modules.guest.IdTypeRepository;
+import com.hotel_erp.hotel_erp.modules.guest.IdType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
@@ -20,20 +20,17 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     private final RoomRepository roomRepository;
     private final StayRepository stayRepository;
     private final ReservationMapper reservationMapper;
-    private final IdTypeRepository idTypeRepository;
 
     public ReservationServiceImpl(ReservationRepository repository, 
                                   GuestRepository guestRepository, 
                                   RoomRepository roomRepository, 
                                   StayRepository stayRepository, 
-                                  ReservationMapper reservationMapper,
-                                  IdTypeRepository idTypeRepository) {
+                                  ReservationMapper reservationMapper) {
         super(repository);
         this.guestRepository = guestRepository;
         this.roomRepository = roomRepository;
         this.stayRepository = stayRepository;
         this.reservationMapper = reservationMapper;
-        this.idTypeRepository = idTypeRepository;
     }
 
     @Override
@@ -44,8 +41,11 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
             guestRepository.findById(dto.getGuestId()).ifPresent(guest -> {
                 if (dto.getNationality() != null) guest.setNationality(dto.getNationality());
                 if (dto.getIdType() != null) {
-                    idTypeRepository.findByName(dto.getIdType())
-                            .ifPresent(guest::setIdType);
+                    try {
+                        guest.setIdType(IdType.valueOf(dto.getIdType()));
+                    } catch (IllegalArgumentException e) {
+                        // ignore
+                    }
                 }
                 if (dto.getIdNumber() != null) guest.setIdNumber(dto.getIdNumber());
                 if (dto.getPreferences() != null) guest.setPreferences(dto.getPreferences());
@@ -105,8 +105,11 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
             guestRepository.findById(dto.getGuestId()).ifPresent(guest -> {
                 if (dto.getNationality() != null) guest.setNationality(dto.getNationality());
                 if (dto.getIdType() != null) {
-                    idTypeRepository.findByName(dto.getIdType())
-                            .ifPresent(guest::setIdType);
+                    try {
+                        guest.setIdType(IdType.valueOf(dto.getIdType()));
+                    } catch (IllegalArgumentException e) {
+                        // ignore
+                    }
                 }
                 if (dto.getIdNumber() != null) guest.setIdNumber(dto.getIdNumber());
                 if (dto.getPreferences() != null) guest.setPreferences(dto.getPreferences());

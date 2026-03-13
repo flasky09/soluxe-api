@@ -23,8 +23,7 @@ public class GuestDTO {
     private String companyName;
     private LocalDate dateOfBirth;
     private String gender;
-    private Long idTypeId;
-    private String idTypeName;
+    private String idType;
 
     @NotBlank(message = "ID number is required")
     private String idNumber;

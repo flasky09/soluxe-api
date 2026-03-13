@@ -1,6 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.employee;
 
-import com.hotel_erp.hotel_erp.modules.guest.IdTypeRepository;
+import com.hotel_erp.hotel_erp.modules.guest.IdType;
 import com.hotel_erp.hotel_erp.shared.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,14 +12,11 @@ import java.util.stream.Collectors;
 @Service
 public class EmployeeServiceImpl extends BaseServiceImpl<EmployeeEntity, Long, EmployeeRepository> implements EmployeeService {
     
-    private final IdTypeRepository idTypeRepository;
     private final EmployeeMapper mapper;
 
     public EmployeeServiceImpl(EmployeeRepository repository, 
-                               IdTypeRepository idTypeRepository, 
                                EmployeeMapper mapper) {
         super(repository);
-        this.idTypeRepository = idTypeRepository;
         this.mapper = mapper;
     }
 
@@ -40,12 +37,21 @@ public class EmployeeServiceImpl extends BaseServiceImpl<EmployeeEntity, Long, E
     public EmployeeDTO saveEmployee(EmployeeDTO dto) {
         EmployeeEntity entity = mapper.toEntity(dto);
         
-        if (dto.getIdTypeId() != null) {
-            idTypeRepository.findById(dto.getIdTypeId())
-                    .ifPresent(entity::setIdType);
+        if (dto.getIdType() != null) {
+            try {
+                entity.setIdType(IdType.valueOf(dto.getIdType()));
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
         }
 
         entity = repository.save(entity);
         return mapper.toDto(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        repository.deleteById(id);
     }
 }

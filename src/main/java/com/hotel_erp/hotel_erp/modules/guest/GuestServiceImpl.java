@@ -12,14 +12,11 @@ import java.util.stream.Collectors;
 @Service
 public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRepository> implements GuestService {
     
-    private final IdTypeRepository idTypeRepository;
     private final GuestMapper mapper;
 
     public GuestServiceImpl(GuestRepository repository, 
-                            IdTypeRepository idTypeRepository, 
                             GuestMapper mapper) {
         super(repository);
-        this.idTypeRepository = idTypeRepository;
         this.mapper = mapper;
     }
 
@@ -39,12 +36,6 @@ public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRe
     @Transactional
     public GuestDTO saveGuest(GuestDTO dto) {
         GuestEntity entity = mapper.toEntity(dto);
-        
-        if (dto.getIdTypeId() != null) {
-            idTypeRepository.findById(dto.getIdTypeId())
-                    .ifPresent(entity::setIdType);
-        }
-
         entity = repository.save(entity);
         return mapper.toDto(entity);
     }

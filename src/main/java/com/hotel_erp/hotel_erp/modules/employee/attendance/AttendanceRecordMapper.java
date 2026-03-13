@@ -11,7 +11,5 @@ public interface AttendanceRecordMapper {
 
     @Mapping(source = "employeeId", target = "employee.id")
     @Mapping(source = "recordedById", target = "recordedBy.id")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     AttendanceRecordEntity toEntity(AttendanceRecordDTO dto);
 }
