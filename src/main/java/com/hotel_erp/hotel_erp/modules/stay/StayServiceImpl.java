@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepository> implements StayService {
@@ -18,19 +20,22 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     private final com.hotel_erp.hotel_erp.modules.folio.FolioService folioService;
     private final com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository;
     private final com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository;
+    private final com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository chargeTypeRepository;
 
     public StayServiceImpl(StayRepository repository,
                            ReservationRepository reservationRepository,
                            StayMapper stayMapper,
                            com.hotel_erp.hotel_erp.modules.folio.FolioService folioService,
                            com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository,
-                           com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository) {
+                           com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository,
+                           com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository chargeTypeRepository) {
         super(repository);
         this.reservationRepository = reservationRepository;
         this.stayMapper = stayMapper;
         this.folioService = folioService;
         this.folioRepository = folioRepository;
         this.roomRepository = roomRepository;
+        this.chargeTypeRepository = chargeTypeRepository;
     }
 
     @Override
@@ -68,7 +73,10 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         });
 
         // Create Folio for the Stay
-        folioService.createFolioForStay(stay.getId());
+        com.hotel_erp.hotel_erp.modules.folio.FolioDTO folio = folioService.createFolioForStay(stay.getId());
+
+        // Auto-post Room Charge (Advance Billing)
+        postRoomCharge(stay, folio.getId(), userId);
 
         return stayMapper.toDto(stay);
     }
@@ -148,7 +156,10 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         roomRepository.save(room);
 
         // Create Folio for the Stay
-        folioService.createFolioForStay(stay.getId());
+        com.hotel_erp.hotel_erp.modules.folio.FolioDTO folio = folioService.createFolioForStay(stay.getId());
+
+        // Auto-post Room Charge (Advance Billing)
+        postRoomCharge(stay, folio.getId(), userId);
 
         return stayMapper.toDto(stay);
     }
@@ -159,6 +170,37 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         StayEntity stay = repository.findByReservationIdAndStatus(reservationId, StayStatus.ACTIVE)
                 .orElseThrow(() -> new RuntimeException("Active Stay not found for this reservation"));
         return checkOut(stay.getId(), userId);
+    }
+
+    private void postRoomCharge(StayEntity stay, Long folioId, Long userId) {
+        long nights = 0;
+        if (stay.getDateIn() != null && stay.getDateOut() != null) {
+            nights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), stay.getDateOut().toLocalDate());
+        }
+        if (nights <= 0) nights = 1; // Minimum 1 night charge
+
+        var room = roomRepository.findById(stay.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+        
+        BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
+        if (rate == null) rate = BigDecimal.ZERO;
+
+        com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO chargeDto = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+                .folioId(folioId)
+                .description("Room Charge - " + nights + " Night(s)")
+                .quantity(new BigDecimal(nights))
+                .unitPrice(rate)
+                .taxPct(BigDecimal.ZERO)
+                .discountPct(BigDecimal.ZERO)
+                .addedBy(userId)
+                .build();
+
+        // Try to find or create "Room Charge" type
+        chargeTypeRepository.findByName("Room Charge").ifPresent(type -> {
+            chargeDto.setChargeTypeId(type.getId());
+        });
+
+        folioService.addCharge(folioId, chargeDto, userId);
     }
 }
 
