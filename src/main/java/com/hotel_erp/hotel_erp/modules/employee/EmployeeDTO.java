@@ -32,4 +32,6 @@ public class EmployeeDTO {
 
     @NotBlank(message = "ID number is required")
     private String idNumber;
+
+    private String kraPin;
 }

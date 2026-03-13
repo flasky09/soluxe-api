@@ -40,6 +40,8 @@ public class EmployeeEntity extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String idNumber;
+
+    private String kraPin;
     
     private boolean isActive = true;
 }
