@@ -30,4 +30,18 @@ public class ReportController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(reportService.getRevenueReport(startDate, endDate));
     }
+
+    @GetMapping("/profit-and-loss")
+    public ResponseEntity<ProfitAndLossDTO> getProfitAndLoss(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(reportService.getProfitAndLoss(startDate, endDate));
+    }
+
+    @GetMapping("/balance-sheet")
+    public ResponseEntity<BalanceSheetDTO> getBalanceSheet(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOfDate) {
+        if (asOfDate == null) asOfDate = LocalDate.now();
+        return ResponseEntity.ok(reportService.getBalanceSheet(asOfDate));
+    }
 }

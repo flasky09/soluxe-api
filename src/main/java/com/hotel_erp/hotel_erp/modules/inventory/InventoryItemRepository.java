@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InventoryItemRepository extends BaseRepository<InventoryItemEntity, Long> {
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(i.buyingPrice * i.currentStock) FROM InventoryItemEntity i")
+    java.math.BigDecimal getTotalStockValue();
 }
