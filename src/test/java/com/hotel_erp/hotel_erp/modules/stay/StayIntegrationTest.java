@@ -27,6 +27,9 @@ public class StayIntegrationTest {
     private StayService stayService;
 
     @Autowired
+    private com.hotel_erp.hotel_erp.modules.folio.FolioService folioService;
+
+    @Autowired
     private StayRepository stayRepository;
 
     @Autowired
@@ -69,7 +72,9 @@ public class StayIntegrationTest {
         FolioEntity createdFolio = folioRepository.findByStayId(stayDto.getId()).get();
         assertNotNull(createdFolio);
         assertEquals(FolioStatus.OPEN, createdFolio.getStatus());
-        assertEquals(0, createdFolio.getTotalAmount().intValue());
+        // Since Advance Billing is active, totalAmount should NOT be 0.
+        // It should be 10000.00 (2 nights * 5000.00 default rate)
+        assertEquals(10000, createdFolio.getTotalAmount().intValue());
     }
 
     @Test
@@ -80,6 +85,14 @@ public class StayIntegrationTest {
         // Perform Check-In First
         StayDTO stayDto = stayService.checkIn(testReservation.getId(), roomId, userId);
         
+        // Add Payment to settle folio (Advance Billing posts 10000.00)
+        com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO paymentDto = com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO.builder()
+                .amount(java.math.BigDecimal.valueOf(10000))
+                .folioId(folioRepository.findByStayId(stayDto.getId()).get().getId())
+                .recordedBy(userId)
+                .build();
+        folioService.addPayment(paymentDto.getFolioId(), paymentDto, userId);
+
         // Perform Check-Out
         StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
         

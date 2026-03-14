@@ -14,4 +14,15 @@ public class DashboardSummaryDTO {
     private long totalDeparturesToday;
     private long activeStays;
     private double occupancyRate;
+    
+    // Financials
+    private double dailyRevenue;
+    private double averageDailyRate;
+    private double revenuePerAvailableRoom;
+    
+    // Alerts/Actions
+    private long pendingHousekeeping;
+    private long lowStockItems;
+    private long pendingLeaveRequests;
+    private long pendingPurchaseOrders;
 }

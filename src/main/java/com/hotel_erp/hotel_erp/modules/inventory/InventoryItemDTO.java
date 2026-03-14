@@ -11,6 +11,7 @@ public class InventoryItemDTO {
     private Long unitId;
     private String unitName;
     private BigDecimal currentStock;
+    private BigDecimal minimumStock;
     private String notes;
     private BigDecimal unitCost;
     private BigDecimal buyingPrice;

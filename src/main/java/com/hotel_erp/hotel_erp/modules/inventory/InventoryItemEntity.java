@@ -25,5 +25,6 @@ public class InventoryItemEntity extends BaseEntity {
     private InventoryUnitEntity unit;
     
     private BigDecimal currentStock;
+    private BigDecimal minimumStock;
     private String notes;
 }
