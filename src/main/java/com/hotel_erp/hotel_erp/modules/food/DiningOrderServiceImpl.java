@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,9 @@ public class DiningOrderServiceImpl implements DiningOrderService {
     @Override
     @Transactional
     public DiningOrderEntity save(DiningOrderEntity order) {
+        if (order.getOrderedAt() == null) {
+            order.setOrderedAt(LocalDateTime.now());
+        }
         DiningOrderEntity savedOrder = diningOrderRepository.save(order);
         if (savedOrder.getSession() != null) {
             recalculateSessionTotal(savedOrder.getSession().getId());

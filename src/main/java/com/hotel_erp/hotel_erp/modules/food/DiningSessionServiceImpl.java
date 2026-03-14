@@ -33,6 +33,9 @@ public class DiningSessionServiceImpl implements DiningSessionService {
 
     @Override
     public DiningSessionEntity save(DiningSessionEntity session) {
+        if (session.getOpenedAt() == null) {
+            session.setOpenedAt(LocalDateTime.now());
+        }
         return diningSessionRepository.save(session);
     }
 
