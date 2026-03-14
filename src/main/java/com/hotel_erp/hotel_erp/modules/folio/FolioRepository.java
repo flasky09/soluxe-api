@@ -9,6 +9,8 @@ import java.util.Optional;
 @Repository
 public interface FolioRepository extends BaseRepository<FolioEntity, Long> {
     Optional<FolioEntity> findByStayId(Long stayId);
+    Optional<FolioEntity> findByReservationId(Long reservationId);
+    Optional<FolioEntity> findByVenueBookingId(Long venueBookingId);
 
     @Query("SELECT COALESCE(SUM(f.totalAmount), 0) - " +
            "(SELECT COALESCE(SUM(p.amount), 0) FROM FolioPaymentEntity p WHERE p.folioId IN " +

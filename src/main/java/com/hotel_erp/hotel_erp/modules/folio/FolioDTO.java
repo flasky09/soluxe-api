@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class FolioDTO {
     private Long id;
     private Long stayId;
+    private Long reservationId;
     private Long venueBookingId;
     private Long diningSessionId;
     private FolioType folioType;

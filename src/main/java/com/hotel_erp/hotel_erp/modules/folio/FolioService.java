@@ -6,6 +6,9 @@ import java.util.List;
 
 public interface FolioService extends BaseService<FolioEntity, Long> {
     FolioDTO createFolioForStay(Long stayId);
+    FolioDTO createFolioForReservation(Long reservationId);
+    FolioDTO getOrCreateFolioForReservation(Long reservationId);
+    FolioDTO linkReservationFolioToStay(Long reservationId, Long stayId);
     FolioDTO createFolioForDining(Long sessionId);
     FolioChargeDTO addCharge(Long folioId, FolioChargeDTO chargeDto, Long userId);
     

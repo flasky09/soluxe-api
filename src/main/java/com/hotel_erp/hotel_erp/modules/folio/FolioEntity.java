@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class FolioEntity extends BaseEntity {
 
     private Long stayId;
+    private Long reservationId;
     private Long venueBookingId;
     private Long diningSessionId;
 

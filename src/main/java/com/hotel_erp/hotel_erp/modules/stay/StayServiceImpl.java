@@ -58,7 +58,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setStatus(StayStatus.ACTIVE);
         stay.setCheckedInBy(userId);
         
-        stay = repository.save(stay);
+        final StayEntity savedStay = repository.save(stay);
         
         // Update Reservation Status
         reservation.setStatus(ReservationStatus.CHECKED_IN);
@@ -71,13 +71,15 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             roomRepository.save(room);
         });
 
-        // Create Folio for the Stay
-        com.hotel_erp.hotel_erp.modules.folio.FolioDTO folio = folioService.createFolioForStay(stay.getId());
+        // Create or Link Folio for the Stay
+        com.hotel_erp.hotel_erp.modules.folio.FolioDTO folio = folioRepository.findByReservationId(reservationId)
+                .map(f -> folioService.linkReservationFolioToStay(reservationId, savedStay.getId()))
+                .orElseGet(() -> folioService.createFolioForStay(savedStay.getId()));
 
         // Auto-post Room Charge (Advance Billing)
-        postRoomCharge(stay, folio.getId(), userId);
+        postRoomCharge(savedStay, folio.getId(), userId);
 
-        return stayMapper.toDto(stay);
+        return stayMapper.toDto(savedStay);
     }
 
     @Override

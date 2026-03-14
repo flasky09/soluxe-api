@@ -36,6 +36,11 @@ public class FolioController {
         return folioService.getFolioByStayId(stayId);
     }
 
+    @GetMapping("/reservation/{reservationId}")
+    public FolioDTO getFolioByReservationId(@PathVariable Long reservationId) {
+        return folioService.getOrCreateFolioForReservation(reservationId);
+    }
+
     @GetMapping("/{id}/charges")
     public java.util.List<FolioChargeDTO> getChargesByFolioId(@PathVariable Long id) {
         return folioService.getChargesByFolioId(id);

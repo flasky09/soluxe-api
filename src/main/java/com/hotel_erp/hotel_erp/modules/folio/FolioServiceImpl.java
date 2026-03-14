@@ -64,6 +64,39 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
 
     @Override
     @Transactional
+    public FolioDTO createFolioForReservation(Long reservationId) {
+        FolioEntity folio = new FolioEntity();
+        folio.setReservationId(reservationId);
+        folio.setFolioType(FolioType.RESERVATION);
+        folio.setStatus(FolioStatus.OPEN);
+        folio.setOpenedAt(LocalDateTime.now());
+        folio.setTotalAmount(BigDecimal.ZERO);
+        
+        return folioMapper.toDto(repository.save(folio));
+    }
+
+    @Override
+    @Transactional
+    public FolioDTO getOrCreateFolioForReservation(Long reservationId) {
+        return repository.findByReservationId(reservationId)
+                .map(folioMapper::toDto)
+                .orElseGet(() -> createFolioForReservation(reservationId));
+    }
+
+    @Override
+    @Transactional
+    public FolioDTO linkReservationFolioToStay(Long reservationId, Long stayId) {
+        FolioEntity folio = repository.findByReservationId(reservationId)
+                .orElseThrow(() -> new RuntimeException("Folio not found for Reservation ID: " + reservationId));
+        
+        folio.setStayId(stayId);
+        folio.setFolioType(FolioType.STAY);
+        // We keep reservationId for audit trail or linking back if needed
+        return folioMapper.toDto(repository.save(folio));
+    }
+
+    @Override
+    @Transactional
     public FolioDTO createFolioForDining(Long sessionId) {
         FolioEntity folio = new FolioEntity();
         folio.setDiningSessionId(sessionId);
