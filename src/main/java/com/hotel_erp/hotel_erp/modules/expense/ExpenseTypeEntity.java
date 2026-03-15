@@ -12,6 +12,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "expense_types")
 public class ExpenseTypeEntity extends BaseEntity {
+    @Column(unique = true)
     private String name;
     private String description;
     

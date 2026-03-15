@@ -17,4 +17,5 @@ public class DepartmentEntity extends BaseEntity {
     private String name;
 
     private String description;
+    private boolean active = true;
 }

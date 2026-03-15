@@ -12,6 +12,11 @@ public class LeaveRequestController {
 
     private final LeaveRequestService leaveRequestService;
 
+    @GetMapping
+    public List<LeaveRequestDTO> getAllRequests() {
+        return leaveRequestService.findAll();
+    }
+
     @GetMapping("/employee/{employeeId}")
     public List<LeaveRequestDTO> getRequestsByEmployee(@PathVariable Long employeeId) {
         return leaveRequestService.findByEmployeeId(employeeId);

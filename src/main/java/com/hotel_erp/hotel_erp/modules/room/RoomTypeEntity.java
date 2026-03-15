@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "room_types")
 public class RoomTypeEntity extends BaseEntity {
+    @Column(unique = true)
     private String name;
     private String description;
     private BigDecimal defaultRate;

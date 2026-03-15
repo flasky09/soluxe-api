@@ -29,6 +29,13 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
     @Override
     public void deleteById(Long id) {
-        menuCategoryRepository.deleteById(id);
+        try {
+            menuCategoryRepository.deleteById(id);
+        } catch (Exception e) {
+            menuCategoryRepository.findById(id).ifPresent(entity -> {
+                entity.setActive(false);
+                menuCategoryRepository.save(entity);
+            });
+        }
     }
 }

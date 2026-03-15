@@ -15,6 +15,13 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final LeaveTypeRepository leaveTypeRepository;
     private final LeaveRequestMapper mapper;
+    
+    @Override
+    public List<LeaveRequestDTO> findAll() {
+        return leaveRequestRepository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<LeaveRequestDTO> findByEmployeeId(Long employeeId) {

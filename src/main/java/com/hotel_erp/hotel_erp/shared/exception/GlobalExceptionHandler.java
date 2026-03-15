@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         String message = ex.getMostSpecificCause().getMessage();
         
-        if (message.contains("Duplicate entry")) {
+        if (message.contains("Duplicate entry") || message.contains("Unique index or primary key violation")) {
             error.put("error", "A record with this information already exists.");
             return new ResponseEntity<>(error, HttpStatus.CONFLICT);
         }

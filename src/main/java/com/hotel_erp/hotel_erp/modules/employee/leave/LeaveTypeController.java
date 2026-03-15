@@ -21,6 +21,7 @@ public class LeaveTypeController {
                     dto.setId(entity.getId());
                     dto.setName(entity.getName());
                     dto.setDescription(entity.getDescription());
+                    dto.setActive(entity.isActive());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -31,8 +32,32 @@ public class LeaveTypeController {
         LeaveTypeEntity entity = new LeaveTypeEntity();
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
+        entity.setActive(dto.isActive());
         entity = repository.save(entity);
         dto.setId(entity.getId());
         return dto;
+    }
+
+    @PutMapping("/{id}")
+    public LeaveTypeDTO update(@PathVariable Long id, @RequestBody LeaveTypeDTO dto) {
+        LeaveTypeEntity entity = repository.findById(id).orElseThrow();
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+        entity.setActive(dto.isActive());
+        repository.save(entity);
+        return dto;
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        try {
+            repository.deleteById(id);
+        } catch (Exception e) {
+            // Fallback to logical delete
+            repository.findById(id).ifPresent(entity -> {
+                entity.setActive(false);
+                repository.save(entity);
+            });
+        }
     }
 }

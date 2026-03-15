@@ -35,6 +35,13 @@ public class InventoryCategoryController {
 
     @DeleteMapping("/{id}")
     public void deleteCategory(@PathVariable Long id) {
-        inventoryCategoryRepository.deleteById(id);
+        try {
+            inventoryCategoryRepository.deleteById(id);
+        } catch (Exception e) {
+            inventoryCategoryRepository.findById(id).ifPresent(entity -> {
+                entity.setActive(false);
+                inventoryCategoryRepository.save(entity);
+            });
+        }
     }
 }

@@ -11,6 +11,11 @@ import java.util.Optional;
 public class AttendanceRecordServiceImpl implements AttendanceRecordService {
 
     private final AttendanceRecordRepository attendanceRecordRepository;
+    
+    @Override
+    public List<AttendanceRecordEntity> findAll() {
+        return attendanceRecordRepository.findAll();
+    }
 
     @Override
     public List<AttendanceRecordEntity> findByEmployeeId(Long employeeId) {

@@ -15,6 +15,7 @@ public class InventoryItemEntity extends BaseEntity {
     @JoinColumn(name = "category_id")
     private InventoryCategoryEntity category;
     
+    @Column(unique = true)
     private String name;
     private BigDecimal unitCost; // Serving as Selling Price per user reference
     private BigDecimal buyingPrice;

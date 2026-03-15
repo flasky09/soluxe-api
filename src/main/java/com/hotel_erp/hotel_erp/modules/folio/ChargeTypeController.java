@@ -21,6 +21,7 @@ public class ChargeTypeController {
                     dto.setId(entity.getId());
                     dto.setName(entity.getName());
                     dto.setDescription(entity.getDescription());
+                    dto.setActive(entity.isActive());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -31,8 +32,32 @@ public class ChargeTypeController {
         ChargeTypeEntity entity = new ChargeTypeEntity();
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
-        entity = repository.save(entity);
+        entity.setActive(dto.isActive());
+        entity = repository.saveAndFlush(entity);
         dto.setId(entity.getId());
         return dto;
+    }
+
+    @PutMapping("/{id}")
+    public ChargeTypeDTO update(@PathVariable Long id, @RequestBody ChargeTypeDTO dto) {
+        ChargeTypeEntity entity = repository.findById(id).orElseThrow();
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+        entity.setActive(dto.isActive());
+        repository.save(entity);
+        return dto;
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        try {
+            repository.deleteById(id);
+        } catch (Exception e) {
+            // Fallback to logical delete if hard delete fails (e.g. FK constraint)
+            repository.findById(id).ifPresent(entity -> {
+                entity.setActive(false);
+                repository.save(entity);
+            });
+        }
     }
 }

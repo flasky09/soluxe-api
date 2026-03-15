@@ -1,6 +1,7 @@
 package com.hotel_erp.hotel_erp.modules.food;
 
 import com.hotel_erp.hotel_erp.shared.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "menu_items")
 @EqualsAndHashCode(callSuper = true)
 public class MenuItemEntity extends BaseEntity {
+    @Column(unique = true)
     private String name;
     private String nameZh;
     private String description;
