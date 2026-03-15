@@ -60,18 +60,21 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Explicitly allow development and production origins
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "https://soluxe-hotel-erp.vercel.app", // Adding common frontend domains
-                "https://soluxe-erp-frontend-production.up.railway.app"
-        ));
+
+        // Allow all origins via pattern to support allowCredentials(true)
+        configuration.setAllowedOriginPatterns(List.of("*"));
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        // Allow ALL headers to prevent preflight mismatches
         configuration.setAllowedHeaders(List.of("*"));
+
+        // Expose Authorization so the frontend can read it from responses
         configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Auth-Token"));
+
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L); // 1 hour preflight cache
-        
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -79,22 +82,26 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(org.springframework.web.cors.CorsUtils::isPreFlightRequest).permitAll()
-                                .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                .requestMatchers("/api/folios/**").permitAll()
-                                .requestMatchers("/error").permitAll()
-                                .requestMatchers("/api/**").authenticated()
-                                .anyRequest().authenticated()
-                );
+        http
+            // Apply CORS using our CorsConfigurationSource bean
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth ->
+                auth
+                    // Explicitly permit all OPTIONS preflight requests first
+                    .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                    .requestMatchers("/api/folios/**").permitAll()
+                    .requestMatchers("/error").permitAll()
+                    .requestMatchers("/api/admin/reset-password").permitAll() // Temporary reset endpoint
+                    .requestMatchers("/api/**").authenticated()
+                    .anyRequest().authenticated()
+            );
 
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
