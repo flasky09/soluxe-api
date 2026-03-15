@@ -67,8 +67,8 @@ public class WebSecurityConfig {
                 "https://soluxe-erp-frontend-production.up.railway.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
-        configuration.setExposedHeaders(List.of("X-Auth-Token", "Authorization"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Auth-Token"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // 1 hour preflight cache
         
