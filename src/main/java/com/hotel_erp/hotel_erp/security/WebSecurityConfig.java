@@ -60,12 +60,17 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow all origins while supporting allowCredentials(true)
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        // Explicitly allow development and production origins
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "https://soluxe-hotel-erp.vercel.app", // Adding common frontend domains
+                "https://soluxe-erp-frontend-production.up.railway.app"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
-        configuration.setExposedHeaders(List.of("X-Auth-Token"));
-        configuration.setAllowCredentials(true); // Set to true if cookies/auth headers are needed, else false
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
+        configuration.setExposedHeaders(List.of("X-Auth-Token", "Authorization"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // 1 hour preflight cache
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -79,7 +84,7 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        auth.requestMatchers(org.springframework.web.cors.CorsUtils::isPreFlightRequest).permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers("/api/folios/**").permitAll()
