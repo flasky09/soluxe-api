@@ -12,7 +12,6 @@ public class HotelSettingsDTO {
     private String kraPin;
     private String vatStatus;
     private String companyReg;
-    private String currency;
     private String website;
 
     // Operations

@@ -18,7 +18,6 @@ public class HotelSettingsEntity extends BaseEntity {
     private String kraPin;
     private String vatStatus;
     private String companyReg;
-    private String currency; // e.g. "KES"
     private String website;
 
     // Operations
