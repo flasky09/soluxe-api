@@ -12,6 +12,8 @@ public interface ReservationRepository extends BaseRepository<ReservationEntity,
     @org.springframework.data.jpa.repository.Query("SELECT r FROM ReservationEntity r WHERE r.status = :status AND r.dateIn = :dateIn")
     List<ReservationEntity> findByStatusAndDateIn(ReservationStatus status, LocalDate dateIn);
 
+    List<ReservationEntity> findByStatus(ReservationStatus status);
+
     @org.springframework.data.jpa.repository.Query("SELECT r FROM ReservationEntity r WHERE r.status = :status AND r.dateIn <= :dateIn")
     java.util.List<ReservationEntity> findByStatusAndDateInLessThanEqual(ReservationStatus status, java.time.LocalDate dateIn);
 

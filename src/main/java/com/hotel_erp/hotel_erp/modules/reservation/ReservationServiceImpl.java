@@ -119,7 +119,7 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     }
     @Override
     public List<ReservationDTO> getTodayArrivals() {
-        return repository.findByStatusAndDateInLessThanEqual(ReservationStatus.BOOKED, java.time.LocalDate.now())
+        return repository.findByStatus(ReservationStatus.BOOKED)
                 .stream()
                 .map(reservationMapper::toDto)
                 .collect(java.util.stream.Collectors.toList());
