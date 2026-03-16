@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS guests (
     emergency_contact_name VARCHAR(255),
     emergency_contact_phone VARCHAR(50),
     image_url VARCHAR(512),
+    voided BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

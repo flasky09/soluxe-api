@@ -41,6 +41,7 @@ public class DiningOrderEntity extends BaseEntity {
     private String notes;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @Column(name = "round_no")

@@ -93,3 +93,28 @@ CREATE TABLE IF NOT EXISTS expenses (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_expense_type FOREIGN KEY (expense_type_id) REFERENCES expense_types(id)
 );
+
+-- Payment Methods
+CREATE TABLE IF NOT EXISTS payment_methods (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Folio Payments
+CREATE TABLE IF NOT EXISTS folio_payments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    folio_id BIGINT NOT NULL,
+    payment_method_id BIGINT NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    reference_number VARCHAR(255),
+    recorded_by BIGINT,
+    recorded_at DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_payment_folio FOREIGN KEY (folio_id) REFERENCES folios(id),
+    CONSTRAINT fk_payment_method FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)
+);
