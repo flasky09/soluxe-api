@@ -71,10 +71,19 @@ public class DashboardService {
                         && item.getCurrentStock().compareTo(item.getMinimumStock()) <= 0)
                 .count();
 
+        long cleanRooms = roomRepository.findAll().stream()
+                .filter(r -> r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE || r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.INSPECTED)
+                .count();
+
+        long maintenanceRooms = roomRepository.findAll().stream()
+                .filter(r -> r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.MAINTENANCE)
+                .count();
+
         return DashboardSummaryDTO.builder()
                 .totalArrivalsToday(arrivals)
                 .totalDeparturesToday(departures)
                 .activeStays(activeStays)
+                .totalRooms(totalRooms)
                 .occupancyRate(Math.round(occupancyRate * 100.0) / 100.0)
                 .dailyRevenue(Math.round(dailyRevenue * 100.0) / 100.0)
                 .averageDailyRate(Math.round(adr * 100.0) / 100.0)
@@ -83,6 +92,9 @@ public class DashboardService {
                 .pendingLeaveRequests(pendingLeaves)
                 .pendingPurchaseOrders(pendingPOs)
                 .lowStockItems(lowStockItems)
+                .cleanRooms(cleanRooms)
+                .dirtyRooms(dirtyRooms)
+                .maintenanceRooms(maintenanceRooms)
                 .build();
     }
 }

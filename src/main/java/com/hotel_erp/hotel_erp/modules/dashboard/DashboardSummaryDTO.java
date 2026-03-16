@@ -13,6 +13,7 @@ public class DashboardSummaryDTO {
     private long totalArrivalsToday;
     private long totalDeparturesToday;
     private long activeStays;
+    private long totalRooms;
     private double occupancyRate;
     
     // Financials
@@ -25,4 +26,9 @@ public class DashboardSummaryDTO {
     private long pendingLeaveRequests;
     private long pendingPurchaseOrders;
     private long lowStockItems;
+    
+    // Room Status Health
+    private long cleanRooms;
+    private long dirtyRooms;
+    private long maintenanceRooms;
 }
