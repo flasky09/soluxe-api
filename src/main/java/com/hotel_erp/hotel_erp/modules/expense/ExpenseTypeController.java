@@ -9,7 +9,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/expense-types")
 @RequiredArgsConstructor
-public class ExpenseControllerTypes {
+public class ExpenseTypeController {
     private final ExpenseTypeService expenseTypeService;
 
     @GetMapping
