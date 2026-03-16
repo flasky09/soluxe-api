@@ -61,21 +61,17 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Specific production and local origins for maximum reliability
-        configuration.setAllowedOrigins(List.of(
+        // Use origin patterns for more flexibility with subdomains and local dev
+        configuration.setAllowedOriginPatterns(List.of(
             "https://soluxe-erp-frontend-production.up.railway.app",
-            "http://localhost:5173",
-            "http://localhost:3000"
+            "https://*.up.railway.app",
+            "http://localhost:[*]",
+            "http://127.0.0.1:[*]"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-
-        // Allow ALL headers to prevent preflight mismatches
         configuration.setAllowedHeaders(List.of("*"));
-
-        // Expose Authorization so the frontend can read it from responses
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Auth-Token"));
-
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Auth-Token", "Content-Type"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -87,8 +83,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // Apply CORS using our CorsConfigurationSource bean
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(org.springframework.security.config.Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
