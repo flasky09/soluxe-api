@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class RoomTypeEntity extends BaseEntity {
     @Column(unique = true)
     private String name;
+    private String shortcut;
     private BigDecimal defaultRate;
     private BigDecimal weekendRate;
     
