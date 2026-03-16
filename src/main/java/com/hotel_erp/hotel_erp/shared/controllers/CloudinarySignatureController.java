@@ -24,11 +24,11 @@ public class CloudinarySignatureController {
         
         String signature = cloudinary.apiSignRequest(params, cloudinary.config.apiSecret);
         
-        return ObjectUtils.asMap(
-                "signature", signature,
-                "timestamp", timestamp,
-                "api_key", cloudinary.config.apiKey,
-                "cloud_name", cloudinary.config.cloudName
-        );
+        Map<String, Object> result = new java.util.HashMap<>();
+        result.put("signature", signature);
+        result.put("timestamp", timestamp);
+        result.put("api_key", cloudinary.config.apiKey);
+        result.put("cloud_name", cloudinary.config.cloudName);
+        return result;
     }
 }

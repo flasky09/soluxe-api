@@ -19,6 +19,9 @@ public class GuestDocumentController {
 
     @GetMapping
     public List<GuestDocumentDTO> getGuestDocuments(@PathVariable Long guestId) {
+        if (guestId == null) {
+            return java.util.Collections.emptyList();
+        }
         return guestDocumentRepository.findAllByGuestId(guestId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -62,10 +65,15 @@ public class GuestDocumentController {
     }
 
     private GuestDocumentDTO toDto(GuestDocumentEntity entity) {
+        if (entity == null) return null;
         GuestDocumentDTO dto = new GuestDocumentDTO();
         dto.setId(entity.getId());
-        dto.setGuestId(entity.getGuest().getId());
-        dto.setDocumentType(entity.getDocumentType().name());
+        if (entity.getGuest() != null) {
+            dto.setGuestId(entity.getGuest().getId());
+        }
+        if (entity.getDocumentType() != null) {
+            dto.setDocumentType(entity.getDocumentType().name());
+        }
         dto.setDocumentNumber(entity.getDocumentNumber());
         dto.setFilePath(entity.getFilePath());
         dto.setExpiryDate(entity.getExpiryDate());
