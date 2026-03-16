@@ -34,12 +34,12 @@ public class DataInitializer implements CommandLineRunner {
                     return departmentRepository.save(dept);
                 });
 
-        if (userRepository.findByUsername("admin").isEmpty()) {
+        if (userRepository.findByUsername("coresphere").isEmpty()) {
             UserEntity admin = new UserEntity();
-            admin.setUsername("admin");
+            admin.setUsername("coresphere");
             admin.setPasswordHash(passwordEncoder.encode("admin123"));
-            admin.setFullName("Hotel Admin");
-            admin.setEmail("admin@hotel-erp.com");
+            admin.setFullName("Coresphere Admin");
+            admin.setEmail("admin@coresphere.com");
             admin.setPhoneNumber("1234567890");
             admin.setRole(Role.HOTEL_ADMIN);
             admin.setDepartment(adminDept);

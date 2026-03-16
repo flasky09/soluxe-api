@@ -26,14 +26,14 @@ public class AdminResetController {
     /**
      * POST /api/admin/reset-password
      *
-     * Resets the "admin" user password to "admin123".
-     * Returns 200 on success, 404 if the admin user is not found.
+     * Resets the "coresphere" user password to "admin123".
+     * Returns 200 on success, 404 if the coresphere user is not found.
      */
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetAdminPassword() {
         logger.warn("Admin password reset endpoint invoked — ensure this is removed after debugging.");
 
-        Optional<UserEntity> adminOpt = userRepository.findByUsername("admin");
+        Optional<UserEntity> adminOpt = userRepository.findByUsername("coresphere");
 
         if (adminOpt.isEmpty()) {
             logger.error("Admin user not found in the database.");
@@ -46,7 +46,7 @@ public class AdminResetController {
         admin.setActive(true);
         userRepository.save(admin);
 
-        logger.info("Admin password successfully reset to 'admin123'.");
-        return ResponseEntity.ok("Admin password reset to 'admin123'. Remove this endpoint now.");
+        logger.info("Admin password successfully reset to 'admin123' for user 'coresphere'.");
+        return ResponseEntity.ok("Admin password reset to 'admin123' for user 'coresphere'. Remove this endpoint now.");
     }
 }
