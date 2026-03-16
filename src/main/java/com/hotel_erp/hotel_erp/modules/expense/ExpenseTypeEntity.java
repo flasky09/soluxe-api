@@ -14,7 +14,6 @@ import lombok.Setter;
 public class ExpenseTypeEntity extends BaseEntity {
     @Column(unique = true)
     private String name;
-    private String description;
     
     @Column(nullable = false)
     private boolean isAsset = false;

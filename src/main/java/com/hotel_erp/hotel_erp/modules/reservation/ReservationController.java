@@ -20,6 +20,11 @@ public class ReservationController {
                 .toList();
     }
 
+    @GetMapping("/arrivals")
+    public List<ReservationDTO> getTodayArrivals() {
+        return reservationService.getTodayArrivals();
+    }
+
 
     @PostMapping("/{reservationIdentifier}/cancel")
     public ReservationDTO cancelReservation(@PathVariable Long reservationIdentifier) {

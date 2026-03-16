@@ -16,7 +16,6 @@ public class MenuCategoryEntity extends BaseEntity {
     @Column(unique = true)
     private String name;
     private String nameZh;
-    private String description;
     private Integer sortOrder;
     
     @JsonProperty("isActive")

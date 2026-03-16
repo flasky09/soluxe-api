@@ -22,7 +22,7 @@ public class DashboardSummaryDTO {
     
     // Alerts/Actions
     private long pendingHousekeeping;
-    private long lowStockItems;
     private long pendingLeaveRequests;
     private long pendingPurchaseOrders;
+    private long lowStockItems;
 }

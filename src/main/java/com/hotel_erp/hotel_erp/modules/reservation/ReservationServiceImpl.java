@@ -3,12 +3,10 @@ package com.hotel_erp.hotel_erp.modules.reservation;
 import com.hotel_erp.hotel_erp.shared.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
-import com.hotel_erp.hotel_erp.modules.guest.GuestEntity;
 import com.hotel_erp.hotel_erp.modules.guest.IdType;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 
 import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
 import com.hotel_erp.hotel_erp.modules.stay.StayStatus;
@@ -17,18 +15,15 @@ import com.hotel_erp.hotel_erp.modules.stay.StayStatus;
 public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, Long, ReservationRepository> implements ReservationService {
     
     private final GuestRepository guestRepository;
-    private final RoomRepository roomRepository;
     private final StayRepository stayRepository;
     private final ReservationMapper reservationMapper;
 
     public ReservationServiceImpl(ReservationRepository repository, 
                                   GuestRepository guestRepository, 
-                                  RoomRepository roomRepository, 
                                   StayRepository stayRepository, 
                                   ReservationMapper reservationMapper) {
         super(repository);
         this.guestRepository = guestRepository;
-        this.roomRepository = roomRepository;
         this.stayRepository = stayRepository;
         this.reservationMapper = reservationMapper;
     }
@@ -121,5 +116,12 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
         }
 
         return reservationMapper.toDto(repository.save(existing));
+    }
+    @Override
+    public List<ReservationDTO> getTodayArrivals() {
+        return repository.findByStatusAndDateInLessThanEqual(ReservationStatus.BOOKED, java.time.LocalDate.now())
+                .stream()
+                .map(reservationMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

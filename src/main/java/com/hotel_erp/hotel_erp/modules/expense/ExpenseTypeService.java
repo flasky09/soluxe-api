@@ -48,12 +48,10 @@ public class ExpenseTypeService {
         ExpenseTypeDTO dto = new ExpenseTypeDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
-        dto.setDescription(entity.getDescription());
         return dto;
     }
 
     private void mapToEntity(ExpenseTypeDTO dto, ExpenseTypeEntity entity) {
         entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
     }
 }

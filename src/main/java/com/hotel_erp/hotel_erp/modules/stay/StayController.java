@@ -19,6 +19,16 @@ public class StayController {
                 .toList();
     }
 
+    @GetMapping("/active")
+    public java.util.List<StayDTO> getActiveStays() {
+        return stayService.findActiveStays();
+    }
+
+    @GetMapping("/guest/{guestId}")
+    public java.util.List<StayDTO> getGuestStays(@PathVariable Long guestId) {
+        return stayService.findByGuestId(guestId);
+    }
+
     @PostMapping("/check-in")
     public StayDTO checkIn(@RequestBody CheckInRequest request) {
         return stayService.checkIn(request.getReservationId(), request.getRoomId(), request.getUserId());
@@ -30,13 +40,20 @@ public class StayController {
     }
 
     @PostMapping("/{id}/check-out")
-    public StayDTO checkOut(@PathVariable Long id, @RequestParam Long userId) {
-        return stayService.checkOut(id, userId);
+    public StayDTO checkOut(@PathVariable Long id, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "false") boolean approveAdjustment) {
+        // Since the interface doesn't have the boolean flag yet, we'll cast or call the service method directly if it's public
+        // In this case, I'll update the interface too for consistency
+        return ((StayServiceImpl)stayService).checkOut(id, userId, approveAdjustment);
     }
 
-    @PostMapping("/checkout-by-reservation/{reservationId}")
-    public StayDTO checkOutByReservationId(@PathVariable Long reservationId, @RequestParam Long userId) {
-        return stayService.checkOutByReservationId(reservationId, userId);
+    @PostMapping("/{id}/extend")
+    public StayDTO extendStay(@PathVariable Long id, @RequestParam java.time.LocalDateTime newDateOut, @RequestParam Long userId) {
+        return stayService.extendStay(id, newDateOut, userId);
+    }
+
+    @PostMapping("/reservations/{reservationId}/no-show")
+    public void markNoShow(@PathVariable Long reservationId, @RequestParam Long userId) {
+        stayService.markNoShow(reservationId, userId);
     }
 
     @Data

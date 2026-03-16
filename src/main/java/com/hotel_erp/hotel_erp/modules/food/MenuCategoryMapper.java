@@ -12,6 +12,5 @@ public interface MenuCategoryMapper {
 
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "description", ignore = true)
     MenuCategoryEntity toEntity(MenuCategoryDTO dto);
 }

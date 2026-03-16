@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.*;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@WithMockUser(username = "admin", roles = {"ADMIN"})
+@WithMockUser(username = "admin", roles = {"HOTEL_ADMIN"})
 public class ChargeTypeControllerTest {
 
     @Autowired
@@ -30,18 +30,23 @@ public class ChargeTypeControllerTest {
     private ChargeTypeRepository chargeTypeRepository;
 
     @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        chargeTypeRepository.deleteAll();
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        jdbcTemplate.execute("TRUNCATE TABLE folio_charges");
+        jdbcTemplate.execute("TRUNCATE TABLE charge_types");
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 
     @Test
     void testCreateChargeType() throws Exception {
         ChargeTypeDTO dto = new ChargeTypeDTO();
         dto.setName("Service Charge");
-        dto.setDescription("General service charge");
         dto.setActive(true);
 
         mockMvc.perform(post("/api/charge-types")

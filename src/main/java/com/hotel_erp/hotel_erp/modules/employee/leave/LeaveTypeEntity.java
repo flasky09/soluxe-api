@@ -14,6 +14,5 @@ import lombok.EqualsAndHashCode;
 public class LeaveTypeEntity extends BaseEntity {
     @Column(unique = true)
     private String name;
-    private String description;
     private boolean active = true;
 }

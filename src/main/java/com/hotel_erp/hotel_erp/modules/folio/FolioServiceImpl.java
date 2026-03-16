@@ -128,8 +128,8 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                     .ifPresent(charge::setChargeType);
         }
         
-        BigDecimal quantity = charge.getQuantity();
-        BigDecimal unitPrice = charge.getUnitPrice();
+        BigDecimal quantity = charge.getQuantity() != null ? charge.getQuantity() : BigDecimal.ONE;
+        BigDecimal unitPrice = charge.getUnitPrice() != null ? charge.getUnitPrice() : BigDecimal.ZERO;
         BigDecimal discountPct = charge.getDiscountPct() != null ? charge.getDiscountPct() : BigDecimal.ZERO;
         BigDecimal taxPct = charge.getTaxPct() != null ? charge.getTaxPct() : BigDecimal.ZERO;
 
@@ -141,6 +141,10 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         BigDecimal taxFactor = BigDecimal.ONE.add(taxPct.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP));
         BigDecimal totalAmount = subtotal.multiply(taxFactor).setScale(2, RoundingMode.HALF_UP);
 
+        charge.setQuantity(quantity);
+        charge.setUnitPrice(unitPrice);
+        charge.setDiscountPct(discountPct);
+        charge.setTaxPct(taxPct);
         charge.setTotalAmount(totalAmount);
         
         charge = folioChargeRepository.save(charge);

@@ -1,5 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.food;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ public class MenuCategoryController {
     private final MenuCategoryService menuCategoryService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'MANAGER')")
     public MenuCategoryEntity createCategory(@RequestBody MenuCategoryEntity category) {
         return menuCategoryService.save(category);
     }
@@ -28,6 +30,7 @@ public class MenuCategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
     public void deleteCategory(@PathVariable Long id) {
         menuCategoryService.deleteById(id);
     }

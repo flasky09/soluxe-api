@@ -31,7 +31,6 @@ public class DataInitializer implements CommandLineRunner {
                 .orElseGet(() -> {
                     DepartmentEntity dept = new DepartmentEntity();
                     dept.setName("Administration");
-                    dept.setDescription("System Administration Department");
                     return departmentRepository.save(dept);
                 });
 

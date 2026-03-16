@@ -27,9 +27,6 @@ public class DailyRevenueDTO {
     private BigDecimal supplyCosts;
     private BigDecimal payrollExpenses;
     private BigDecimal inventoryValue;
-    private BigDecimal totalDrawings;
-    private BigDecimal totalSavings;
-    private BigDecimal totalCapitalInjected;
     private BigDecimal accountsReceivable;
     private BigDecimal accountsPayable;
     private BigDecimal pettyCash;

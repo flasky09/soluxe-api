@@ -7,4 +7,10 @@ public interface StayService extends BaseService<StayEntity, Long> {
     StayDTO walkInCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDateTime dateOut, Long userId);
     StayDTO checkOut(Long stayId, Long userId);
     StayDTO checkOutByReservationId(Long reservationId, Long userId);
+    
+    java.util.List<StayDTO> findActiveStays();
+    java.util.List<StayDTO> findByGuestId(Long guestId);
+    StayDTO extendStay(Long id, java.time.LocalDateTime newDateOut, Long userId);
+    void markNoShow(Long reservationId, Long userId);
+    void autoFlagOverstays();
 }

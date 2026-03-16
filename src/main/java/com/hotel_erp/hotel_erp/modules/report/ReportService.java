@@ -73,28 +73,16 @@ public class ReportService {
         BigDecimal payrollExpenses = employeeRepository.getTotalPayroll();
         if (payrollExpenses == null) payrollExpenses = BigDecimal.ZERO;
 
-        BigDecimal inventoryValue = inventoryItemRepository.getTotalStockValue();
-        if (inventoryValue == null) inventoryValue = BigDecimal.ZERO;
-
-        BigDecimal totalDrawings = cashMovementRepository.getTotalDrawingsInDateRange(date, date);
-        if (totalDrawings == null) totalDrawings = BigDecimal.ZERO;
-
-        BigDecimal totalSavings = cashMovementRepository.getTotalSavingsInDateRange(date, date);
-        if (totalSavings == null) totalSavings = BigDecimal.ZERO;
-
-        BigDecimal totalCapitalInjected = cashMovementRepository.getTotalCapitalInjectionsInDateRange(date, date);
-        if (totalCapitalInjected == null) totalCapitalInjected = BigDecimal.ZERO;
-
-        BigDecimal pettyCash = pettyCashRepository.getTotalPettyCashInDateRange(date, date);
-        if (pettyCash == null) pettyCash = BigDecimal.ZERO;
-
         BigDecimal accountsReceivable = folioRepository.getOutstandingBalanceForClosedFolios();
         if (accountsReceivable == null) accountsReceivable = BigDecimal.ZERO;
 
         BigDecimal accountsPayable = purchaseOrderRepository.getTotalAccountsPayable();
         if (accountsPayable == null) accountsPayable = BigDecimal.ZERO;
 
-        return calculateDailyRevenue(date, dailyCharges, payments, expenses, totalExpenses, operationalExpenses, totalAssets, maintenanceCosts, supplyCosts, payrollExpenses, inventoryValue, totalDrawings, totalSavings, totalCapitalInjected, accountsReceivable, accountsPayable, pettyCash);
+        BigDecimal pettyCash = pettyCashRepository.getTotalPettyCashInDateRange(date, date);
+        if (pettyCash == null) pettyCash = BigDecimal.ZERO;
+
+        return calculateDailyRevenue(date, dailyCharges, payments, expenses, totalExpenses, operationalExpenses, totalAssets, maintenanceCosts, supplyCosts, payrollExpenses, accountsReceivable, accountsPayable, pettyCash);
     }
 
     public RevenueReportDTO getRevenueReport(LocalDate startDate, LocalDate endDate) {
@@ -141,26 +129,14 @@ public class ReportService {
         BigDecimal payrollExpenses = employeeRepository.getTotalPayroll();
         if (payrollExpenses == null) payrollExpenses = BigDecimal.ZERO;
 
-        BigDecimal inventoryValue = inventoryItemRepository.getTotalStockValue();
-        if (inventoryValue == null) inventoryValue = BigDecimal.ZERO;
-
-        BigDecimal totalDrawings = cashMovementRepository.getTotalDrawingsInDateRange(startDate, endDate);
-        if (totalDrawings == null) totalDrawings = BigDecimal.ZERO;
-
-        BigDecimal totalSavings = cashMovementRepository.getTotalSavingsInDateRange(startDate, endDate);
-        if (totalSavings == null) totalSavings = BigDecimal.ZERO;
-
-        BigDecimal totalCapitalInjected = cashMovementRepository.getTotalCapitalInjectionsInDateRange(startDate, endDate);
-        if (totalCapitalInjected == null) totalCapitalInjected = BigDecimal.ZERO;
-
-        BigDecimal pettyCash = pettyCashRepository.getTotalPettyCashInDateRange(startDate, endDate);
-        if (pettyCash == null) pettyCash = BigDecimal.ZERO;
-
         BigDecimal accountsReceivable = folioRepository.getOutstandingBalanceForClosedFolios();
         if (accountsReceivable == null) accountsReceivable = BigDecimal.ZERO;
 
         BigDecimal accountsPayable = purchaseOrderRepository.getTotalAccountsPayable();
         if (accountsPayable == null) accountsPayable = BigDecimal.ZERO;
+
+        BigDecimal pettyCash = pettyCashRepository.getTotalPettyCashInDateRange(startDate, endDate);
+        if (pettyCash == null) pettyCash = BigDecimal.ZERO;
 
         BigDecimal totalRevenue = BigDecimal.ZERO;
         BigDecimal netRevenue = BigDecimal.ZERO;
@@ -208,10 +184,6 @@ public class ReportService {
                 .maintenanceCosts(maintenanceCosts)
                 .supplyCosts(supplyCosts)
                 .payrollExpenses(payrollExpenses)
-                .inventoryValue(inventoryValue)
-                .totalDrawings(totalDrawings)
-                .totalSavings(totalSavings)
-                .totalCapitalInjected(totalCapitalInjected)
                 .accountsReceivable(accountsReceivable)
                 .accountsPayable(accountsPayable)
                 .pettyCash(pettyCash)
@@ -220,153 +192,8 @@ public class ReportService {
                 .build();
     }
 
-    public BalanceSheetDTO getBalanceSheet(LocalDate asOfDate) {
-        // Point in time (all time up to asOfDate)
-        LocalDate startDate = LocalDate.of(2000, 1, 1); 
 
-        // Current Assets
-        BigDecimal collections = folioPaymentRepository.findAllByDateRange(startDate.atStartOfDay(), asOfDate.plusDays(1).atStartOfDay()).stream()
-                .map(com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        BigDecimal capitalIn = cashMovementRepository.getTotalCapitalInjectionsInDateRange(startDate, asOfDate);
-        if (capitalIn == null) capitalIn = BigDecimal.ZERO;
-
-        BigDecimal allExpenses = expenseRepository.findAllByExpenseDateBetween(startDate, asOfDate).stream()
-                .map(com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        BigDecimal allDrawings = cashMovementRepository.getTotalDrawingsInDateRange(startDate, asOfDate);
-        if (allDrawings == null) allDrawings = BigDecimal.ZERO;
-
-        BigDecimal allPettyCash = pettyCashRepository.getTotalPettyCashInDateRange(startDate, asOfDate);
-        if (allPettyCash == null) allPettyCash = BigDecimal.ZERO;
-
-        // Cash on Hand = (Collections + Capital In) - (Expenses + Drawings + Petty Cash)
-        BigDecimal cashOnHand = collections.add(capitalIn).subtract(allExpenses).subtract(allDrawings).subtract(allPettyCash);
-
-        BigDecimal accountsReceivable = folioRepository.getOutstandingBalanceForClosedFolios();
-        if (accountsReceivable == null) accountsReceivable = BigDecimal.ZERO;
-
-        BigDecimal inventoryValue = inventoryItemRepository.getTotalStockValue();
-        if (inventoryValue == null) inventoryValue = BigDecimal.ZERO;
-
-        BigDecimal totalCurrentAssets = cashOnHand.add(accountsReceivable).add(inventoryValue);
-
-        // Fixed Assets
-        BigDecimal fixedAssetsValue = expenseRepository.findAllByExpenseDateBetween(startDate, asOfDate).stream()
-                .filter(e -> e.getExpenseType() != null && e.getExpenseType().isAsset())
-                .map(com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal totalAssets = totalCurrentAssets.add(fixedAssetsValue);
-
-        // Liabilities
-        BigDecimal accountsPayable = purchaseOrderRepository.getTotalAccountsPayable();
-        if (accountsPayable == null) accountsPayable = BigDecimal.ZERO;
-
-        BigDecimal totalLiabilities = accountsPayable;
-
-        // Equity
-        // Net Profit = All Revenue - All OpEx
-        BigDecimal totalRevenue = folioChargeRepository.findAllByDateRange(startDate.atStartOfDay(), asOfDate.plusDays(1).atStartOfDay()).stream()
-                .map(FolioChargeEntity::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal totalOpEx = expenseRepository.findAllByExpenseDateBetween(startDate, asOfDate).stream()
-                .filter(e -> e.getExpenseType() != null && !e.getExpenseType().isAsset())
-                .map(com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal cumulativeNetProfit = totalRevenue.subtract(totalOpEx);
-        BigDecimal retainedEarnings = cumulativeNetProfit.subtract(allDrawings);
-
-        BigDecimal totalEquity = capitalIn.add(retainedEarnings);
-
-        return BalanceSheetDTO.builder()
-                .asOfDate(asOfDate)
-                .cashOnHand(cashOnHand)
-                .accountsReceivable(accountsReceivable)
-                .inventoryValue(inventoryValue)
-                .totalCurrentAssets(totalCurrentAssets)
-                .fixedAssetsValue(fixedAssetsValue)
-                .totalAssets(totalAssets)
-                .accountsPayable(accountsPayable)
-                .taxPayable(BigDecimal.ZERO)
-                .totalLiabilities(totalLiabilities)
-                .capitalInjected(capitalIn)
-                .retainedEarnings(retainedEarnings)
-                .totalEquity(totalEquity)
-                .build();
-    }
-
-    public ProfitAndLossDTO getProfitAndLoss(LocalDate startDate, LocalDate endDate) {
-        List<FolioChargeEntity> dailyCharges = folioChargeRepository.findAllByDateRange(
-                startDate.atStartOfDay(),
-                endDate.plusDays(1).atStartOfDay()
-        );
-
-        BigDecimal totalRevenue = dailyCharges.stream()
-                .map(FolioChargeEntity::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Map<String, BigDecimal> revenueByDepartment = dailyCharges.stream()
-                .collect(Collectors.groupingBy(
-                        charge -> charge.getChargeType() != null ? charge.getChargeType().getName() : "UNASSIGNED",
-                        Collectors.reducing(BigDecimal.ZERO, FolioChargeEntity::getTotalAmount, BigDecimal::add)
-                ));
-
-        List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> expenses = expenseRepository.findAllByExpenseDateBetween(startDate, endDate);
-        
-        BigDecimal costOfSales = purchaseOrderItemRepository.getTotalSpendInDateRange(startDate, endDate);
-        if (costOfSales == null) costOfSales = BigDecimal.ZERO;
-
-        BigDecimal grossProfit = totalRevenue.subtract(costOfSales);
-
-        BigDecimal payrollExpenses = employeeRepository.getTotalPayroll();
-        if (payrollExpenses == null) payrollExpenses = BigDecimal.ZERO;
-
-        BigDecimal maintenanceCosts = BigDecimal.ZERO;
-        BigDecimal pettyCashExpenses = pettyCashRepository.getTotalPettyCashInDateRange(startDate, endDate);
-        if (pettyCashExpenses == null) pettyCashExpenses = BigDecimal.ZERO;
-
-        BigDecimal operationalExpenses = BigDecimal.ZERO;
-        
-        for (com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity e : expenses) {
-            BigDecimal amt = e.getAmount() != null ? e.getAmount() : BigDecimal.ZERO;
-            if (e.getExpenseType() != null && !e.getExpenseType().isAsset()) {
-                operationalExpenses = operationalExpenses.add(amt);
-                if (e.getExpenseType().getName() != null && e.getExpenseType().getName().toLowerCase().contains("maintenance")) {
-                    maintenanceCosts = maintenanceCosts.add(amt);
-                }
-            }
-        }
-
-        BigDecimal totalOperatingExpenses = operationalExpenses.add(payrollExpenses).add(pettyCashExpenses);
-        BigDecimal netProfit = grossProfit.subtract(totalOperatingExpenses);
-
-        BigDecimal operatingMargin = totalRevenue.compareTo(BigDecimal.ZERO) > 0 
-            ? netProfit.multiply(new BigDecimal("100")).divide(totalRevenue, 2, RoundingMode.HALF_UP) 
-            : BigDecimal.ZERO;
-
-        return ProfitAndLossDTO.builder()
-                .startDate(startDate)
-                .endDate(endDate)
-                .totalRevenue(totalRevenue)
-                .revenueByDepartment(revenueByDepartment)
-                .costOfSales(costOfSales)
-                .grossProfit(grossProfit)
-                .payrollExpenses(payrollExpenses)
-                .operationalExpenses(operationalExpenses)
-                .maintenanceCosts(maintenanceCosts)
-                .pettyCashExpenses(pettyCashExpenses)
-                .totalOperatingExpenses(totalOperatingExpenses)
-                .netProfit(netProfit)
-                .operatingMargin(operatingMargin)
-                .build();
-    }
-
-    private DailyRevenueDTO calculateDailyRevenue(LocalDate date, List<FolioChargeEntity> dailyCharges, List<com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity> payments, List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> dailyExpenses, BigDecimal totalExpenses, BigDecimal operationalExpenses, BigDecimal totalAssets, BigDecimal maintenanceCosts, BigDecimal supplyCosts, BigDecimal payrollExpenses, BigDecimal inventoryValue, BigDecimal totalDrawings, BigDecimal totalSavings, BigDecimal totalCapitalInjected, BigDecimal accountsReceivable, BigDecimal accountsPayable, BigDecimal pettyCash) {
+    private DailyRevenueDTO calculateDailyRevenue(LocalDate date, List<FolioChargeEntity> dailyCharges, List<com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity> payments, List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> dailyExpenses, BigDecimal totalExpenses, BigDecimal operationalExpenses, BigDecimal totalAssets, BigDecimal maintenanceCosts, BigDecimal supplyCosts, BigDecimal payrollExpenses, BigDecimal accountsReceivable, BigDecimal accountsPayable, BigDecimal pettyCash) {
         BigDecimal totalPayments = payments.stream()
                 .map(com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -414,10 +241,6 @@ public class ReportService {
                 .maintenanceCosts(maintenanceCosts)
                 .supplyCosts(supplyCosts)
                 .payrollExpenses(payrollExpenses)
-                .inventoryValue(inventoryValue)
-                .totalDrawings(totalDrawings)
-                .totalSavings(totalSavings)
-                .totalCapitalInjected(totalCapitalInjected)
                 .accountsReceivable(accountsReceivable)
                 .accountsPayable(accountsPayable)
                 .pettyCash(pettyCash)
@@ -481,10 +304,13 @@ public class ReportService {
         // Add Cash Movements
         List<CashMovementEntity> movements = cashMovementRepository.findAllByMovementDateBetween(start, end);
         for (CashMovementEntity m : movements) {
-            String trayType = "COLLECTION";
-            if (m.getType() == CashMovementEntity.CashMovementType.DRAWING) {
-                trayType = "EXPENSE";
+            // Filter out DRAWING and SAVING as per user request
+            if (m.getType() == CashMovementEntity.CashMovementType.DRAWING || 
+                m.getType() == CashMovementEntity.CashMovementType.SAVING) {
+                continue;
             }
+            
+            String trayType = "COLLECTION";
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(m.getMovementDate().atStartOfDay())
                 .type(trayType)

@@ -38,9 +38,6 @@ public class DepartmentService {
             departmentRepository.deleteById(id);
         } catch (Exception e) {
             departmentRepository.findById(id).ifPresent(entity -> {
-                entity.setActive(true); // Wait, should be false
-                // Actually, I need to check the field name. In other entities I used 'active = true' by default.
-                // So delete should set it to false.
                 entity.setActive(false);
                 departmentRepository.save(entity);
             });

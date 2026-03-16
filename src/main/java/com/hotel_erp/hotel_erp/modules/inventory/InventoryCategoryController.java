@@ -23,9 +23,13 @@ public class InventoryCategoryController {
     }
 
     @PutMapping("/{id}")
-    public InventoryCategoryEntity updateCategory(@PathVariable Long id, @RequestBody InventoryCategoryEntity category) {
-        category.setId(id);
-        return inventoryCategoryRepository.save(category);
+    public InventoryCategoryEntity updateCategory(@PathVariable Long id, @RequestBody InventoryCategoryEntity categoryDetails) {
+        InventoryCategoryEntity entity = inventoryCategoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("InventoryCategory not found"));
+        entity.setName(categoryDetails.getName());
+        entity.setDescription(categoryDetails.getDescription());
+        entity.setActive(categoryDetails.isActive());
+        return inventoryCategoryRepository.save(entity);
     }
 
     @GetMapping("/{id}")

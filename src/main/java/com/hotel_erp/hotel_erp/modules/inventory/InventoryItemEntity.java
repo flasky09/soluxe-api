@@ -17,15 +17,14 @@ public class InventoryItemEntity extends BaseEntity {
     
     @Column(unique = true)
     private String name;
-    private BigDecimal unitCost; // Serving as Selling Price per user reference
     private BigDecimal buyingPrice;
+    private BigDecimal currentStock;
+    private BigDecimal minimumStock;
 
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_id")
     private InventoryUnitEntity unit;
     
-    private BigDecimal currentStock;
-    private BigDecimal minimumStock;
     private String notes;
 }

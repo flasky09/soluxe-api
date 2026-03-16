@@ -40,7 +40,8 @@ public class InventoryUnitController {
 
     @PutMapping("/{id}")
     public InventoryUnitDTO update(@PathVariable Long id, @RequestBody InventoryUnitDTO dto) {
-        InventoryUnitEntity entity = repository.findById(id).orElseThrow();
+        InventoryUnitEntity entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Inventory Unit not found"));
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setActive(dto.isActive());

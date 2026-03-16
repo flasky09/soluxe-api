@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +30,9 @@ public class DashboardService {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(java.time.LocalTime.MAX);
 
-        long arrivals = reservationRepository.countByStatusAndDateIn(ReservationStatus.BOOKED, today);
+        long arrivals = reservationRepository.countByStatusAndDateInLessThanEqual(ReservationStatus.BOOKED, today);
         long departures = reservationRepository.countByStatusAndDateOut(ReservationStatus.CHECKED_IN, today);
-        long activeStays = stayRepository.findAllByStatus(StayStatus.ACTIVE).size();
+        long activeStays = stayRepository.countByStatusIn(java.util.List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY));
 
         long totalRooms = roomRepository.count();
         double occupancyRate = totalRooms > 0 ? (double) activeStays / totalRooms * 100 : 0.0;
@@ -59,17 +58,17 @@ public class DashboardService {
                 .filter(r -> r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.DIRTY)
                 .count();
 
-        long lowStock = inventoryItemRepository.findAll().stream()
-                .filter(i -> i.getMinimumStock() != null && i.getCurrentStock() != null && 
-                             i.getCurrentStock().compareTo(i.getMinimumStock()) <= 0)
-                .count();
-
         long pendingLeaves = leaveRequestRepository.findAll().stream()
                 .filter(l -> l.getStatus() == com.hotel_erp.hotel_erp.modules.employee.leave.LeaveStatus.PENDING)
                 .count();
 
         long pendingPOs = purchaseOrderRepository.findAll().stream()
                 .filter(p -> "PENDING".equalsIgnoreCase(p.getStatus().name()))
+                .count();
+
+        long lowStockItems = inventoryItemRepository.findAll().stream()
+                .filter(item -> item.getCurrentStock() != null && item.getMinimumStock() != null 
+                        && item.getCurrentStock().compareTo(item.getMinimumStock()) <= 0)
                 .count();
 
         return DashboardSummaryDTO.builder()
@@ -81,9 +80,9 @@ public class DashboardService {
                 .averageDailyRate(Math.round(adr * 100.0) / 100.0)
                 .revenuePerAvailableRoom(Math.round(revpar * 100.0) / 100.0)
                 .pendingHousekeeping(dirtyRooms)
-                .lowStockItems(lowStock)
                 .pendingLeaveRequests(pendingLeaves)
                 .pendingPurchaseOrders(pendingPOs)
+                .lowStockItems(lowStockItems)
                 .build();
     }
 }

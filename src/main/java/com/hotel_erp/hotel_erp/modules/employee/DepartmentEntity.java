@@ -16,6 +16,5 @@ public class DepartmentEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String name;
 
-    private String description;
     private boolean active = true;
 }

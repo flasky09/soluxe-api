@@ -56,7 +56,6 @@ public class ExpenseService {
             ExpenseTypeDTO typeDto = new ExpenseTypeDTO();
             typeDto.setId(entity.getExpenseType().getId());
             typeDto.setName(entity.getExpenseType().getName());
-            typeDto.setDescription(entity.getExpenseType().getDescription());
             dto.setExpenseType(typeDto);
         }
         

@@ -4,12 +4,15 @@ import com.hotel_erp.hotel_erp.modules.reservation.ReservationEntity;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationStatus;
 import com.hotel_erp.hotel_erp.shared.BaseServiceImpl;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepository> implements StayService {
@@ -45,6 +48,11 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
         if (reservation.getStatus() != ReservationStatus.BOOKED) {
              throw new RuntimeException("Reservation is not in BOOKED status");
+        }
+
+        // Validate no existing active stay for this guest
+        if (repository.countByGuestIdAndStatusIn(reservation.getGuestId(), List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY)) > 0) {
+            throw new RuntimeException("Guest already has an active stay.");
         }
 
         StayEntity stay = new StayEntity();
@@ -84,16 +92,53 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     @Transactional
-    public StayDTO checkOut(Long stayId, Long userId) {
-        StayEntity stay = repository.findById(stayId)
+    public StayDTO checkOut(Long id, Long userId) {
+        return checkOut(id, userId, false); // Default to no auto-adjustment without approval UI
+    }
+
+    @Transactional
+    public StayDTO checkOut(Long id, Long userId, boolean approveAdjustment) {
+        StayEntity stay = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Stay not found"));
 
-        if (stay.getStatus() != StayStatus.ACTIVE) {
-            throw new RuntimeException("Stay is not ACTIVE");
+        if (stay.getStatus() == StayStatus.CHECKED_OUT) {
+            throw new RuntimeException("Stay is already checked out");
         }
 
         // ✅ VALIDATE FOLIO BALANCE FIRST — before any mutations
-        var folio = folioRepository.findByStayId(stayId).orElse(null);
+        var folio = folioRepository.findByStayId(id).orElse(null);
+        
+        LocalDateTime now = LocalDateTime.now();
+        
+        // Handle Understay (Early Checkout) Adjustment
+        if (folio != null && stay.getDateOut() != null) {
+            long plannedNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), stay.getDateOut().toLocalDate());
+            long actualNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), now.toLocalDate());
+            
+            if (actualNights < plannedNights) {
+                if (approveAdjustment) {
+                    long diff = plannedNights - actualNights;
+                    BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : BigDecimal.ZERO;
+                    
+                    com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO adjustment = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+                            .folioId(folio.getId())
+                            .description("Understay Adjustment - " + diff + " Night(s)")
+                            .quantity(new BigDecimal(diff))
+                            .unitPrice(rate.negate()) // Negative price to reduce total
+                            .taxPct(BigDecimal.ZERO)
+                            .discountPct(BigDecimal.ZERO)
+                            .addedBy(userId)
+                            .build();
+                    
+                    chargeTypeRepository.findByName("Room Charge").ifPresent(type -> adjustment.setChargeTypeId(type.getId()));
+                    folioService.addCharge(folio.getId(), adjustment, userId);
+                    
+                    // Refresh folio balance after adjustment
+                    folio = folioRepository.findById(folio.getId()).orElse(folio);
+                }
+            }
+        }
+
         if (folio != null && folio.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
             throw new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.BAD_REQUEST,
@@ -138,6 +183,11 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                 .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
         if (room.getStatus() != com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE) {
             throw new RuntimeException("Room " + room.getRoomNumber() + " is not available for check-in.");
+        }
+
+        // Validate no existing active stay for this guest
+        if (repository.countByGuestIdAndStatusIn(guestId, List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY)) > 0) {
+            throw new RuntimeException("Guest already has an active stay.");
         }
 
         StayEntity stay = new StayEntity();
@@ -203,6 +253,92 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         });
 
         folioService.addCharge(folioId, chargeDto, userId);
+    }
+
+    @Override
+    public List<StayDTO> findActiveStays() {
+        return repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY))
+                .stream()
+                .map(stayMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 * * * *") // Every hour
+    @Transactional
+    public void autoFlagOverstays() {
+        List<StayEntity> activeStays = repository.findAllByStatusAndDateOutBefore(StayStatus.ACTIVE, LocalDateTime.now());
+        for (StayEntity stay : activeStays) {
+            stay.setStatus(StayStatus.OVERSTAY);
+            repository.save(stay);
+        }
+    }
+
+    @Override
+    public List<StayDTO> findByGuestId(Long guestId) {
+        return repository.findAllByGuestIdOrderByDateInDesc(guestId)
+                .stream()
+                .map(stayMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public StayDTO extendStay(Long id, LocalDateTime newDateOut, Long userId) {
+        StayEntity stay = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Stay not found"));
+
+        if (stay.getStatus() == StayStatus.CHECKED_OUT) {
+            throw new RuntimeException("Cannot extend a checked-out stay");
+        }
+
+        LocalDateTime oldDateOut = stay.getDateOut();
+        if (newDateOut != null && oldDateOut != null && newDateOut.isBefore(oldDateOut)) {
+            throw new RuntimeException("New checkout date must be after current checkout date");
+        }
+
+        long additionalNights = java.time.Duration.between(oldDateOut, newDateOut).toDays();
+        if (additionalNights > 0) {
+            var folio = folioRepository.findByStayId(id).orElseThrow(() -> new RuntimeException("Folio not found"));
+            var room = roomRepository.findById(stay.getRoomId()).orElseThrow();
+            BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
+            
+            com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO chargeDto = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+                    .folioId(folio.getId())
+                    .description("Room Charge Extension - " + additionalNights + " Night(s)")
+                    .quantity(new BigDecimal(additionalNights))
+                    .unitPrice(rate != null ? rate : BigDecimal.ZERO)
+                    .taxPct(BigDecimal.ZERO)
+                    .discountPct(BigDecimal.ZERO)
+                    .addedBy(userId)
+                    .build();
+
+            chargeTypeRepository.findByName("Room Charge").ifPresent(type -> chargeDto.setChargeTypeId(type.getId()));
+            folioService.addCharge(folio.getId(), chargeDto, userId);
+        }
+
+        stay.setDateOut(newDateOut);
+        if (stay.getStatus() == StayStatus.OVERSTAY && newDateOut != null && newDateOut.isAfter(LocalDateTime.now())) {
+            stay.setStatus(StayStatus.ACTIVE);
+        }
+
+        return stayMapper.toDto(repository.save(stay));
+    }
+
+    @Override
+    @Transactional
+    public void markNoShow(Long reservationId, Long userId) {
+        reservationRepository.findById(reservationId).ifPresent(res -> {
+            res.setStatus(ReservationStatus.CANCELLED);
+            reservationRepository.save(res);
+            
+            roomRepository.findById(res.getRoomId()).ifPresent(room -> {
+                if (room.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.OCCUPIED) {
+                    room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE);
+                    roomRepository.save(room);
+                }
+            });
+        });
     }
 }
 

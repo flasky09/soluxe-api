@@ -14,6 +14,13 @@ import lombok.EqualsAndHashCode;
 public class ChargeTypeEntity extends BaseEntity {
     @Column(unique = true)
     private String name;
-    private String description;
     private boolean active = true;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

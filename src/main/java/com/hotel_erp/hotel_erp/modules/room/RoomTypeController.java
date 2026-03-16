@@ -1,5 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.room;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class RoomTypeController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'MANAGER')")
     public ResponseEntity<RoomTypeDTO> createRoomType(@RequestBody RoomTypeDTO roomTypeDTO) {
         RoomTypeEntity entity = roomTypeMapper.toEntity(roomTypeDTO);
         RoomTypeEntity saved = roomTypeService.save(entity);
@@ -37,18 +39,24 @@ public class RoomTypeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoomTypeDTO> updateRoomType(@PathVariable Long id, @RequestBody RoomTypeDTO roomTypeDTO) {
-        return roomTypeService.findById(id)
-                .map(existing -> {
-                    RoomTypeEntity entity = roomTypeMapper.toEntity(roomTypeDTO);
-                    entity.setId(id);
-                    RoomTypeEntity updated = roomTypeService.save(entity);
-                    return ResponseEntity.ok(roomTypeMapper.toDto(updated));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'MANAGER')")
+    public RoomTypeDTO update(@PathVariable Long id, @RequestBody RoomTypeDTO dto) {
+        RoomTypeEntity entity = roomTypeService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room Type not found"));
+        
+        entity.setName(dto.getName());
+        entity.setDefaultRate(dto.getDefaultRate());
+        entity.setWeekendRate(dto.getWeekendRate());
+        entity.setCapacity(dto.getCapacity());
+        entity.setBedType(dto.getBedType());
+        entity.setAmenities(dto.getAmenities());
+        
+        RoomTypeEntity saved = roomTypeService.save(entity);
+        return roomTypeMapper.toDto(saved);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
     public ResponseEntity<Void> deleteRoomType(@PathVariable Long id) {
         roomTypeService.deleteById(id);
         return ResponseEntity.noContent().build();

@@ -32,7 +32,7 @@ public class FolioChargeEntity extends BaseEntity {
     private LocalDateTime chargedAt;
     private Long addedBy;
 
-    private Long referenceId;
+    private String referenceId;
     private boolean voided;
     private String voidReason;
     private Long voidedBy;

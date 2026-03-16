@@ -1,5 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.folio;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,6 @@ public class ChargeTypeController {
                     ChargeTypeDTO dto = new ChargeTypeDTO();
                     dto.setId(entity.getId());
                     dto.setName(entity.getName());
-                    dto.setDescription(entity.getDescription());
                     dto.setActive(entity.isActive());
                     return dto;
                 })
@@ -28,10 +28,10 @@ public class ChargeTypeController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'MANAGER')")
     public ChargeTypeDTO create(@RequestBody ChargeTypeDTO dto) {
         ChargeTypeEntity entity = new ChargeTypeEntity();
         entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
         entity.setActive(dto.isActive());
         entity = repository.saveAndFlush(entity);
         dto.setId(entity.getId());
@@ -39,16 +39,18 @@ public class ChargeTypeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'MANAGER')")
     public ChargeTypeDTO update(@PathVariable Long id, @RequestBody ChargeTypeDTO dto) {
-        ChargeTypeEntity entity = repository.findById(id).orElseThrow();
+        ChargeTypeEntity entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Charge Type not found"));
         entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
         entity.setActive(dto.isActive());
         repository.save(entity);
         return dto;
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
     public void delete(@PathVariable Long id) {
         try {
             repository.deleteById(id);
