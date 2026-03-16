@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GuestRepository extends BaseRepository<GuestEntity, Long> {
+    java.util.List<GuestEntity> findAllByOrderByIdDesc();
 }

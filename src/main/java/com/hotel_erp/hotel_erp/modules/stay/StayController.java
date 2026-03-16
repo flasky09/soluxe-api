@@ -58,6 +58,11 @@ public class StayController {
         stayService.markNoShow(reservationId, userId);
     }
 
+    @PostMapping("/{id}/void")
+    public void voidStay(@PathVariable("id") Long id, @RequestParam("userId") Long userId) {
+        stayService.voidStay(id, userId);
+    }
+
     @Data
     public static class CheckInRequest {
         private Long reservationId;
@@ -71,7 +76,7 @@ public class StayController {
         private Long roomId;
         private Integer adults;
         private Integer children;
-        private LocalDateTime dateOut;
+        private java.time.LocalDate dateOut;
         private Long userId;
     }
 }

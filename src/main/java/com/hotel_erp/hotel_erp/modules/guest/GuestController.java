@@ -39,4 +39,9 @@ public class GuestController {
     public void deleteGuest(@PathVariable Long id) {
         guestService.deleteById(id);
     }
+
+    @PostMapping("/{id}/void")
+    public void voidGuest(@PathVariable Long id) {
+        guestService.voidGuest(id);
+    }
 }

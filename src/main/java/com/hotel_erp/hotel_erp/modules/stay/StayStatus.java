@@ -4,5 +4,6 @@ public enum StayStatus {
     ACTIVE,
     OVERSTAY,
     CHECKED_OUT,
-    CANCELLED
+    CANCELLED,
+    VOIDED
 }

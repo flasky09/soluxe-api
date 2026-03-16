@@ -22,7 +22,8 @@ public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRe
 
     @Override
     public List<GuestDTO> findAllGuests() {
-        return repository.findAll().stream()
+        return repository.findAllByOrderByIdDesc().stream()
+                .filter(g -> !g.isVoided())
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -38,5 +39,14 @@ public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRe
         GuestEntity entity = mapper.toEntity(dto);
         entity = repository.save(entity);
         return mapper.toDto(entity);
+    }
+
+    @Override
+    @Transactional
+    public void voidGuest(Long id) {
+        repository.findById(id).ifPresent(guest -> {
+            guest.setVoided(true);
+            repository.save(guest);
+        });
     }
 }

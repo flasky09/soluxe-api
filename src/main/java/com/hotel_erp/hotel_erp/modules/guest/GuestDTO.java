@@ -33,4 +33,5 @@ public class GuestDTO {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String imageUrl;
+    private boolean voided;
 }

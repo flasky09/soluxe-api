@@ -186,7 +186,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     @Transactional
-    public StayDTO directCheckIn(Long guestId, Long roomId, Integer adults, Integer children, LocalDateTime dateOut, Long userId) {
+    public StayDTO directCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDate dateOut, Long userId) {
         var room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
         if (room.getStatus() != RoomStatus.AVAILABLE) {
@@ -203,7 +203,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setGuestId(guestId);
         stay.setRoomId(roomId);
         stay.setDateIn(LocalDateTime.now());
-        stay.setDateOut(dateOut);
+        stay.setDateOut(dateOut != null ? dateOut.atStartOfDay() : null);
         stay.setAdults(adults != null ? adults : 1);
         stay.setChildren(children != null ? children : 0);
         stay.setStatus(StayStatus.ACTIVE);
@@ -331,6 +331,43 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         }
 
         return stayMapper.toDto(repository.save(stay));
+    }
+
+    @Override
+    @Transactional
+    public void voidStay(Long stayId, Long userId) {
+        StayEntity stay = repository.findById(stayId)
+                .orElseThrow(() -> new RuntimeException("Stay not found"));
+
+        if (stay.getStatus() == StayStatus.CHECKED_OUT) {
+            throw new RuntimeException("Cannot void a checked-out stay");
+        }
+
+        stay.setStatus(StayStatus.VOIDED);
+        repository.save(stay);
+
+        // Revert Room Status to AVAILABLE
+        if (stay.getRoomId() != null) {
+            roomRepository.findById(stay.getRoomId()).ifPresent(room -> {
+                room.setStatus(RoomStatus.AVAILABLE);
+                roomRepository.save(room);
+            });
+        }
+
+        // Revert Reservation Status if linked
+        if (stay.getReservationId() != null) {
+            reservationRepository.findById(stay.getReservationId()).ifPresent(res -> {
+                res.setStatus(ReservationStatus.BOOKED);
+                reservationRepository.save(res);
+            });
+        }
+
+        // Void Folio if exists
+        folioRepository.findByStayId(stayId).ifPresent(folio -> {
+            // We just note it's voided for now, in a real system we'd void all charges
+            // For now, we'll keep the folio but maybe add a note or leave it as is
+            // since the stay is voided.
+        });
     }
 
     @Override

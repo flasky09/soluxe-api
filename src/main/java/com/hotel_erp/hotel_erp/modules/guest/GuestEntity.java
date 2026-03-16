@@ -36,4 +36,5 @@ public class GuestEntity extends BaseEntity {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String imageUrl;
+    private boolean voided = false;
 }
