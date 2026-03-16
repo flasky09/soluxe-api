@@ -3,6 +3,8 @@ package com.hotel_erp.hotel_erp.modules.stay;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/stays")
@@ -13,19 +15,19 @@ public class StayController {
     private final StayMapper stayMapper;
 
     @GetMapping
-    public java.util.List<StayDTO> getAllStays() {
+    public List<StayDTO> getAllStays() {
         return stayService.findAll().stream()
                 .map(stayMapper::toDto)
                 .toList();
     }
 
     @GetMapping("/active")
-    public java.util.List<StayDTO> getActiveStays() {
+    public List<StayDTO> getActiveStays() {
         return stayService.findActiveStays();
     }
 
     @GetMapping("/guest/{guestId}")
-    public java.util.List<StayDTO> getGuestStays(@PathVariable Long guestId) {
+    public List<StayDTO> getGuestStays(@PathVariable("guestId") Long guestId) {
         return stayService.findByGuestId(guestId);
     }
 
@@ -40,19 +42,19 @@ public class StayController {
     }
 
     @PostMapping("/{id}/check-out")
-    public StayDTO checkOut(@PathVariable Long id, @RequestParam Long userId, @RequestParam(required = false, defaultValue = "false") boolean approveAdjustment) {
+    public StayDTO checkOut(@PathVariable("id") Long id, @RequestParam("userId") Long userId, @RequestParam(name = "approveAdjustment", required = false, defaultValue = "false") boolean approveAdjustment) {
         // Since the interface doesn't have the boolean flag yet, we'll cast or call the service method directly if it's public
         // In this case, I'll update the interface too for consistency
         return ((StayServiceImpl)stayService).checkOut(id, userId, approveAdjustment);
     }
 
     @PostMapping("/{id}/extend")
-    public StayDTO extendStay(@PathVariable Long id, @RequestParam java.time.LocalDateTime newDateOut, @RequestParam Long userId) {
+    public StayDTO extendStay(@PathVariable("id") Long id, @RequestParam("newDateOut") LocalDateTime newDateOut, @RequestParam("userId") Long userId) {
         return stayService.extendStay(id, newDateOut, userId);
     }
 
     @PostMapping("/reservations/{reservationId}/no-show")
-    public void markNoShow(@PathVariable Long reservationId, @RequestParam Long userId) {
+    public void markNoShow(@PathVariable("reservationId") Long reservationId, @RequestParam("userId") Long userId) {
         stayService.markNoShow(reservationId, userId);
     }
 
@@ -69,7 +71,7 @@ public class StayController {
         private Long roomId;
         private Integer adults;
         private Integer children;
-        private java.time.LocalDateTime dateOut;
+        private LocalDateTime dateOut;
         private Long userId;
     }
 }

@@ -31,4 +31,7 @@ public class DashboardSummaryDTO {
     private long cleanRooms;
     private long dirtyRooms;
     private long maintenanceRooms;
+    
+    // Room Availability Details
+    private java.util.Map<String, Long> availableRoomsByType;
 }

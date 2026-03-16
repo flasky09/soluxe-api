@@ -13,6 +13,13 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity;
+import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
+import com.hotel_erp.hotel_erp.modules.employee.leave.LeaveStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -28,17 +35,17 @@ public class DashboardService {
     public DashboardSummaryDTO getSummary() {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(java.time.LocalTime.MAX);
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
         long arrivals = reservationRepository.countByStatusAndDateInLessThanEqual(ReservationStatus.BOOKED, today);
         long departures = reservationRepository.countByStatusAndDateOut(ReservationStatus.CHECKED_IN, today);
-        long activeStays = stayRepository.countByStatusIn(java.util.List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY));
+        long activeStays = stayRepository.countByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY));
 
         long totalRooms = roomRepository.count();
         double occupancyRate = totalRooms > 0 ? (double) activeStays / totalRooms * 100 : 0.0;
 
         // Financials
-        java.util.List<com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity> todayCharges = 
+        List<FolioChargeEntity> todayCharges = 
             folioChargeRepository.findAllByDateRange(startOfDay, endOfDay);
         
         double dailyRevenue = todayCharges.stream()
@@ -55,11 +62,11 @@ public class DashboardService {
 
         // Operational Alerts
         long dirtyRooms = roomRepository.findAll().stream()
-                .filter(r -> r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.DIRTY)
+                .filter(r -> r.getStatus() == RoomStatus.DIRTY)
                 .count();
 
         long pendingLeaves = leaveRequestRepository.findAll().stream()
-                .filter(l -> l.getStatus() == com.hotel_erp.hotel_erp.modules.employee.leave.LeaveStatus.PENDING)
+                .filter(l -> l.getStatus() == LeaveStatus.PENDING)
                 .count();
 
         long pendingPOs = purchaseOrderRepository.findAll().stream()
@@ -72,12 +79,20 @@ public class DashboardService {
                 .count();
 
         long cleanRooms = roomRepository.findAll().stream()
-                .filter(r -> r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE || r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.INSPECTED)
+                .filter(r -> r.getStatus() == RoomStatus.AVAILABLE || r.getStatus() == RoomStatus.INSPECTED)
                 .count();
 
         long maintenanceRooms = roomRepository.findAll().stream()
-                .filter(r -> r.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.MAINTENANCE)
+                .filter(r -> r.getStatus() == RoomStatus.MAINTENANCE)
                 .count();
+
+        // Aggregate Available Rooms by Type
+        Map<String, Long> availableRoomsByType = roomRepository.findAll().stream()
+                .filter(r -> r.getStatus() == RoomStatus.AVAILABLE || r.getStatus() == RoomStatus.INSPECTED)
+                .collect(Collectors.groupingBy(
+                        r -> r.getRoomType().getName(),
+                        Collectors.counting()
+                ));
 
         return DashboardSummaryDTO.builder()
                 .totalArrivalsToday(arrivals)
@@ -95,6 +110,7 @@ public class DashboardService {
                 .cleanRooms(cleanRooms)
                 .dirtyRooms(dirtyRooms)
                 .maintenanceRooms(maintenanceRooms)
+                .availableRoomsByType(availableRoomsByType)
                 .build();
     }
 }

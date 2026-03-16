@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,7 +124,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         charge.setChargedAt(LocalDateTime.now());
         charge.setAddedBy(userId);
 
-        if (chargeDto.getChargeTypeId() != null) {
+        if (chargeDto.getChargeTypeId() != null && chargeDto.getChargeTypeId() > 0) {
             chargeTypeRepository.findById(chargeDto.getChargeTypeId())
                     .ifPresent(charge::setChargeType);
         }
@@ -159,7 +160,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     public List<PaymentMethodDTO> getAllPaymentMethods() {
         return paymentMethodRepository.findAllByActiveTrue().stream()
                 .map(paymentMethodMapper::toDto)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -275,13 +276,13 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     public List<FolioChargeDTO> getChargesByFolioId(Long folioId) {
         return folioChargeRepository.findAllByFolioId(folioId).stream()
                 .map(folioChargeMapper::toDto)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<FolioPaymentDTO> getPaymentsByFolioId(Long folioId) {
         return folioPaymentRepository.findAllByFolioId(folioId).stream()
                 .map(folioPaymentMapper::toDto)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 }

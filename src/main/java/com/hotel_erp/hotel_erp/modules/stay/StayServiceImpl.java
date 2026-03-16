@@ -4,12 +4,20 @@ import com.hotel_erp.hotel_erp.modules.reservation.ReservationEntity;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationStatus;
 import com.hotel_erp.hotel_erp.shared.BaseServiceImpl;
+import com.hotel_erp.hotel_erp.modules.folio.FolioService;
+import com.hotel_erp.hotel_erp.modules.folio.FolioRepository;
+import com.hotel_erp.hotel_erp.modules.folio.FolioDTO;
+import com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO;
+import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
+import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
+import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,18 +27,18 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     private final ReservationRepository reservationRepository;
     private final StayMapper stayMapper;
-    private final com.hotel_erp.hotel_erp.modules.folio.FolioService folioService;
-    private final com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository;
-    private final com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository;
-    private final com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository chargeTypeRepository;
+    private final FolioService folioService;
+    private final FolioRepository folioRepository;
+    private final RoomRepository roomRepository;
+    private final ChargeTypeRepository chargeTypeRepository;
 
     public StayServiceImpl(StayRepository repository,
                            ReservationRepository reservationRepository,
                            StayMapper stayMapper,
-                           com.hotel_erp.hotel_erp.modules.folio.FolioService folioService,
-                           com.hotel_erp.hotel_erp.modules.folio.FolioRepository folioRepository,
-                           com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository,
-                           com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository chargeTypeRepository) {
+                           FolioService folioService,
+                           FolioRepository folioRepository,
+                           RoomRepository roomRepository,
+                           ChargeTypeRepository chargeTypeRepository) {
         super(repository);
         this.reservationRepository = reservationRepository;
         this.stayMapper = stayMapper;
@@ -75,12 +83,12 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
         // Update Room Status
         roomRepository.findById(roomId).ifPresent(room -> {
-            room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.OCCUPIED);
+            room.setStatus(RoomStatus.OCCUPIED);
             roomRepository.save(room);
         });
 
         // Create or Link Folio for the Stay
-        com.hotel_erp.hotel_erp.modules.folio.FolioDTO folio = folioRepository.findByReservationId(reservationId)
+        FolioDTO folio = folioRepository.findByReservationId(reservationId)
                 .map(f -> folioService.linkReservationFolioToStay(reservationId, savedStay.getId()))
                 .orElseGet(() -> folioService.createFolioForStay(savedStay.getId()));
 
@@ -120,7 +128,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                     long diff = plannedNights - actualNights;
                     BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : BigDecimal.ZERO;
                     
-                    com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO adjustment = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+                    FolioChargeDTO adjustment = FolioChargeDTO.builder()
                             .folioId(folio.getId())
                             .description("Understay Adjustment - " + diff + " Night(s)")
                             .quantity(new BigDecimal(diff))
@@ -139,7 +147,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             }
         }
 
-        if (folio != null && folio.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+        if (folio != null && folio.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {
             throw new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.BAD_REQUEST,
                 "Cannot check out. Outstanding folio balance: " + folio.getTotalAmount()
@@ -155,7 +163,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         // Update Room Status to DIRTY
         if (stay.getRoomId() != null) {
             roomRepository.findById(stay.getRoomId()).ifPresent(room -> {
-                room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.DIRTY);
+                room.setStatus(RoomStatus.DIRTY);
                 roomRepository.save(room);
             });
         }
@@ -178,10 +186,10 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     @Transactional
-    public StayDTO directCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDateTime dateOut, Long userId) {
+    public StayDTO directCheckIn(Long guestId, Long roomId, Integer adults, Integer children, LocalDateTime dateOut, Long userId) {
         var room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
-        if (room.getStatus() != com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE) {
+        if (room.getStatus() != RoomStatus.AVAILABLE) {
             throw new RuntimeException("Room " + room.getRoomNumber() + " is not available for check-in.");
         }
 
@@ -204,11 +212,11 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay = repository.save(stay);
 
         // Update Room Status to OCCUPIED
-        room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.OCCUPIED);
+        room.setStatus(RoomStatus.OCCUPIED);
         roomRepository.save(room);
 
         // Create Folio for the Stay
-        com.hotel_erp.hotel_erp.modules.folio.FolioDTO folio = folioService.createFolioForStay(stay.getId());
+        FolioDTO folio = folioService.createFolioForStay(stay.getId());
 
         // Auto-post Room Charge (Advance Billing)
         postRoomCharge(stay, folio.getId(), userId);
@@ -237,7 +245,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
         if (rate == null) rate = BigDecimal.ZERO;
 
-        com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO chargeDto = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+        FolioChargeDTO chargeDto = FolioChargeDTO.builder()
                 .folioId(folioId)
                 .description("Room Charge - " + nights + " Night(s)")
                 .quantity(new BigDecimal(nights))
@@ -279,7 +287,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         return repository.findAllByGuestIdOrderByDateInDesc(guestId)
                 .stream()
                 .map(stayMapper::toDto)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -297,13 +305,13 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             throw new RuntimeException("New checkout date must be after current checkout date");
         }
 
-        long additionalNights = java.time.Duration.between(oldDateOut, newDateOut).toDays();
+        long additionalNights = Duration.between(oldDateOut, newDateOut).toDays();
         if (additionalNights > 0) {
             var folio = folioRepository.findByStayId(id).orElseThrow(() -> new RuntimeException("Folio not found"));
             var room = roomRepository.findById(stay.getRoomId()).orElseThrow();
             BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
             
-            com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO chargeDto = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+            FolioChargeDTO chargeDto = FolioChargeDTO.builder()
                     .folioId(folio.getId())
                     .description("Room Charge Extension - " + additionalNights + " Night(s)")
                     .quantity(new BigDecimal(additionalNights))
@@ -333,8 +341,8 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             reservationRepository.save(res);
             
             roomRepository.findById(res.getRoomId()).ifPresent(room -> {
-                if (room.getStatus() == com.hotel_erp.hotel_erp.modules.room.RoomStatus.OCCUPIED) {
-                    room.setStatus(com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE);
+                if (room.getStatus() == RoomStatus.OCCUPIED) {
+                    room.setStatus(RoomStatus.AVAILABLE);
                     roomRepository.save(room);
                 }
             });

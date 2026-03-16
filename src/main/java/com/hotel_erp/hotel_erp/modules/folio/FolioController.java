@@ -2,6 +2,8 @@ package com.hotel_erp.hotel_erp.modules.folio;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/folios")
@@ -12,47 +14,47 @@ public class FolioController {
     private final FolioMapper folioMapper;
 
     @PostMapping("/{id}/charges")
-    public FolioChargeDTO addCharge(@PathVariable Long id, @RequestBody FolioChargeDTO chargeDto, @RequestParam Long userId) {
+    public FolioChargeDTO addCharge(@PathVariable("id") Long id, @RequestBody FolioChargeDTO chargeDto, @RequestParam("userId") Long userId) {
         return folioService.addCharge(id, chargeDto, userId);
     }
 
     @GetMapping
-    public java.util.List<FolioDTO> getAllFolios() {
+    public List<FolioDTO> getAllFolios() {
         return folioService.findAll()
                 .stream()
                 .map(folioMapper::toDto)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public FolioDTO getFolio(@PathVariable Long id) {
+    public FolioDTO getFolio(@PathVariable("id") Long id) {
         return folioService.findById(id)
                 .map(folioMapper::toDto)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
     }
 
     @GetMapping("/stay/{stayId}")
-    public FolioDTO getFolioByStayId(@PathVariable Long stayId) {
+    public FolioDTO getFolioByStayId(@PathVariable("stayId") Long stayId) {
         return folioService.getFolioByStayId(stayId);
     }
 
     @GetMapping("/reservation/{reservationId}")
-    public FolioDTO getFolioByReservationId(@PathVariable Long reservationId) {
+    public FolioDTO getFolioByReservationId(@PathVariable("reservationId") Long reservationId) {
         return folioService.getOrCreateFolioForReservation(reservationId);
     }
 
     @GetMapping("/{id}/charges")
-    public java.util.List<FolioChargeDTO> getChargesByFolioId(@PathVariable Long id) {
+    public List<FolioChargeDTO> getChargesByFolioId(@PathVariable("id") Long id) {
         return folioService.getChargesByFolioId(id);
     }
 
     @GetMapping("/{id}/payments")
-    public java.util.List<FolioPaymentDTO> getPaymentsByFolioId(@PathVariable Long id) {
+    public List<FolioPaymentDTO> getPaymentsByFolioId(@PathVariable("id") Long id) {
         return folioService.getPaymentsByFolioId(id);
     }
 
     @GetMapping("/payment-methods")
-    public java.util.List<PaymentMethodDTO> getPaymentMethods() {
+    public List<PaymentMethodDTO> getPaymentMethods() {
         return folioService.getAllPaymentMethods();
     }
 
@@ -62,17 +64,17 @@ public class FolioController {
     }
 
     @PutMapping("/payment-methods/{id}")
-    public PaymentMethodDTO updatePaymentMethod(@PathVariable Long id, @RequestBody PaymentMethodDTO dto) {
+    public PaymentMethodDTO updatePaymentMethod(@PathVariable("id") Long id, @RequestBody PaymentMethodDTO dto) {
         return folioService.updatePaymentMethod(id, dto);
     }
 
     @PostMapping("/{id}/payments")
-    public FolioPaymentDTO addPayment(@PathVariable Long id, @RequestBody FolioPaymentDTO paymentDto, @RequestParam Long userId) {
+    public FolioPaymentDTO addPayment(@PathVariable("id") Long id, @RequestBody FolioPaymentDTO paymentDto, @RequestParam("userId") Long userId) {
         return folioService.addPayment(id, paymentDto, userId);
     }
 
     @PostMapping("/{id}/close")
-    public FolioDTO closeFolio(@PathVariable Long id, @RequestParam Long userId) {
+    public FolioDTO closeFolio(@PathVariable("id") Long id, @RequestParam("userId") Long userId) {
         return folioService.closeFolio(id, userId);
     }
 }

@@ -13,6 +13,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hotel_erp.hotel_erp.modules.room.RoomEntity;
+import com.hotel_erp.hotel_erp.modules.room.RoomTypeEntity;
+import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
+import com.hotel_erp.hotel_erp.modules.room.RoomTypeRepository;
+import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
+import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeEntity;
+import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
+import com.hotel_erp.hotel_erp.modules.folio.FolioDTO;
+import com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -38,14 +48,45 @@ public class StayIntegrationTest {
     @Autowired
     private FolioRepository folioRepository;
 
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private RoomTypeRepository roomTypeRepository;
+
+    @Autowired
+    private ChargeTypeRepository chargeTypeRepository;
+
     private ReservationEntity testReservation;
+    private Long testRoomId;
 
     @BeforeEach
     void setUp() {
+        // Create Room Type
+        RoomTypeEntity rt = new RoomTypeEntity();
+        rt.setName("Standard " + System.currentTimeMillis());
+        rt.setDefaultRate(new BigDecimal("5000"));
+        rt = roomTypeRepository.save(rt);
+
+        // Create Room
+        RoomEntity room = new RoomEntity();
+        room.setRoomNumber("ROOM-" + System.currentTimeMillis());
+        room.setRoomType(rt);
+        room.setStatus(RoomStatus.AVAILABLE);
+        room = roomRepository.save(room);
+        testRoomId = room.getId();
+
+        // Create Room Charge type
+        ChargeTypeEntity ct = new ChargeTypeEntity();
+        ct.setName("Room Charge");
+        if (chargeTypeRepository.findByName("Room Charge").isEmpty()) {
+            chargeTypeRepository.save(ct);
+        }
+
         // Create a test reservation
         testReservation = new ReservationEntity();
         testReservation.setGuestId(1L);
-        testReservation.setRoomTypeId(1L);
+        testReservation.setRoomTypeId(rt.getId());
         testReservation.setDateIn(LocalDate.now());
         testReservation.setDateOut(LocalDate.now().plusDays(2));
         testReservation.setAdults(2);
@@ -55,14 +96,13 @@ public class StayIntegrationTest {
 
     @Test
     void testCheckInFlow() {
-        Long roomId = 1L;
         Long userId = 1L;
 
-        StayDTO stayDto = stayService.checkIn(testReservation.getId(), roomId, userId);
+        StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
 
         assertNotNull(stayDto);
         assertEquals(StayStatus.ACTIVE, stayDto.getStatus());
-        assertEquals(roomId, stayDto.getRoomId());
+        assertEquals(testRoomId, stayDto.getRoomId());
         
         // Verify Reservation Status
         ReservationEntity updatedReservation = reservationRepository.findById(testReservation.getId()).get();
@@ -79,15 +119,14 @@ public class StayIntegrationTest {
 
     @Test
     void testCheckOutFlow() {
-        Long roomId = 1L;
         Long userId = 1L;
 
         // Perform Check-In First
-        StayDTO stayDto = stayService.checkIn(testReservation.getId(), roomId, userId);
+        StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
         
         // Add Payment to settle folio (Advance Billing posts 10000.00)
-        com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO paymentDto = com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO.builder()
-                .amount(java.math.BigDecimal.valueOf(10000))
+        FolioPaymentDTO paymentDto = FolioPaymentDTO.builder()
+                .amount(BigDecimal.valueOf(10000))
                 .folioId(folioRepository.findByStayId(stayDto.getId()).get().getId())
                 .recordedBy(userId)
                 .build();

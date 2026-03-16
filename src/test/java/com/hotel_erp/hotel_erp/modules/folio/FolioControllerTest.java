@@ -56,6 +56,25 @@ class FolioControllerTest {
 
     @Test
     @WithMockUser(roles = "RECEPTIONIST")
+    void testAddCharge_WithZeroChargeTypeId_ReturnsSuccess() throws Exception {
+        FolioChargeDTO chargeDto = new FolioChargeDTO();
+        chargeDto.setChargeTypeId(0L); // Current bug scenario
+        chargeDto.setQuantity(new BigDecimal("1"));
+        chargeDto.setUnitPrice(new BigDecimal("50"));
+        chargeDto.setDescription("Zero ID Charge");
+
+        when(folioService.addCharge(eq(1L), any(FolioChargeDTO.class), eq(1L)))
+                .thenReturn(chargeDto);
+
+        mockMvc.perform(post("/api/folios/1/charges")
+                .param("userId", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(chargeDto)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "RECEPTIONIST")
     @SuppressWarnings("unchecked")
     void testGetFolio_ReturnsFolio() throws Exception {
         FolioDTO folioDto = new FolioDTO();
