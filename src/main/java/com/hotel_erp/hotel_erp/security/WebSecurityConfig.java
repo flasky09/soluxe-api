@@ -61,8 +61,12 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow all origins via pattern to support allowCredentials(true)
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        // Specific production and local origins for maximum reliability
+        configuration.setAllowedOrigins(List.of(
+            "https://soluxe-erp-frontend-production.up.railway.app",
+            "http://localhost:5173",
+            "http://localhost:3000"
+        ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 

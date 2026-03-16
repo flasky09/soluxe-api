@@ -10,9 +10,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")           // supports allowCredentials + wildcard
+                .allowedOrigins(
+                    "https://soluxe-erp-frontend-production.up.railway.app",
+                    "http://localhost:5173",
+                    "http://localhost:3000"
+                )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")                  // allow all headers to prevent preflight mismatches
+                .allowedHeaders("*")
                 .exposedHeaders("Authorization", "X-Auth-Token")
                 .allowCredentials(true)
                 .maxAge(3600);
