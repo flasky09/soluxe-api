@@ -43,6 +43,12 @@ public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRe
 
     @Override
     @Transactional
+    public void deleteById(Long id) {
+        voidGuest(id);
+    }
+
+    @Override
+    @Transactional
     public void voidGuest(Long id) {
         repository.findById(id).ifPresent(guest -> {
             guest.setVoided(true);

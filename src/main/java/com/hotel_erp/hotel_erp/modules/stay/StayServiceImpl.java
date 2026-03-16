@@ -118,32 +118,32 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         
         LocalDateTime now = LocalDateTime.now();
         
-        // Handle Understay (Early Checkout) Adjustment
         if (folio != null && stay.getDateOut() != null) {
             long plannedNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), stay.getDateOut().toLocalDate());
             long actualNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), now.toLocalDate());
-            
+            if (actualNights < 1) actualNights = 1; // Minimum 1 night stay for billing
+
             if (actualNights < plannedNights) {
-                if (approveAdjustment) {
-                    long diff = plannedNights - actualNights;
-                    BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : BigDecimal.ZERO;
-                    
-                    FolioChargeDTO adjustment = FolioChargeDTO.builder()
-                            .folioId(folio.getId())
-                            .description("Understay Adjustment - " + diff + " Night(s)")
-                            .quantity(new BigDecimal(diff))
-                            .unitPrice(rate.negate()) // Negative price to reduce total
-                            .taxPct(BigDecimal.ZERO)
-                            .discountPct(BigDecimal.ZERO)
-                            .addedBy(userId)
-                            .build();
-                    
-                    chargeTypeRepository.findByName("Room Charge").ifPresent(type -> adjustment.setChargeTypeId(type.getId()));
-                    folioService.addCharge(folio.getId(), adjustment, userId);
-                    
-                    // Refresh folio balance after adjustment
-                    folio = folioRepository.findById(folio.getId()).orElse(folio);
-                }
+                long diff = plannedNights - actualNights;
+                BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : BigDecimal.ZERO;
+                
+                // Check if an adjustment already exists (to avoid duplicate posts)
+                // In a production system we'd search folios, here we just post if diff > 0
+                FolioChargeDTO adjustment = FolioChargeDTO.builder()
+                        .folioId(folio.getId())
+                        .description("Understay Adjustment - " + diff + " Night(s) (Early Check-out)")
+                        .quantity(new BigDecimal(diff))
+                        .unitPrice(rate.negate()) // Negative price to reduce total
+                        .taxPct(BigDecimal.ZERO)
+                        .discountPct(BigDecimal.ZERO)
+                        .addedBy(userId)
+                        .build();
+                
+                chargeTypeRepository.findByName("Room Charge").ifPresent(type -> adjustment.setChargeTypeId(type.getId()));
+                folioService.addCharge(folio.getId(), adjustment, userId);
+                
+                // Refresh folio balance after adjustment
+                folio = folioRepository.findById(folio.getId()).orElse(folio);
             }
         }
 
