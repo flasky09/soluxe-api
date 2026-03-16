@@ -1,9 +1,11 @@
 package com.hotel_erp.hotel_erp.modules.guest;
 
+import com.hotel_erp.hotel_erp.shared.services.CloudinaryService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -13,6 +15,7 @@ public class GuestDocumentController {
 
     private final GuestDocumentRepository guestDocumentRepository;
     private final GuestRepository guestRepository;
+    private final CloudinaryService cloudinaryService;
 
     @GetMapping
     public List<GuestDocumentDTO> getGuestDocuments(@PathVariable Long guestId) {
@@ -32,20 +35,25 @@ public class GuestDocumentController {
         GuestEntity guest = guestRepository.findById(guestId)
                 .orElseThrow(() -> new RuntimeException("Guest not found"));
 
-        GuestDocumentEntity doc = new GuestDocumentEntity();
-        doc.setGuest(guest);
-        doc.setDocumentType(DocumentType.valueOf(type));
-        doc.setDocumentNumber(number);
-        doc.setFileName(file.getOriginalFilename());
-        // In a real app, we'd save the file to a cloud bucket or local FS
-        // For this demo, we'll just simulate a path
-        doc.setFilePath("/uploads/guests/" + guestId + "/" + file.getOriginalFilename());
-        
-        if (expiry != null && !expiry.isEmpty()) {
-            doc.setExpiryDate(java.time.LocalDate.parse(expiry));
-        }
+        try {
+            Map<String, Object> uploadResult = cloudinaryService.upload(file, "guests/" + guestId);
+            String url = (String) uploadResult.get("secure_url");
 
-        return toDto(guestDocumentRepository.save(doc));
+            GuestDocumentEntity doc = new GuestDocumentEntity();
+            doc.setGuest(guest);
+            doc.setDocumentType(DocumentType.valueOf(type));
+            doc.setDocumentNumber(number);
+            doc.setFileName(file.getOriginalFilename());
+            doc.setFilePath(url);
+            
+            if (expiry != null && !expiry.isEmpty()) {
+                doc.setExpiryDate(java.time.LocalDate.parse(expiry));
+            }
+
+            return toDto(guestDocumentRepository.save(doc));
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to upload document to Cloudinary", e);
+        }
     }
 
     @DeleteMapping("/{docId}")
