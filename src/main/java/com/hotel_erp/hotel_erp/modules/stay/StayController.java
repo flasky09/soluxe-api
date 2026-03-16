@@ -34,9 +34,9 @@ public class StayController {
         return stayService.checkIn(request.getReservationId(), request.getRoomId(), request.getUserId());
     }
 
-    @PostMapping("/walk-in")
-    public StayDTO walkIn(@RequestBody WalkInRequest request) {
-        return stayService.walkInCheckIn(request.getGuestId(), request.getRoomId(), request.getAdults(), request.getChildren(), request.getDateOut(), request.getUserId());
+    @PostMapping("/direct")
+    public StayDTO directCheckIn(@RequestBody DirectCheckInRequest request) {
+        return stayService.directCheckIn(request.getGuestId(), request.getRoomId(), request.getAdults(), request.getChildren(), request.getDateOut(), request.getUserId());
     }
 
     @PostMapping("/{id}/check-out")
@@ -64,7 +64,7 @@ public class StayController {
     }
 
     @Data
-    public static class WalkInRequest {
+    public static class DirectCheckInRequest {
         private Long guestId;
         private Long roomId;
         private Integer adults;

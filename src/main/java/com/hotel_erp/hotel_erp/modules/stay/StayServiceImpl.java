@@ -178,7 +178,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     @Transactional
-    public StayDTO walkInCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDateTime dateOut, Long userId) {
+    public StayDTO directCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDateTime dateOut, Long userId) {
         var room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
         if (room.getStatus() != com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE) {
