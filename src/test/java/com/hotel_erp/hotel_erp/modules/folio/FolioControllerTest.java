@@ -84,8 +84,7 @@ class FolioControllerTest {
         folioDto.setFolioType(FolioType.STAY);
         folioDto.setStatus(FolioStatus.OPEN);
 
-        when(folioService.findById(1L)).thenReturn(Optional.of(new FolioEntity()));
-        when(folioMapper.toDto(any())).thenReturn(folioDto);
+        when(folioService.findEnrichedDtoById(1L)).thenReturn(Optional.of(folioDto));
 
         mockMvc.perform(get("/api/folios/1"))
                 .andExpect(status().isOk())
