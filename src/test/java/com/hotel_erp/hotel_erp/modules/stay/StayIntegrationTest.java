@@ -143,4 +143,37 @@ public class StayIntegrationTest {
         assertEquals(FolioStatus.CLOSED, closedFolio.getStatus());
         assertNotNull(closedFolio.getClosedAt());
     }
+
+    @Test
+    void testOverstayAndDueCheckoutLogic() {
+        Long userId = 1L;
+
+        // 1. Check-in today
+        StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
+        
+        // Verify default dateOut is at 11:00 AM
+        LocalDateTime expectedDateOut = testReservation.getDateOut().atTime(11, 0);
+        assertEquals(expectedDateOut, stayDto.getDateOut());
+        assertEquals(StayStatus.ACTIVE, stayDto.getStatus());
+
+        // 2. Simulate departure day (set dateOut to today 11:00 AM)
+        StayEntity stay = stayRepository.findById(stayDto.getId()).get();
+        stay.setDateOut(LocalDate.now().atTime(11, 0));
+        stayRepository.save(stay);
+
+        // Run autoFlagOverstays - should become DUE_CHECKOUT because it's departure day and currently 06:17 AM
+        stayService.autoFlagOverstays();
+        
+        StayEntity updatedStay = stayRepository.findById(stayDto.getId()).get();
+        assertEquals(StayStatus.DUE_CHECKOUT, updatedStay.getStatus());
+
+        // 3. Simulate past 11:00 AM (set dateOut to 1 hour ago)
+        stay.setDateOut(LocalDateTime.now().minusHours(1));
+        stayRepository.save(stay);
+
+        stayService.autoFlagOverstays();
+
+        StayEntity overstayedStay = stayRepository.findById(stayDto.getId()).get();
+        assertEquals(StayStatus.OVERSTAY, overstayedStay.getStatus());
+    }
 }

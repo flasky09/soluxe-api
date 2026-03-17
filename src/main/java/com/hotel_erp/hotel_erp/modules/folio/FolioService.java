@@ -25,4 +25,7 @@ public interface FolioService extends BaseService<FolioEntity, Long> {
     FolioDTO getFolioByStayId(Long stayId);
     List<FolioChargeDTO> getChargesByFolioId(Long folioId);
     List<FolioPaymentDTO> getPaymentsByFolioId(Long folioId);
+
+    List<FolioDTO> findAllDTOs();
+    java.util.Optional<FolioDTO> findEnrichedDtoById(Long id);
 }

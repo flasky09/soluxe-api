@@ -17,4 +17,6 @@ public class FolioDTO {
     private LocalDateTime openedAt;
     private LocalDateTime closedAt;
     private BigDecimal totalAmount;
+    private String guestName;
+    private String roomNumber;
 }

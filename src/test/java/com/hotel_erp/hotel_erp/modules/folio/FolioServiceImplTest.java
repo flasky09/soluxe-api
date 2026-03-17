@@ -7,6 +7,10 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
+import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
+import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
+import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +42,14 @@ class FolioServiceImplTest {
     private PaymentMethodMapper paymentMethodMapper;
     @Mock
     private FolioReceiptMapper folioReceiptMapper;
+    @Mock
+    private StayRepository stayRepository;
+    @Mock
+    private ReservationRepository reservationRepository;
+    @Mock
+    private GuestRepository guestRepository;
+    @Mock
+    private RoomRepository roomRepository;
 
     private FolioServiceImpl folioService;
 
@@ -54,7 +66,11 @@ class FolioServiceImplTest {
                 folioChargeMapper,
                 folioPaymentMapper,
                 paymentMethodMapper,
-                folioReceiptMapper
+                folioReceiptMapper,
+                stayRepository,
+                reservationRepository,
+                guestRepository,
+                roomRepository
         );
     }
 

@@ -20,16 +20,12 @@ public class FolioController {
 
     @GetMapping
     public List<FolioDTO> getAllFolios() {
-        return folioService.findAll()
-                .stream()
-                .map(folioMapper::toDto)
-                .collect(Collectors.toList());
+        return folioService.findAllDTOs();
     }
 
     @GetMapping("/{id}")
     public FolioDTO getFolio(@PathVariable("id") Long id) {
-        return folioService.findById(id)
-                .map(folioMapper::toDto)
+        return folioService.findEnrichedDtoById(id)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
     }
 

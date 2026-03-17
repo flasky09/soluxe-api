@@ -4,8 +4,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
+import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
+import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
+import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +30,11 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     private final FolioPaymentMapper folioPaymentMapper;
     private final PaymentMethodMapper paymentMethodMapper;
     private final FolioReceiptMapper folioReceiptMapper;
+    
+    private final StayRepository stayRepository;
+    private final ReservationRepository reservationRepository;
+    private final GuestRepository guestRepository;
+    private final RoomRepository roomRepository;
 
     public FolioServiceImpl(FolioRepository repository,
                              FolioChargeRepository folioChargeRepository,
@@ -36,7 +46,11 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                              FolioChargeMapper folioChargeMapper,
                              FolioPaymentMapper folioPaymentMapper,
                              PaymentMethodMapper paymentMethodMapper,
-                             FolioReceiptMapper folioReceiptMapper) {
+                             FolioReceiptMapper folioReceiptMapper,
+                             StayRepository stayRepository,
+                             ReservationRepository reservationRepository,
+                             GuestRepository guestRepository,
+                             RoomRepository roomRepository) {
         super(repository);
         this.folioChargeRepository = folioChargeRepository;
         this.folioPaymentRepository = folioPaymentRepository;
@@ -48,6 +62,10 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         this.folioPaymentMapper = folioPaymentMapper;
         this.paymentMethodMapper = paymentMethodMapper;
         this.folioReceiptMapper = folioReceiptMapper;
+        this.stayRepository = stayRepository;
+        this.reservationRepository = reservationRepository;
+        this.guestRepository = guestRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -265,11 +283,39 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         folioReceiptRepository.save(receipt);
     }
 
+    public List<FolioDTO> findAllDTOs() {
+        return repository.findAll().stream()
+                .map(folioMapper::toDto)
+                .map(this::enrichFolioDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<FolioDTO> findEnrichedDtoById(Long id) {
+        return repository.findById(id)
+                .map(folioMapper::toDto)
+                .map(this::enrichFolioDTO);
+    }
+
     @Override
     public FolioDTO getFolioByStayId(Long stayId) {
         return repository.findByStayId(stayId)
                 .map(folioMapper::toDto)
+                .map(this::enrichFolioDTO)
                 .orElseThrow(() -> new RuntimeException("Folio not found for Stay ID: " + stayId));
+    }
+
+    private FolioDTO enrichFolioDTO(FolioDTO dto) {
+        if (dto.getStayId() != null) {
+            stayRepository.findById(dto.getStayId()).ifPresent(stay -> {
+                guestRepository.findById(stay.getGuestId()).ifPresent(guest -> dto.setGuestName(guest.getFullName()));
+                roomRepository.findById(stay.getRoomId()).ifPresent(room -> dto.setRoomNumber(room.getRoomNumber()));
+            });
+        } else if (dto.getReservationId() != null) {
+            reservationRepository.findById(dto.getReservationId()).ifPresent(res -> {
+                guestRepository.findById(res.getGuestId()).ifPresent(guest -> dto.setGuestName(guest.getFullName()));
+            });
+        }
+        return dto;
     }
 
     @Override

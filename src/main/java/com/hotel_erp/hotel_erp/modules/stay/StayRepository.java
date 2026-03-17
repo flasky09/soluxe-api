@@ -13,5 +13,6 @@ public interface StayRepository extends BaseRepository<StayEntity, Long> {
     long countByStatusIn(java.util.List<StayStatus> statuses);
     long countByGuestIdAndStatusIn(Long guestId, List<StayStatus> statuses);
     java.util.List<StayEntity> findAllByGuestIdOrderByDateInDesc(Long guestId);
+    List<StayEntity> findByReservationIdAndStatusIn(Long reservationId, List<StayStatus> statuses);
     java.util.Optional<StayEntity> findByReservationIdAndStatus(Long reservationId, StayStatus status);
 }

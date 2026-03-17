@@ -68,7 +68,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setGuestId(reservation.getGuestId());
         stay.setRoomId(roomId);
         stay.setDateIn(LocalDateTime.now());
-        stay.setDateOut(reservation.getDateOut() != null ? reservation.getDateOut().atStartOfDay() : null);
+        stay.setDateOut(reservation.getDateOut() != null ? reservation.getDateOut().atTime(11, 0) : null);
         stay.setAdults(reservation.getAdults());
         stay.setChildren(reservation.getChildren());
         stay.setStatus(StayStatus.ACTIVE);
@@ -203,7 +203,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setGuestId(guestId);
         stay.setRoomId(roomId);
         stay.setDateIn(LocalDateTime.now());
-        stay.setDateOut(dateOut != null ? dateOut.atStartOfDay() : null);
+        stay.setDateOut(dateOut != null ? dateOut.atTime(11, 0) : null);
         stay.setAdults(adults != null ? adults : 1);
         stay.setChildren(children != null ? children : 0);
         stay.setStatus(StayStatus.ACTIVE);
@@ -227,7 +227,8 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Override
     @Transactional
     public StayDTO checkOutByReservationId(Long reservationId, Long userId) {
-        StayEntity stay = repository.findByReservationIdAndStatus(reservationId, StayStatus.ACTIVE)
+        StayEntity stay = repository.findByReservationIdAndStatusIn(reservationId, List.of(StayStatus.ACTIVE, StayStatus.DUE_CHECKOUT))
+                .stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("Active Stay not found for this reservation"));
         return checkOut(stay.getId(), userId);
     }
@@ -265,7 +266,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     @Override
     public List<StayDTO> findActiveStays() {
-        return repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY))
+        return repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.DUE_CHECKOUT, StayStatus.OVERSTAY))
                 .stream()
                 .map(stayMapper::toDto)
                 .collect(Collectors.toList());
@@ -275,10 +276,25 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Scheduled(cron = "0 0 * * * *") // Every hour
     @Transactional
     public void autoFlagOverstays() {
-        List<StayEntity> activeStays = repository.findAllByStatusAndDateOutBefore(StayStatus.ACTIVE, LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 1. Mark ACTIVE as DUE_CHECKOUT if it's departure day and before 11:00 AM (or strictly on departure day)
+        // Actually, "DUE CHECKOUT" is normally the whole day of checkout until 11:00 AM.
+        List<StayEntity> activeStays = repository.findAllByStatusIn(List.of(StayStatus.ACTIVE));
         for (StayEntity stay : activeStays) {
-            stay.setStatus(StayStatus.OVERSTAY);
-            repository.save(stay);
+            if (stay.getDateOut() != null && stay.getDateOut().toLocalDate().isEqual(now.toLocalDate())) {
+                stay.setStatus(StayStatus.DUE_CHECKOUT);
+                repository.save(stay);
+            }
+        }
+
+        // 2. Mark ACTIVE or DUE_CHECKOUT as OVERSTAY if it's past 11:00 AM on departure day
+        List<StayEntity> pendingOverstays = repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.DUE_CHECKOUT));
+        for (StayEntity stay : pendingOverstays) {
+            if (stay.getDateOut() != null && now.isAfter(stay.getDateOut())) {
+                stay.setStatus(StayStatus.OVERSTAY);
+                repository.save(stay);
+            }
         }
     }
 
@@ -326,7 +342,8 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         }
 
         stay.setDateOut(newDateOut);
-        if (stay.getStatus() == StayStatus.OVERSTAY && newDateOut != null && newDateOut.isAfter(LocalDateTime.now())) {
+        if ((stay.getStatus() == StayStatus.OVERSTAY || stay.getStatus() == StayStatus.DUE_CHECKOUT) 
+                && newDateOut != null && newDateOut.isAfter(LocalDateTime.now())) {
             stay.setStatus(StayStatus.ACTIVE);
         }
 
