@@ -120,20 +120,32 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         
         if (folio != null && stay.getDateOut() != null) {
             long plannedNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), stay.getDateOut().toLocalDate());
+            if (plannedNights < 1) plannedNights = 1;
+
             long actualNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), now.toLocalDate());
-            if (actualNights < 1) actualNights = 1; // Minimum 1 night stay for billing
+            
+            // Check-out on same day as Check-in is still 1 night (industry standard)
+            if (actualNights < 1) actualNights = 1;
 
             if (actualNights < plannedNights) {
                 long diff = plannedNights - actualNights;
-                BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : BigDecimal.ZERO;
                 
-                // Check if an adjustment already exists (to avoid duplicate posts)
-                // In a production system we'd search folios, here we just post if diff > 0
+                // Fallback rate logic
+                BigDecimal rate = stay.getRatePerNight();
+                if (rate == null) {
+                    var room = roomRepository.findById(stay.getRoomId()).orElse(null);
+                    if (room != null && room.getRoomType() != null) {
+                        rate = room.getRoomType().getDefaultRate();
+                    }
+                }
+                if (rate == null) rate = BigDecimal.ZERO;
+                
+                // Post adjustment
                 FolioChargeDTO adjustment = FolioChargeDTO.builder()
                         .folioId(folio.getId())
                         .description("Understay Adjustment - " + diff + " Night(s) (Early Check-out)")
                         .quantity(new BigDecimal(diff))
-                        .unitPrice(rate.negate()) // Negative price to reduce total
+                        .unitPrice(rate.negate()) // Credit
                         .taxPct(BigDecimal.ZERO)
                         .discountPct(BigDecimal.ZERO)
                         .addedBy(userId)
