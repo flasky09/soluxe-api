@@ -61,13 +61,8 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Use origin patterns for more flexibility with subdomains and local dev
-        configuration.setAllowedOriginPatterns(List.of(
-            "https://soluxe-erp-frontend-production.up.railway.app",
-            "https://*.up.railway.app",
-            "http://localhost:[*]",
-            "http://127.0.0.1:[*]"
-        ));
+        // Allow all origins for the production environment as requested
+        configuration.setAllowedOriginPatterns(List.of("*"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
