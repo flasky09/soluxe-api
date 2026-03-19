@@ -20,6 +20,9 @@ public class FolioEntity extends BaseEntity {
     private Long venueBookingId;
     private Long diningSessionId;
 
+    @Version
+    private Long version;
+
     @Enumerated(EnumType.STRING)
     private FolioType folioType;
 

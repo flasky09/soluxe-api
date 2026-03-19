@@ -2,6 +2,8 @@ package com.hotel_erp.hotel_erp.modules.folio;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,7 +16,7 @@ public class FolioController {
     private final FolioMapper folioMapper;
 
     @PostMapping("/{id}/charges")
-    public FolioChargeDTO addCharge(@PathVariable("id") Long id, @RequestBody FolioChargeDTO chargeDto, @RequestParam("userId") Long userId) {
+    public FolioChargeDTO addCharge(@PathVariable("id") Long id, @Valid @RequestBody FolioChargeDTO chargeDto, @RequestParam("userId") Long userId) {
         return folioService.addCharge(id, chargeDto, userId);
     }
 
@@ -55,17 +57,17 @@ public class FolioController {
     }
 
     @PostMapping("/payment-methods")
-    public PaymentMethodDTO createPaymentMethod(@RequestBody PaymentMethodDTO dto) {
+    public PaymentMethodDTO createPaymentMethod(@Valid @RequestBody PaymentMethodDTO dto) {
         return folioService.createPaymentMethod(dto);
     }
 
     @PutMapping("/payment-methods/{id}")
-    public PaymentMethodDTO updatePaymentMethod(@PathVariable("id") Long id, @RequestBody PaymentMethodDTO dto) {
+    public PaymentMethodDTO updatePaymentMethod(@PathVariable("id") Long id, @Valid @RequestBody PaymentMethodDTO dto) {
         return folioService.updatePaymentMethod(id, dto);
     }
 
     @PostMapping("/{id}/payments")
-    public FolioPaymentDTO addPayment(@PathVariable("id") Long id, @RequestBody FolioPaymentDTO paymentDto, @RequestParam("userId") Long userId) {
+    public FolioPaymentDTO addPayment(@PathVariable("id") Long id, @Valid @RequestBody FolioPaymentDTO paymentDto, @RequestParam("userId") Long userId) {
         return folioService.addPayment(id, paymentDto, userId);
     }
 

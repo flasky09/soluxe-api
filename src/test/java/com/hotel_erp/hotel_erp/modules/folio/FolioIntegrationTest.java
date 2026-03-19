@@ -27,7 +27,13 @@ public class FolioIntegrationTest {
     private FolioChargeRepository folioChargeRepository;
 
     @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
+
+    @Autowired
     private ChargeTypeRepository chargeTypeRepository;
+
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
     
     private FolioEntity testFolio;
     private Long roomChargeTypeId;
@@ -119,5 +125,55 @@ public class FolioIntegrationTest {
         });
         
         assertEquals("Folio is closed", exception.getMessage());
+    }
+
+    @Test
+    void testAddRefundFlow() {
+        Long userId = 1L;
+        
+        // 1. Manually set a negative balance (guest is owed a refund)
+        testFolio.setTotalAmount(new BigDecimal("-100.00"));
+        folioRepository.saveAndFlush(testFolio);
+
+        // Need to add a mock Payment Method to db for integration test
+        PaymentMethodEntity pm = new PaymentMethodEntity();
+        pm.setName("Refund Method");
+        pm.setActive(true);
+        pm = paymentMethodRepository.saveAndFlush(pm);
+
+        // 2. Process a Refund (negative payment)
+        FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("-100.00")) // Refund amount
+                .folioId(testFolio.getId())
+                .recordedBy(userId)
+                .paymentMethodId(pm.getId())
+                .build();
+
+        FolioPaymentDTO savedRefund = folioService.addPayment(testFolio.getId(), refundDto, userId);
+
+        assertNotNull(savedRefund);
+        // Using compareTo for BigDecimal equivalence
+        assertEquals(0, new BigDecimal("-100.00").compareTo(savedRefund.getAmount()));
+
+        // 3. Verify Folio Balance is now zero ( -100 - (-100) = 0 )
+        FolioEntity updatedFolio = folioRepository.findById(testFolio.getId()).get();
+        assertEquals(0, BigDecimal.ZERO.compareTo(updatedFolio.getTotalAmount()));
+    }
+
+    @Test
+    void testOptimisticLocking() {
+        // Read the folio into the hibernate session cache
+        FolioEntity folio = folioRepository.findById(testFolio.getId()).get();
+        
+        // Simulate a concurrent update completed by another transaction by incrementing the version directly
+        jdbcTemplate.update("UPDATE folios SET version = version + 1 WHERE id = ?", folio.getId());
+
+        // This transaction's view is now stale
+        folio.setTotalAmount(folio.getTotalAmount().add(new BigDecimal("50.00")));
+        
+        // Saving the stale entity should trigger the optimistic locking exception
+        assertThrows(org.springframework.orm.ObjectOptimisticLockingFailureException.class, () -> {
+            folioRepository.saveAndFlush(folio);
+        });
     }
 }

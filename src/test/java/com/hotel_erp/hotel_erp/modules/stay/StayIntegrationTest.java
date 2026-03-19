@@ -156,9 +156,9 @@ public class StayIntegrationTest {
         assertEquals(expectedDateOut, stayDto.getDateOut());
         assertEquals(StayStatus.ACTIVE, stayDto.getStatus());
 
-        // 2. Simulate departure day (set dateOut to today 11:00 AM)
+        // 2. Simulate departure day (set dateOut to late tonight to prevent test flakiness if run past 11am)
         StayEntity stay = stayRepository.findById(stayDto.getId()).get();
-        stay.setDateOut(LocalDate.now().atTime(11, 0));
+        stay.setDateOut(LocalDate.now().atTime(23, 59));
         stayRepository.save(stay);
 
         // Run autoFlagOverstays - should become DUE_CHECKOUT because it's departure day and currently 06:17 AM
@@ -175,5 +175,64 @@ public class StayIntegrationTest {
 
         StayEntity overstayedStay = stayRepository.findById(stayDto.getId()).get();
         assertEquals(StayStatus.OVERSTAY, overstayedStay.getStatus());
+    }
+
+    @Test
+    void testEarlyCheckOutWithRefundFlow() {
+        Long userId = 1L;
+
+        // 1. Check-in for 2 nights (10000 limit initially billed)
+        StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
+        
+        // 2. Guest pays in full in advance
+        FolioPaymentDTO paymentDto = FolioPaymentDTO.builder()
+                .amount(BigDecimal.valueOf(10000))
+                .folioId(folioRepository.findByStayId(stayDto.getId()).get().getId())
+                .recordedBy(userId)
+                .build();
+        folioService.addPayment(paymentDto.getFolioId(), paymentDto, userId);
+
+        // 3. Guest checks out early (today) instead of after 2 nights
+        // actualNights = max(1, today - today) = 1 night.
+        // plannedNights = 2 nights (based on reservation dateOut).
+        // Difference = 1 night (Credit of 1 * 5000 = 5000).
+        // Planned nights = 2 (today to today+2).
+        // Since we are mocking "early checkout", let's just let checkOut calculate the nights based on now.
+        // Wait, checkOut uses LocalDate.now() automatically for ACTUAL nights.
+        // Since testReservation was made for 2 nights starting today, and today is today:
+        // actualNights = max(1, today - today) = 1 night.
+        // plannedNights = 2 nights.
+        // Difference = 1 night (Credit of 1 * 5000 = 5000).
+        
+        // So checking out now will apply a credit of 5000 automatically.
+        // Wait, checkOut method throws if balance is not 0.
+        // Wait! In the real app, we said "Final balance must be $0" which means we issue refund FIRST.
+        // Let's issue the refund first, then checkout.
+        // But how do we issue refund if the adjustment hasn't been posted yet?
+        // Wait, in real app, we calculate the adjustment mathematically on UI, post refund, then checkout.
+        // In backend, checkOut() applies the adjustment and then checks balance!
+        
+        // So if we refund 5000 before checkout:
+        // current folio = 10000 charges - 10000 payments = 0 balance.
+        // Refund 5000 -> 10000 charges - (-5000) payments? No, Payment is +10000, Refund is -5000. Total Payments = 5000.
+        // Folio Balance = 10000 - 5000 = +5000.
+        
+        FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("-5000"))
+                .folioId(paymentDto.getFolioId())
+                .recordedBy(userId)
+                .build();
+        folioService.addPayment(refundDto.getFolioId(), refundDto, userId);
+
+        // Folio balance is now +5000.
+        // Check-out should apply credit of -5000.
+        // Final balance = 0, checkOut should succeed!
+        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
+        
+        assertEquals(StayStatus.CHECKED_OUT, checkOutDto.getStatus());
+        FolioEntity closedFolio = folioRepository.findByStayId(stayDto.getId()).get();
+        assertEquals(FolioStatus.CLOSED, closedFolio.getStatus());
+        // Verify balance is perfectly 0
+        assertEquals(0, BigDecimal.ZERO.compareTo(closedFolio.getTotalAmount()));
     }
 }

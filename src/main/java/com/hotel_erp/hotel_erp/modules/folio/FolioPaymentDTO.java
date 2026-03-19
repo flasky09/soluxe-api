@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -15,8 +17,10 @@ import java.time.LocalDateTime;
 public class FolioPaymentDTO {
     private Long id;
     private Long folioId;
+    @NotNull(message = "Payment method is required")
     private Long paymentMethodId;
     private String paymentMethodName; // Optional for UI display
+    @NotNull(message = "Amount is required")
     private BigDecimal amount;
     private String referenceNumber;
     private Long recordedBy;
