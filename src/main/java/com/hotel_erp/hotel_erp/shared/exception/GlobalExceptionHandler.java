@@ -31,13 +31,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         Map<String, String> error = new HashMap<>();
         String message = ex.getMostSpecificCause().getMessage();
+        log.error("Data integrity violation: {}", message);
         
         if (message.contains("Duplicate entry") || message.contains("Unique index or primary key violation")) {
-            error.put("error", "A record with this information already exists.");
+            if (message.toLowerCase().contains("username")) {
+                error.put("error", "This username is already taken. Please choose a different one.");
+            } else if (message.toLowerCase().contains("email")) {
+                error.put("error", "An account with this email address already exists.");
+            } else if (message.toLowerCase().contains("phone")) {
+                error.put("error", "This phone number is already registered to another record.");
+            } else if (message.toLowerCase().contains("id_number") || message.toLowerCase().contains("idnumber")) {
+                error.put("error", "A record with this ID number already exists.");
+            } else if (message.toLowerCase().contains("name")) {
+                error.put("error", "A record with this name already exists.");
+            } else {
+                error.put("error", "A record with this information already exists in our system.");
+            }
             return new ResponseEntity<>(error, HttpStatus.CONFLICT);
         }
         
-        error.put("error", "Database integrity violation: " + message);
+        error.put("error", "We couldn't save this record due to a database restriction. Please check your data and try again.");
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
