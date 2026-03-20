@@ -12,6 +12,9 @@ import java.util.List;
 public interface FolioChargeRepository extends BaseRepository<FolioChargeEntity, Long> {
     List<FolioChargeEntity> findAllByFolioId(Long folioId);
 
+    @Query("SELECT COALESCE(SUM(c.totalAmount), 0) FROM FolioChargeEntity c WHERE c.folioId = :folioId")
+    java.math.BigDecimal sumTotalByFolioId(@Param("folioId") Long folioId);
+
     @Query("SELECT f FROM FolioChargeEntity f WHERE f.chargedAt >= :startDate AND f.chargedAt < :endDate")
     List<FolioChargeEntity> findAllByDateRange(
             @Param("startDate") LocalDateTime startDate,

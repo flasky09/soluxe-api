@@ -65,7 +65,9 @@ public class GuestDocumentController {
     }
 
     private GuestDocumentDTO toDto(GuestDocumentEntity entity) {
-        if (entity == null) return null;
+        if (entity == null) {
+            return null;
+        }
         GuestDocumentDTO dto = new GuestDocumentDTO();
         dto.setId(entity.getId());
         if (entity.getGuest() != null) {

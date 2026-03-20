@@ -75,6 +75,8 @@ public class HousekeepingService {
             case INSPECTED:
                 // Typically just a log entry, no status change unless specific business rules apply
                 break;
+            default:
+                break;
         }
         roomRepository.save(room);
     }

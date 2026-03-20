@@ -10,6 +10,7 @@ public interface LeaveRequestMapper {
     @Mapping(target = "leaveTypeId", source = "leaveType.id")
     @Mapping(target = "leaveTypeName", source = "leaveType.name")
     LeaveRequestDTO toDto(LeaveRequestEntity entity);
+
     @Mapping(source = "employeeId", target = "employee.id")
     @Mapping(source = "approvedById", target = "approvedBy.id")
     @Mapping(target = "leaveType", ignore = true)

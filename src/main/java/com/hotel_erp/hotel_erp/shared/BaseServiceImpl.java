@@ -1,9 +1,13 @@
 package com.hotel_erp.hotel_erp.shared;
 
+import org.springframework.data.domain.Sort;
+
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseServiceImpl<ENTITY extends BaseEntity, ID_TYPE, REPOSITORY extends BaseRepository<ENTITY, ID_TYPE>> implements BaseService<ENTITY, ID_TYPE> {
+public abstract class BaseServiceImpl<ENTITY extends BaseEntity, ID_TYPE,
+        REPOSITORY extends BaseRepository<ENTITY, ID_TYPE>>
+        implements BaseService<ENTITY, ID_TYPE> {
 
     protected final REPOSITORY repository;
 
@@ -13,7 +17,11 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, ID_TYPE, REPOSI
 
     @Override
     public List<ENTITY> findAll() {
-        return repository.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+        return repository.findAll(
+            Sort.by(
+                Sort.Direction.DESC, "createdAt"
+            )
+        );
     }
 
     @Override

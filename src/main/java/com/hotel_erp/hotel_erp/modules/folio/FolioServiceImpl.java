@@ -167,10 +167,14 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         charge.setTotalAmount(totalAmount);
         
         charge = folioChargeRepository.save(charge);
-        
-        folio.setTotalAmount(folio.getTotalAmount().add(charge.getTotalAmount()));
+
+        // BUG 6 FIX: Recalculate totalAmount from DB aggregates to avoid race condition
+        // when multiple charges are posted concurrently.
+        BigDecimal totalCharges = folioChargeRepository.sumTotalByFolioId(folioId);
+        BigDecimal totalPayments = folioPaymentRepository.sumAmountByFolioId(folioId);
+        folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
-        
+
         return folioChargeMapper.toDto(charge);
     }
 
@@ -216,15 +220,24 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         payment.setRecordedAt(LocalDateTime.now());
         payment.setRecordedBy(userId);
         
+        // BUG 5 FIX: Prevent overpayment — reject if payment exceeds outstanding balance.
+        if (payment.getAmount().compareTo(folio.getTotalAmount()) > 0) {
+            throw new RuntimeException(
+                "Payment amount (" + payment.getAmount() + ") exceeds outstanding balance (" + folio.getTotalAmount() + ")"
+            );
+        }
+
         payment = folioPaymentRepository.save(payment);
-        
+
         // Generate receipt
         generateReceipt(payment);
-        
-        // Update folio total amount (decrease balance)
-        folio.setTotalAmount(folio.getTotalAmount().subtract(payment.getAmount()));
+
+        // BUG 6 FIX: Recalculate totalAmount from DB aggregates to avoid in-memory race condition.
+        BigDecimal totalCharges = folioChargeRepository.sumTotalByFolioId(folioId);
+        BigDecimal totalPayments = folioPaymentRepository.sumAmountByFolioId(folioId);
+        folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
-        
+
         return folioPaymentMapper.toDto(payment);
     }
 
@@ -248,6 +261,40 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         folio.setClosedAt(LocalDateTime.now());
         
         return folioMapper.toDto(repository.save(folio));
+    }
+
+    @Override
+    @Transactional
+    public void voidFolio(Long folioId, Long userId) {
+        // BUG 4 FIX: Properly void a folio by posting a credit reversal for each charge
+        // and then closing the folio so it no longer shows as outstanding.
+        FolioEntity folio = repository.findById(folioId)
+                .orElseThrow(() -> new RuntimeException("Folio not found: " + folioId));
+
+        if (folio.getStatus() != FolioStatus.OPEN) {
+            return; // Already closed/voided, nothing to do
+        }
+
+        // Post a single reversal charge that zeroes the balance
+        BigDecimal currentBalance = folio.getTotalAmount();
+        if (currentBalance.compareTo(BigDecimal.ZERO) > 0) {
+            FolioChargeEntity reversal = new FolioChargeEntity();
+            reversal.setFolioId(folioId);
+            reversal.setDescription("Void Reversal — Stay Voided");
+            reversal.setQuantity(BigDecimal.ONE);
+            reversal.setUnitPrice(currentBalance.negate());
+            reversal.setDiscountPct(BigDecimal.ZERO);
+            reversal.setTaxPct(BigDecimal.ZERO);
+            reversal.setTotalAmount(currentBalance.negate());
+            reversal.setChargedAt(java.time.LocalDateTime.now());
+            reversal.setAddedBy(userId);
+            folioChargeRepository.save(reversal);
+        }
+
+        folio.setTotalAmount(BigDecimal.ZERO);
+        folio.setStatus(FolioStatus.CLOSED);
+        folio.setClosedAt(java.time.LocalDateTime.now());
+        repository.save(folio);
     }
 
     @Override

@@ -14,6 +14,8 @@ import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -104,6 +106,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         return checkOut(id, userId, false); // Default to no auto-adjustment without approval UI
     }
 
+    @Override
     @Transactional
     public StayDTO checkOut(Long id, Long userId, boolean approveAdjustment) {
         StayEntity stay = repository.findById(id)
@@ -120,12 +123,16 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         
         if (folio != null && stay.getDateOut() != null) {
             long plannedNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), stay.getDateOut().toLocalDate());
-            if (plannedNights < 1) plannedNights = 1;
+            if (plannedNights < 1) {
+                plannedNights = 1;
+            }
 
             long actualNights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), now.toLocalDate());
             
             // Check-out on same day as Check-in is still 1 night (industry standard)
-            if (actualNights < 1) actualNights = 1;
+            if (actualNights < 1) {
+                actualNights = 1;
+            }
 
             if (actualNights < plannedNights) {
                 long diff = plannedNights - actualNights;
@@ -138,7 +145,9 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                         rate = room.getRoomType().getDefaultRate();
                     }
                 }
-                if (rate == null) rate = BigDecimal.ZERO;
+                if (rate == null) {
+                    rate = BigDecimal.ZERO;
+                }
                 
                 // Post adjustment
                 FolioChargeDTO adjustment = FolioChargeDTO.builder()
@@ -160,8 +169,8 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         }
 
         if (folio != null && folio.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                org.springframework.http.HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
                 "Cannot check out. Outstanding folio balance: " + folio.getTotalAmount()
             );
         }
@@ -250,13 +259,17 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         if (stay.getDateIn() != null && stay.getDateOut() != null) {
             nights = ChronoUnit.DAYS.between(stay.getDateIn().toLocalDate(), stay.getDateOut().toLocalDate());
         }
-        if (nights <= 0) nights = 1; // Minimum 1 night charge
+        if (nights <= 0) {
+            nights = 1; // Minimum 1 night charge
+        }
 
         var room = roomRepository.findById(stay.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
         
         BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
-        if (rate == null) rate = BigDecimal.ZERO;
+        if (rate == null) {
+            rate = BigDecimal.ZERO;
+        }
 
         FolioChargeDTO chargeDto = FolioChargeDTO.builder()
                 .folioId(folioId)
@@ -289,9 +302,10 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Transactional
     public void autoFlagOverstays() {
         LocalDateTime now = LocalDateTime.now();
-        
-        // 1. Mark ACTIVE as DUE_CHECKOUT if it's departure day and before 11:00 AM (or strictly on departure day)
-        // Actually, "DUE CHECKOUT" is normally the whole day of checkout until 11:00 AM.
+
+        // BUG 3 FIX: Fetch ACTIVE stays to mark as DUE_CHECKOUT on departure day (before cut-off).
+        // FIX: After saving, we re-fetch for the overstay check so they aren't double-processed
+        // in the same scheduler run (prevents ACTIVE -> DUE_CHECKOUT -> OVERSTAY in one tick).
         List<StayEntity> activeStays = repository.findAllByStatusIn(List.of(StayStatus.ACTIVE));
         for (StayEntity stay : activeStays) {
             if (stay.getDateOut() != null && stay.getDateOut().toLocalDate().isEqual(now.toLocalDate())) {
@@ -300,12 +314,17 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             }
         }
 
-        // 2. Mark ACTIVE or DUE_CHECKOUT as OVERSTAY if it's past 11:00 AM on departure day
-        List<StayEntity> pendingOverstays = repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.DUE_CHECKOUT));
-        for (StayEntity stay : pendingOverstays) {
+        // Step 2: Only look at PRE-EXISTING DUE_CHECKOUT stays (from previous scheduler runs).
+        // These have already spent time in DUE_CHECKOUT and are now past their 11:00 AM cutoff.
+        List<StayEntity> dueCheckoutStays = repository.findAllByStatusIn(List.of(StayStatus.DUE_CHECKOUT));
+        for (StayEntity stay : dueCheckoutStays) {
             if (stay.getDateOut() != null && now.isAfter(stay.getDateOut())) {
-                stay.setStatus(StayStatus.OVERSTAY);
-                repository.save(stay);
+                // Only transition to OVERSTAY if the stay was ALREADY in DUE_CHECKOUT before this run
+                // (i.e., its dateOut was in a previous run's departure date, not today's first pass).
+                if (!stay.getDateOut().toLocalDate().isEqual(now.toLocalDate()) || now.getHour() >= 12) {
+                    stay.setStatus(StayStatus.OVERSTAY);
+                    repository.save(stay);
+                }
             }
         }
     }
@@ -331,6 +350,11 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         LocalDateTime oldDateOut = stay.getDateOut();
         if (newDateOut != null && oldDateOut != null && newDateOut.isBefore(oldDateOut)) {
             throw new RuntimeException("New checkout date must be after current checkout date");
+        }
+
+        // BUG 2 FIX: guard against null oldDateOut (walk-in with no planned checkout)
+        if (oldDateOut == null) {
+            throw new RuntimeException("Cannot extend a stay with no original checkout date set. Please set a checkout date first.");
         }
 
         long additionalNights = Duration.between(oldDateOut, newDateOut).toDays();
@@ -391,11 +415,11 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             });
         }
 
-        // Void Folio if exists
+        // BUG 4 FIX: Void the folio and reverse all charges when a stay is voided.
         folioRepository.findByStayId(stayId).ifPresent(folio -> {
-            // We just note it's voided for now, in a real system we'd void all charges
-            // For now, we'll keep the folio but maybe add a note or leave it as is
-            // since the stay is voided.
+            if (folio.getStatus() == com.hotel_erp.hotel_erp.modules.folio.FolioStatus.OPEN) {
+                folioService.voidFolio(folio.getId(), userId);
+            }
         });
     }
 

@@ -8,6 +8,8 @@ import java.util.List;
 @Repository
 public interface MaintenanceRepository extends BaseRepository<MaintenanceEntity, Long> {
     List<MaintenanceEntity> findAllByStatus(MaintenanceStatus status);
+
     List<MaintenanceEntity> findAllByRoomId(Long roomId);
+
     List<MaintenanceEntity> findAllByAssignedTo(Long assignedTo);
 }

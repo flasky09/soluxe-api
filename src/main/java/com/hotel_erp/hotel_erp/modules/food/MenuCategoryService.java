@@ -4,8 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MenuCategoryService {
+
     Optional<MenuCategoryEntity> findById(Long id);
+
     MenuCategoryEntity save(MenuCategoryEntity category);
+
     List<MenuCategoryEntity> findAll();
+
     void deleteById(Long id);
+
 }

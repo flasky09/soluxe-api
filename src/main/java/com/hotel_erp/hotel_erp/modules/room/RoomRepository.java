@@ -7,6 +7,9 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends BaseRepository<RoomEntity, Long> {
+
     List<RoomEntity> findAllByStatusIn(List<RoomStatus> statuses);
+
     List<RoomEntity> findAllByRoomTypeIdAndStatus(Long roomTypeId, RoomStatus status);
+
 }

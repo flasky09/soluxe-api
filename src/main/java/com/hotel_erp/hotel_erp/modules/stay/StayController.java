@@ -38,14 +38,18 @@ public class StayController {
 
     @PostMapping("/direct")
     public StayDTO directCheckIn(@RequestBody DirectCheckInRequest request) {
-        return stayService.directCheckIn(request.getGuestId(), request.getRoomId(), request.getAdults(), request.getChildren(), request.getDateOut(), request.getUserId());
+        return stayService.directCheckIn(
+                request.getGuestId(), request.getRoomId(),
+                request.getAdults(), request.getChildren(),
+                request.getDateOut(), request.getUserId());
     }
 
     @PostMapping("/{id}/check-out")
-    public StayDTO checkOut(@PathVariable("id") Long id, @RequestParam("userId") Long userId, @RequestParam(name = "approveAdjustment", required = false, defaultValue = "false") boolean approveAdjustment) {
-        // Since the interface doesn't have the boolean flag yet, we'll cast or call the service method directly if it's public
-        // In this case, I'll update the interface too for consistency
-        return ((StayServiceImpl)stayService).checkOut(id, userId, approveAdjustment);
+    public StayDTO checkOut(@PathVariable("id") Long id,
+            @RequestParam("userId") Long userId,
+            @RequestParam(name = "approveAdjustment", required = false, defaultValue = "false") boolean approveAdjustment) {
+        // BUG 1 FIX: Call through the interface directly; checkOut(Long, Long, boolean) is now declared on StayService.
+        return stayService.checkOut(id, userId, approveAdjustment);
     }
 
     @PostMapping("/{id}/extend")

@@ -2,33 +2,43 @@ package com.hotel_erp.hotel_erp.modules.report;
 
 import com.hotel_erp.hotel_erp.modules.folio.FolioChargeEntity;
 import com.hotel_erp.hotel_erp.modules.folio.FolioChargeRepository;
+import com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity;
+import com.hotel_erp.hotel_erp.modules.folio.FolioPaymentRepository;
+import com.hotel_erp.hotel_erp.modules.folio.FolioRepository;
+import com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity;
+import com.hotel_erp.hotel_erp.modules.expense.ExpenseRepository;
+import com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderItemRepository;
+import com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderEntity;
+import com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderRepository;
+import com.hotel_erp.hotel_erp.modules.inventory.InventoryItemRepository;
+import com.hotel_erp.hotel_erp.modules.employee.EmployeeRepository;
+import com.hotel_erp.hotel_erp.modules.finance.CashMovementRepository;
+import com.hotel_erp.hotel_erp.modules.finance.CashMovementEntity;
+import com.hotel_erp.hotel_erp.modules.finance.PettyCashRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.stream.Collectors;
-import com.hotel_erp.hotel_erp.modules.finance.CashMovementRepository;
-import com.hotel_erp.hotel_erp.modules.finance.CashMovementEntity;
-import com.hotel_erp.hotel_erp.modules.finance.PettyCashRepository;
-import com.hotel_erp.hotel_erp.modules.folio.FolioRepository;
 
 @Service
 @RequiredArgsConstructor
 public class ReportService {
 
     private final FolioChargeRepository folioChargeRepository;
-    private final com.hotel_erp.hotel_erp.modules.folio.FolioPaymentRepository folioPaymentRepository;
-    private final com.hotel_erp.hotel_erp.modules.expense.ExpenseRepository expenseRepository;
-    private final com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderItemRepository purchaseOrderItemRepository;
-    private final com.hotel_erp.hotel_erp.modules.employee.EmployeeRepository employeeRepository;
-    private final com.hotel_erp.hotel_erp.modules.inventory.InventoryItemRepository inventoryItemRepository;
-    private final com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderRepository purchaseOrderRepository;
+    private final FolioPaymentRepository folioPaymentRepository;
+    private final ExpenseRepository expenseRepository;
+    private final PurchaseOrderItemRepository purchaseOrderItemRepository;
+    private final EmployeeRepository employeeRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
     private final CashMovementRepository cashMovementRepository;
     private final PettyCashRepository pettyCashRepository;
     private final FolioRepository folioRepository;
@@ -40,18 +50,18 @@ public class ReportService {
                 date.plusDays(1).atStartOfDay()
         );
 
-        List<com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity> payments = folioPaymentRepository.findAllByDateRange(
+        List<FolioPaymentEntity> payments = folioPaymentRepository.findAllByDateRange(
                 date.atStartOfDay(),
                 date.plusDays(1).atStartOfDay()
         );
 
-        List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> expenses = expenseRepository.findAllByExpenseDateBetween(date, date);
+        List<ExpenseEntity> expenses = expenseRepository.findAllByExpenseDateBetween(date, date);
         BigDecimal totalExpenses = BigDecimal.ZERO;
         BigDecimal operationalExpenses = BigDecimal.ZERO;
         BigDecimal totalAssets = BigDecimal.ZERO;
         BigDecimal maintenanceCosts = BigDecimal.ZERO;
 
-        for (com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity e : expenses) {
+        for (ExpenseEntity e : expenses) {
             BigDecimal amt = e.getAmount() != null ? e.getAmount() : BigDecimal.ZERO;
             totalExpenses = totalExpenses.add(amt);
             
@@ -68,21 +78,33 @@ public class ReportService {
         }
         
         BigDecimal supplyCosts = purchaseOrderItemRepository.getTotalSpendInDateRange(date, date);
-        if (supplyCosts == null) supplyCosts = BigDecimal.ZERO;
+        if (supplyCosts == null) {
+            supplyCosts = BigDecimal.ZERO;
+        }
 
         BigDecimal payrollExpenses = employeeRepository.getTotalPayroll();
-        if (payrollExpenses == null) payrollExpenses = BigDecimal.ZERO;
+        if (payrollExpenses == null) {
+            payrollExpenses = BigDecimal.ZERO;
+        }
 
         BigDecimal accountsReceivable = folioRepository.getOutstandingBalanceForClosedFolios();
-        if (accountsReceivable == null) accountsReceivable = BigDecimal.ZERO;
+        if (accountsReceivable == null) {
+            accountsReceivable = BigDecimal.ZERO;
+        }
 
         BigDecimal accountsPayable = purchaseOrderRepository.getTotalAccountsPayable();
-        if (accountsPayable == null) accountsPayable = BigDecimal.ZERO;
+        if (accountsPayable == null) {
+            accountsPayable = BigDecimal.ZERO;
+        }
 
         BigDecimal pettyCash = pettyCashRepository.getTotalPettyCashInDateRange(date, date);
-        if (pettyCash == null) pettyCash = BigDecimal.ZERO;
+        if (pettyCash == null) {
+            pettyCash = BigDecimal.ZERO;
+        }
 
-        return calculateDailyRevenue(date, dailyCharges, payments, expenses, totalExpenses, operationalExpenses, totalAssets, maintenanceCosts, supplyCosts, payrollExpenses, accountsReceivable, accountsPayable, pettyCash);
+        return calculateDailyRevenue(date, dailyCharges, payments, expenses,
+                totalExpenses, operationalExpenses, totalAssets, maintenanceCosts,
+                supplyCosts, payrollExpenses, accountsReceivable, accountsPayable, pettyCash);
     }
 
     public RevenueReportDTO getRevenueReport(LocalDate startDate, LocalDate endDate) {
@@ -92,22 +114,22 @@ public class ReportService {
                 endDate.plusDays(1).atStartOfDay()
         );
 
-        List<com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity> payments = folioPaymentRepository.findAllByDateRange(
+        List<FolioPaymentEntity> payments = folioPaymentRepository.findAllByDateRange(
                 startDate.atStartOfDay(),
                 endDate.plusDays(1).atStartOfDay()
         );
 
         BigDecimal totalPayments = payments.stream()
-                .map(com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity::getAmount)
+                .map(FolioPaymentEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> expenses = expenseRepository.findAllByExpenseDateBetween(startDate, endDate);
+        List<ExpenseEntity> expenses = expenseRepository.findAllByExpenseDateBetween(startDate, endDate);
         BigDecimal totalExpenses = BigDecimal.ZERO;
         BigDecimal operationalExpenses = BigDecimal.ZERO;
         BigDecimal totalAssets = BigDecimal.ZERO;
         BigDecimal maintenanceCosts = BigDecimal.ZERO;
 
-        for (com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity e : expenses) {
+        for (ExpenseEntity e : expenses) {
             BigDecimal amt = e.getAmount() != null ? e.getAmount() : BigDecimal.ZERO;
             totalExpenses = totalExpenses.add(amt);
             
@@ -124,19 +146,29 @@ public class ReportService {
         }
 
         BigDecimal supplyCosts = purchaseOrderItemRepository.getTotalSpendInDateRange(startDate, endDate);
-        if (supplyCosts == null) supplyCosts = BigDecimal.ZERO;
+        if (supplyCosts == null) {
+            supplyCosts = BigDecimal.ZERO;
+        }
 
         BigDecimal payrollExpenses = employeeRepository.getTotalPayroll();
-        if (payrollExpenses == null) payrollExpenses = BigDecimal.ZERO;
+        if (payrollExpenses == null) {
+            payrollExpenses = BigDecimal.ZERO;
+        }
 
         BigDecimal accountsReceivable = folioRepository.getOutstandingBalanceForClosedFolios();
-        if (accountsReceivable == null) accountsReceivable = BigDecimal.ZERO;
+        if (accountsReceivable == null) {
+            accountsReceivable = BigDecimal.ZERO;
+        }
 
         BigDecimal accountsPayable = purchaseOrderRepository.getTotalAccountsPayable();
-        if (accountsPayable == null) accountsPayable = BigDecimal.ZERO;
+        if (accountsPayable == null) {
+            accountsPayable = BigDecimal.ZERO;
+        }
 
         BigDecimal pettyCash = pettyCashRepository.getTotalPettyCashInDateRange(startDate, endDate);
-        if (pettyCash == null) pettyCash = BigDecimal.ZERO;
+        if (pettyCash == null) {
+            pettyCash = BigDecimal.ZERO;
+        }
 
         BigDecimal totalRevenue = BigDecimal.ZERO;
         BigDecimal netRevenue = BigDecimal.ZERO;
@@ -193,9 +225,22 @@ public class ReportService {
     }
 
 
-    private DailyRevenueDTO calculateDailyRevenue(LocalDate date, List<FolioChargeEntity> dailyCharges, List<com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity> payments, List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> dailyExpenses, BigDecimal totalExpenses, BigDecimal operationalExpenses, BigDecimal totalAssets, BigDecimal maintenanceCosts, BigDecimal supplyCosts, BigDecimal payrollExpenses, BigDecimal accountsReceivable, BigDecimal accountsPayable, BigDecimal pettyCash) {
+    private DailyRevenueDTO calculateDailyRevenue(
+            LocalDate date,
+            List<FolioChargeEntity> dailyCharges,
+            List<FolioPaymentEntity> payments,
+            List<ExpenseEntity> dailyExpenses,
+            BigDecimal totalExpenses,
+            BigDecimal operationalExpenses,
+            BigDecimal totalAssets,
+            BigDecimal maintenanceCosts,
+            BigDecimal supplyCosts,
+            BigDecimal payrollExpenses,
+            BigDecimal accountsReceivable,
+            BigDecimal accountsPayable,
+            BigDecimal pettyCash) {
         BigDecimal totalPayments = payments.stream()
-                .map(com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity::getAmount)
+                .map(FolioPaymentEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalRevenue = BigDecimal.ZERO;
@@ -249,7 +294,12 @@ public class ReportService {
                 .build();
     }
 
-    private List<FinancialAuditItemDTO> generateAuditTray(List<FolioChargeEntity> charges, List<com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity> payments, List<com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity> expenses, LocalDate start, LocalDate end) {
+    private List<FinancialAuditItemDTO> generateAuditTray(
+            List<FolioChargeEntity> charges,
+            List<FolioPaymentEntity> payments,
+            List<ExpenseEntity> expenses,
+            LocalDate start,
+            LocalDate end) {
         List<FinancialAuditItemDTO> tray = new ArrayList<>();
 
         // Add Charges
@@ -265,7 +315,7 @@ public class ReportService {
         }
 
         // Add Payments
-        for (com.hotel_erp.hotel_erp.modules.folio.FolioPaymentEntity p : payments) {
+        for (FolioPaymentEntity p : payments) {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(p.getRecordedAt() != null ? p.getRecordedAt() : p.getCreatedAt())
                 .type("COLLECTION")
@@ -277,7 +327,7 @@ public class ReportService {
         }
 
         // Add Expenses
-        for (com.hotel_erp.hotel_erp.modules.expense.ExpenseEntity e : expenses) {
+        for (ExpenseEntity e : expenses) {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(e.getExpenseDate().atStartOfDay())
                 .type("EXPENSE")
@@ -289,8 +339,8 @@ public class ReportService {
         }
 
         // Add Purchase Orders
-        List<com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderEntity> pos = purchaseOrderRepository.findAllByOrderDateBetween(start, end);
-        for (com.hotel_erp.hotel_erp.modules.inventory.purchaseorder.PurchaseOrderEntity po : pos) {
+        List<PurchaseOrderEntity> pos = purchaseOrderRepository.findAllByOrderDateBetween(start, end);
+        for (PurchaseOrderEntity po : pos) {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(po.getOrderDate().atStartOfDay())
                 .type("PROCUREMENT")
@@ -337,7 +387,7 @@ public class ReportService {
         }
 
         // Return reversed (descending) for display
-        java.util.Collections.reverse(sortedTray);
+        Collections.reverse(sortedTray);
         return sortedTray.stream()
                 .limit(100)
                 .collect(Collectors.toList());

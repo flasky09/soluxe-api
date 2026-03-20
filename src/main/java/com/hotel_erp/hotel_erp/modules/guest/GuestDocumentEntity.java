@@ -24,7 +24,3 @@ public class GuestDocumentEntity extends BaseEntity {
     private LocalDate expiryDate;
     private String fileName;
 }
-
-enum DocumentType {
-    ID, PASSPORT, VISA, DRIVING_LICENSE, OTHER
-}

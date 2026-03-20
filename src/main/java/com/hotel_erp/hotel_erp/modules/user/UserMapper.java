@@ -12,7 +12,9 @@ public class UserMapper {
     private final DepartmentRepository departmentRepository;
 
     public UserDTO toDto(UserEntity entity) {
-        if (entity == null) return null;
+        if (entity == null) {
+            return null;
+        }
         UserDTO dto = new UserDTO();
         dto.setId(entity.getId());
         dto.setUsername(entity.getUsername());
@@ -26,7 +28,9 @@ public class UserMapper {
     }
 
     public UserEntity toEntity(UserDTO dto) {
-        if (dto == null) return null;
+        if (dto == null) {
+            return null;
+        }
         UserEntity entity = new UserEntity();
         entity.setUsername(dto.getUsername());
         entity.setFullName(dto.getFullName());

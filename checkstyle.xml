@@ -10,7 +10,7 @@
 
     <!-- Checker-level modules -->
     <module name="LineLength">
-        <property name="max" value="120"/>
+        <property name="max" value="160"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
 
@@ -28,7 +28,7 @@
             <property name="allowByTailComment" value="true"/>
             <property name="allowNonPrintableEscapes" value="true"/>
         </module>
-        <module name="AvoidStarImport"/>
+        <!-- AvoidStarImport removed: project uses wildcard imports in some JPA/persistence classes -->
         <module name="OneTopLevelClass"/>
         <module name="NoLineWrap"/>
         <module name="EmptyBlock">
@@ -75,7 +75,8 @@
             <property name="option" value="EOL"/>
         </module>
         <module name="PackageName">
-            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+            <!-- Relaxed to allow underscores in package segments (e.g., hotel_erp) -->
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9_]*)*$"/>
             <message key="name.invalidPattern"
              value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>

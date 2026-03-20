@@ -44,9 +44,15 @@ public class PurchaseOrderController {
             entity.setSupplier(supplierRepository.findById(dto.getSupplierId())
                 .orElseThrow(() -> new RuntimeException("Supplier not found")));
         }
-        if (dto.getExpectedDate() != null) entity.setExpectedDate(dto.getExpectedDate());
-        if (dto.getStatus() != null) entity.setStatus(dto.getStatus());
-        if (dto.getNotes() != null) entity.setNotes(dto.getNotes());
+        if (dto.getExpectedDate() != null) {
+            entity.setExpectedDate(dto.getExpectedDate());
+        }
+        if (dto.getStatus() != null) {
+            entity.setStatus(dto.getStatus());
+        }
+        if (dto.getNotes() != null) {
+            entity.setNotes(dto.getNotes());
+        }
         
         return purchaseOrderMapper.toDto(purchaseOrderService.save(entity));
     }
