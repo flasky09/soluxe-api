@@ -265,8 +265,11 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
         var room = roomRepository.findById(stay.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
-        
-        BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
+
+        BigDecimal rate = stay.getRatePerNight();
+        if (rate == null && room.getRoomType() != null) {
+            rate = room.getRoomType().getDefaultRate();
+        }
         if (rate == null) {
             rate = BigDecimal.ZERO;
         }
@@ -361,7 +364,13 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         if (additionalNights > 0) {
             var folio = folioRepository.findByStayId(id).orElseThrow(() -> new RuntimeException("Folio not found"));
             var room = roomRepository.findById(stay.getRoomId()).orElseThrow();
-            BigDecimal rate = stay.getRatePerNight() != null ? stay.getRatePerNight() : room.getRoomType().getDefaultRate();
+            BigDecimal rate = stay.getRatePerNight();
+            if (rate == null && room.getRoomType() != null) {
+                rate = room.getRoomType().getDefaultRate();
+            }
+            if (rate == null) {
+                rate = BigDecimal.ZERO;
+            }
             
             FolioChargeDTO chargeDto = FolioChargeDTO.builder()
                     .folioId(folio.getId())
