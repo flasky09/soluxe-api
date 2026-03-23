@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RestController
@@ -53,8 +54,9 @@ public class StayController {
     }
 
     @PostMapping("/{id}/extend")
-    public StayDTO extendStay(@PathVariable("id") Long id, @RequestParam("newDateOut") LocalDateTime newDateOut, @RequestParam("userId") Long userId) {
-        return stayService.extendStay(id, newDateOut, userId);
+    public StayDTO extendStay(@PathVariable("id") Long id, @RequestParam("newDateOut") LocalDate newDateOut, @RequestParam("userId") Long userId) {
+        // Convert date-only input (from frontend date picker) to 11:00 AM checkout time
+        return stayService.extendStay(id, newDateOut.atTime(11, 0), userId);
     }
 
     @PostMapping("/reservations/{reservationId}/no-show")

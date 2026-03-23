@@ -172,6 +172,12 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         // when multiple charges are posted concurrently.
         BigDecimal totalCharges = folioChargeRepository.sumTotalByFolioId(folioId);
         BigDecimal totalPayments = folioPaymentRepository.sumAmountByFolioId(folioId);
+        if (totalCharges == null) {
+            totalCharges = BigDecimal.ZERO;
+        }
+        if (totalPayments == null) {
+            totalPayments = BigDecimal.ZERO;
+        }
         folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
 
@@ -220,8 +226,11 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         payment.setRecordedAt(LocalDateTime.now());
         payment.setRecordedBy(userId);
         
-        // BUG 5 FIX: Prevent overpayment — reject if payment exceeds outstanding balance.
-        if (payment.getAmount().compareTo(folio.getTotalAmount()) > 0) {
+        // Prevent overpayment — only applies when both payment and balance are positive.
+        // Skip guard for refunds (negative amounts) and credit-balance folios.
+        if (payment.getAmount().compareTo(BigDecimal.ZERO) > 0
+                && folio.getTotalAmount().compareTo(BigDecimal.ZERO) > 0
+                && payment.getAmount().compareTo(folio.getTotalAmount()) > 0) {
             throw new RuntimeException(
                 "Payment amount (" + payment.getAmount() + ") exceeds outstanding balance (" + folio.getTotalAmount() + ")"
             );
@@ -235,6 +244,12 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         // BUG 6 FIX: Recalculate totalAmount from DB aggregates to avoid in-memory race condition.
         BigDecimal totalCharges = folioChargeRepository.sumTotalByFolioId(folioId);
         BigDecimal totalPayments = folioPaymentRepository.sumAmountByFolioId(folioId);
+        if (totalCharges == null) {
+            totalCharges = BigDecimal.ZERO;
+        }
+        if (totalPayments == null) {
+            totalPayments = BigDecimal.ZERO;
+        }
         folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
 

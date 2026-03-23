@@ -99,6 +99,9 @@ class FolioServiceImplTest {
         when(folioRepository.findById(folioId)).thenReturn(Optional.of(folio));
         when(folioChargeMapper.toEntity(any(FolioChargeDTO.class))).thenReturn(chargeEntity);
         when(folioChargeRepository.save(any(FolioChargeEntity.class))).thenAnswer(i -> i.getArgument(0));
+        // Stub aggregate queries used by addCharge to recalculate folio balance
+        when(folioChargeRepository.sumTotalByFolioId(folioId)).thenReturn(new BigDecimal("189.00"));
+        when(folioPaymentRepository.sumAmountByFolioId(folioId)).thenReturn(BigDecimal.ZERO);
 
         // Act
         folioService.addCharge(folioId, chargeDto, userId);
@@ -133,12 +136,15 @@ class FolioServiceImplTest {
         when(folioRepository.findById(folioId)).thenReturn(Optional.of(folio));
         when(folioPaymentMapper.toEntity(any(FolioPaymentDTO.class))).thenReturn(paymentEntity);
         when(folioPaymentRepository.save(any(FolioPaymentEntity.class))).thenAnswer(i -> i.getArgument(0));
+        // Stub aggregate queries: 500 in charges, 200 paid -> balance 300
+        when(folioChargeRepository.sumTotalByFolioId(folioId)).thenReturn(new BigDecimal("500"));
+        when(folioPaymentRepository.sumAmountByFolioId(folioId)).thenReturn(new BigDecimal("200"));
 
         // Act
         folioService.addPayment(folioId, paymentDto, userId);
 
         // Assert
-        assertEquals(new BigDecimal("300"), folio.getTotalAmount());
+        assertEquals(new BigDecimal("300.00"), folio.getTotalAmount());
         assertEquals("REF123", paymentEntity.getReferenceNumber());
         verify(folioReceiptRepository).save(any(FolioReceiptEntity.class));
     }
