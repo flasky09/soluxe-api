@@ -130,32 +130,62 @@ public class FolioIntegrationTest {
     @Test
     void testAddRefundFlow() {
         Long userId = 1L;
-        
-        // 1. Manually set a negative balance (guest is owed a refund)
-        testFolio.setTotalAmount(new BigDecimal("-100.00"));
-        folioRepository.saveAndFlush(testFolio);
 
-        // Need to add a mock Payment Method to db for integration test
+        // Create a payment method
         PaymentMethodEntity pm = new PaymentMethodEntity();
         pm.setName("Refund Method");
         pm.setActive(true);
         pm = paymentMethodRepository.saveAndFlush(pm);
+        final Long pmId = pm.getId();
 
-        // 2. Process a Refund (negative payment)
-        FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
-                .amount(new BigDecimal("-100.00")) // Refund amount
+        // 1. Charge 100.00 → balance = 100
+        FolioChargeDTO chargeDto = FolioChargeDTO.builder()
+                .chargeTypeId(roomChargeTypeId)
+                .description("Room charge")
+                .quantity(BigDecimal.ONE)
+                .unitPrice(new BigDecimal("100.00"))
+                .discountPct(BigDecimal.ZERO)
+                .taxPct(BigDecimal.ZERO)
+                .build();
+        folioService.addCharge(testFolio.getId(), chargeDto, userId);
+
+        // 2. Pay 100.00 → balance = 0
+        FolioPaymentDTO payDto = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("100.00"))
                 .folioId(testFolio.getId())
                 .recordedBy(userId)
-                .paymentMethodId(pm.getId())
+                .paymentMethodId(pmId)
                 .build();
+        folioService.addPayment(testFolio.getId(), payDto, userId);
 
+        // 3. Post a credit charge of -50 (e.g. discount/early departure credit) → balance = -50
+        FolioChargeDTO creditDto = FolioChargeDTO.builder()
+                .chargeTypeId(roomChargeTypeId)
+                .description("Early departure credit")
+                .quantity(BigDecimal.ONE)
+                .unitPrice(new BigDecimal("-50.00"))
+                .discountPct(BigDecimal.ZERO)
+                .taxPct(BigDecimal.ZERO)
+                .build();
+        folioService.addCharge(testFolio.getId(), creditDto, userId);
+
+        // Verify credit balance: charges(50) - payments(100) = -50
+        FolioEntity afterCredit = folioRepository.findById(testFolio.getId()).get();
+        assertEquals(0, new BigDecimal("-50.00").compareTo(afterCredit.getTotalAmount()));
+
+        // 4. Issue refund of -50 → payments total = 100 + (-50) = 50 → balance = 50 - 50 = 0
+        FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("-50.00"))
+                .folioId(testFolio.getId())
+                .recordedBy(userId)
+                .paymentMethodId(pmId)
+                .build();
         FolioPaymentDTO savedRefund = folioService.addPayment(testFolio.getId(), refundDto, userId);
 
         assertNotNull(savedRefund);
-        // Using compareTo for BigDecimal equivalence
-        assertEquals(0, new BigDecimal("-100.00").compareTo(savedRefund.getAmount()));
+        assertEquals(0, new BigDecimal("-50.00").compareTo(savedRefund.getAmount()));
 
-        // 3. Verify Folio Balance is now zero ( -100 - (-100) = 0 )
+        // 5. Verify balance is now 0
         FolioEntity updatedFolio = folioRepository.findById(testFolio.getId()).get();
         assertEquals(0, BigDecimal.ZERO.compareTo(updatedFolio.getTotalAmount()));
     }
@@ -164,13 +194,13 @@ public class FolioIntegrationTest {
     void testOptimisticLocking() {
         // Read the folio into the hibernate session cache
         FolioEntity folio = folioRepository.findById(testFolio.getId()).get();
-        
-        // Simulate a concurrent update completed by another transaction by incrementing the version directly
+
+        // Simulate a concurrent update by another transaction
         jdbcTemplate.update("UPDATE folios SET version = version + 1 WHERE id = ?", folio.getId());
 
         // This transaction's view is now stale
         folio.setTotalAmount(folio.getTotalAmount().add(new BigDecimal("50.00")));
-        
+
         // Saving the stale entity should trigger the optimistic locking exception
         assertThrows(org.springframework.orm.ObjectOptimisticLockingFailureException.class, () -> {
             folioRepository.saveAndFlush(folio);
