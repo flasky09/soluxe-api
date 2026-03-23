@@ -2,6 +2,7 @@ package com.hotel_erp.hotel_erp.modules.stay;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.time.LocalDate;
@@ -54,7 +55,10 @@ public class StayController {
     }
 
     @PostMapping("/{id}/extend")
-    public StayDTO extendStay(@PathVariable("id") Long id, @RequestParam("newDateOut") LocalDate newDateOut, @RequestParam("userId") Long userId) {
+    public StayDTO extendStay(
+            @PathVariable("id") Long id,
+            @RequestParam("newDateOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate newDateOut,
+            @RequestParam("userId") Long userId) {
         // Convert date-only input (from frontend date picker) to 11:00 AM checkout time
         return stayService.extendStay(id, newDateOut.atTime(11, 0), userId);
     }
