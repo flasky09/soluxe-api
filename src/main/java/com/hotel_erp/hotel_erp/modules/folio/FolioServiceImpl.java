@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
@@ -141,6 +142,9 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         charge.setFolioId(folioId);
         charge.setChargedAt(LocalDateTime.now());
         charge.setAddedBy(userId);
+        charge.setVoided(chargeDto.isVoided());
+        charge.setVoidReason(chargeDto.getVoidReason());
+        charge.setVoidedBy(chargeDto.getVoidedBy());
 
         if (chargeDto.getChargeTypeId() != null && chargeDto.getChargeTypeId() > 0) {
             chargeTypeRepository.findById(chargeDto.getChargeTypeId())
@@ -228,11 +232,16 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         
         // Prevent overpayment — only applies when both payment and balance are positive.
         // Skip guard for refunds (negative amounts) and credit-balance folios.
+        BigDecimal liveBalance = Optional.ofNullable(folioChargeRepository.sumTotalByFolioId(folioId))
+                .orElse(BigDecimal.ZERO)
+            .subtract(Optional.ofNullable(folioPaymentRepository.sumAmountByFolioId(folioId))
+                .orElse(BigDecimal.ZERO));
+
         if (payment.getAmount().compareTo(BigDecimal.ZERO) > 0
-                && folio.getTotalAmount().compareTo(BigDecimal.ZERO) > 0
-                && payment.getAmount().compareTo(folio.getTotalAmount()) > 0) {
+                && liveBalance.compareTo(BigDecimal.ZERO) > 0
+                && payment.getAmount().compareTo(liveBalance) > 0) {
             throw new RuntimeException(
-                "Payment amount (" + payment.getAmount() + ") exceeds outstanding balance (" + folio.getTotalAmount() + ")"
+                "Payment amount (" + payment.getAmount() + ") exceeds outstanding balance (" + liveBalance + ")"
             );
         }
 
@@ -290,21 +299,13 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
             return; // Already closed/voided, nothing to do
         }
 
-        // Post a single reversal charge that zeroes the balance
-        BigDecimal currentBalance = folio.getTotalAmount();
-        if (currentBalance.compareTo(BigDecimal.ZERO) > 0) {
-            FolioChargeEntity reversal = new FolioChargeEntity();
-            reversal.setFolioId(folioId);
-            reversal.setDescription("Void Reversal — Stay Voided");
-            reversal.setQuantity(BigDecimal.ONE);
-            reversal.setUnitPrice(currentBalance.negate());
-            reversal.setDiscountPct(BigDecimal.ZERO);
-            reversal.setTaxPct(BigDecimal.ZERO);
-            reversal.setTotalAmount(currentBalance.negate());
-            reversal.setChargedAt(java.time.LocalDateTime.now());
-            reversal.setAddedBy(userId);
-            folioChargeRepository.save(reversal);
-        }
+        // Void all charges instead of posting a synthetic reversal
+        folioChargeRepository.findAllByFolioId(folioId).forEach(charge -> {
+            charge.setVoided(true);
+            charge.setVoidReason("Folio voided");
+            charge.setVoidedBy(userId);
+            folioChargeRepository.save(charge);
+        });
 
         folio.setTotalAmount(BigDecimal.ZERO);
         folio.setStatus(FolioStatus.CLOSED);
@@ -340,7 +341,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         receipt.setAmount(payment.getAmount());
         receipt.setIssuedAt(LocalDateTime.now());
         receipt.setIssuedBy(payment.getRecordedBy());
-        receipt.setReceiptNumber("REC-" + System.currentTimeMillis() + "-" + payment.getId());
+        receipt.setReceiptNumber("REC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase() + "-" + payment.getId());
         
         folioReceiptRepository.save(receipt);
     }

@@ -19,8 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -327,6 +327,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                 if (!stay.getDateOut().toLocalDate().isEqual(now.toLocalDate()) || now.getHour() >= 12) {
                     stay.setStatus(StayStatus.OVERSTAY);
                     repository.save(stay);
+                    // DO NOT touch room status here — let checkout or extension handle it
                 }
             }
         }
@@ -351,7 +352,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         }
 
         LocalDateTime oldDateOut = stay.getDateOut();
-        if (newDateOut != null && oldDateOut != null && newDateOut.isBefore(oldDateOut)) {
+        if (newDateOut != null && oldDateOut != null && newDateOut.toLocalDate().isBefore(oldDateOut.toLocalDate())) {
             throw new RuntimeException("New checkout date must be after current checkout date");
         }
 
@@ -360,10 +361,31 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             throw new RuntimeException("Cannot extend a stay with no original checkout date set. Please set a checkout date first.");
         }
 
-        long additionalNights = Duration.between(oldDateOut, newDateOut).toDays();
+        if (newDateOut == null) {
+            throw new RuntimeException("New checkout date must be provided");
+        }
+        
+        long additionalNights = ChronoUnit.DAYS.between(oldDateOut.toLocalDate(), newDateOut.toLocalDate());
+        
+        var room = roomRepository.findById(stay.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found for stay: " + id));
+
+        // Re-acquire room if it was released during overstay period
+        if (stay.getStatus() == StayStatus.OVERSTAY || stay.getStatus() == StayStatus.DUE_CHECKOUT) {
+            boolean roomAssignedToAnother = repository.countByRoomIdAndStatus(stay.getRoomId(), StayStatus.ACTIVE) > 0;
+            if (roomAssignedToAnother) {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Room " + room.getRoomNumber() + " has been assigned to another guest."
+                );
+            }
+            // Room is available for this stay to re-occupy from any state
+            room.setStatus(RoomStatus.OCCUPIED);
+            roomRepository.save(room);
+        }
+
         if (additionalNights > 0) {
-            var folio = folioRepository.findByStayId(id).orElseThrow(() -> new RuntimeException("Folio not found"));
-            var room = roomRepository.findById(stay.getRoomId()).orElseThrow();
+            var folio = folioRepository.findByStayId(id).orElseThrow(() -> new RuntimeException("Folio not found for stay: " + id));
             BigDecimal rate = stay.getRatePerNight();
             if (rate == null && room.getRoomType() != null) {
                 rate = room.getRoomType().getDefaultRate();
@@ -371,10 +393,12 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             if (rate == null) {
                 rate = BigDecimal.ZERO;
             }
+            String desc = "Room Charge Extension - " + additionalNights + " Night(s) (Overstay: " 
+                    + oldDateOut.toLocalDate() + " -> " + newDateOut.toLocalDate() + ")";
             
             FolioChargeDTO chargeDto = FolioChargeDTO.builder()
                     .folioId(folio.getId())
-                    .description("Room Charge Extension - " + additionalNights + " Night(s)")
+                    .description(desc)
                     .quantity(new BigDecimal(additionalNights))
                     .unitPrice(rate != null ? rate : BigDecimal.ZERO)
                     .taxPct(BigDecimal.ZERO)

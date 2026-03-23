@@ -21,7 +21,7 @@ public class FolioEntity extends BaseEntity {
     private Long diningSessionId;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @Enumerated(EnumType.STRING)
     private FolioType folioType;
