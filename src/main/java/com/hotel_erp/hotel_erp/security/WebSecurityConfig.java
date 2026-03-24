@@ -91,6 +91,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/api/folios/**").permitAll()
+                    .requestMatchers("/api/tenant/**").permitAll()
                     .requestMatchers("/error").permitAll()
                     .requestMatchers("/api/admin/reset-password").permitAll() // Temporary reset endpoint
                     .requestMatchers("/api/**").authenticated()
