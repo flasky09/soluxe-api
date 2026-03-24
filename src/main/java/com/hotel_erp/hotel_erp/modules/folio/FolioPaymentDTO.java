@@ -19,10 +19,11 @@ public class FolioPaymentDTO {
     private Long folioId;
     @NotNull(message = "Payment method is required")
     private Long paymentMethodId;
-    private String paymentMethodName; // Optional for UI display
+    private String paymentMethodName; 
     @NotNull(message = "Amount is required")
     private BigDecimal amount;
     private String referenceNumber;
+    private String notes;
     private Long recordedBy;
     private LocalDateTime recordedAt;
 }

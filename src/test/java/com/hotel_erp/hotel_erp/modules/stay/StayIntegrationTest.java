@@ -256,4 +256,79 @@ public class StayIntegrationTest {
         // Verify balance is perfectly 0
         assertEquals(0, BigDecimal.ZERO.compareTo(closedFolio.getTotalAmount()));
     }
+
+    @Test
+    void testCheckOutWithMultipleCharges() {
+        Long userId = 1L;
+
+        // 1. Check-in
+        StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
+        FolioEntity folio = folioRepository.findByStayId(stayDto.getId()).get();
+        
+        // At this point, auto room charge is 10000 (2 nights * 5000)
+        // 2. Add Food and Laundry charge types
+        ChargeTypeEntity foodType = new ChargeTypeEntity();
+        foodType.setName("Food & Beverage");
+        chargeTypeRepository.save(foodType);
+
+        ChargeTypeEntity laundryType = new ChargeTypeEntity();
+        laundryType.setName("Laundry");
+        chargeTypeRepository.save(laundryType);
+
+        // 3. Add charges
+        com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO foodCharge = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+                .folioId(folio.getId())
+                .description("Restaurant Dinner")
+                .chargeTypeId(foodType.getId())
+                .quantity(BigDecimal.ONE)
+                .unitPrice(new BigDecimal("1500")) // +1500
+                .build();
+        folioService.addCharge(folio.getId(), foodCharge, userId);
+
+        com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO laundryCharge = com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO.builder()
+                .folioId(folio.getId())
+                .description("Dry Cleaning")
+                .chargeTypeId(laundryType.getId())
+                .quantity(new BigDecimal("2"))
+                .unitPrice(new BigDecimal("250")) // +500
+                .build();
+        folioService.addCharge(folio.getId(), laundryCharge, userId);
+
+        // Total Expected Charges: 10000 (Room) + 1500 (Food) + 500 (Laundry) = 12000
+        
+        // 4. Guest pays only 10000 (leaving 2000 unpaid before adjustment)
+        FolioPaymentDTO partialPayment = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("10000"))
+                .folioId(folio.getId())
+                .recordedBy(userId)
+                .build();
+        folioService.addPayment(folio.getId(), partialPayment, userId);
+
+        // 5. Guest needs a refund of 3000 to reach 0 balance (after 5000 adjustment)
+        FolioPaymentDTO refundPayment = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("-3000")) // Refund
+                .folioId(folio.getId())
+                .recordedBy(userId)
+                .build();
+        folioService.addPayment(folio.getId(), refundPayment, userId);
+
+        // 6. Check-Out should now succeed
+        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
+        assertEquals(StayStatus.CHECKED_OUT, checkOutDto.getStatus());
+    }
+
+    @Test
+    void testCheckOutFailsWithUnpaidBalance() {
+        Long userId = 1L;
+
+        StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
+        
+        // We do not pay the 10000 room charge.
+        // When checking out early, it posts -5000 credit.
+        // Balance will be 10000 - 5000 = 5000 > 0.
+        org.springframework.web.server.ResponseStatusException ex1 = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
+            stayService.checkOut(stayDto.getId(), userId);
+        });
+        assertTrue(ex1.getMessage().contains("Outstanding folio balance"));
+    }
 }

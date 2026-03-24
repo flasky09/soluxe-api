@@ -18,6 +18,7 @@ public class FolioPaymentEntity extends BaseEntity {
     private Long paymentMethodId;
     private BigDecimal amount;
     private String referenceNumber;
+    private String notes;
     private Long recordedBy;
     private LocalDateTime recordedAt;
 }

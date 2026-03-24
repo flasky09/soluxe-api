@@ -178,9 +178,9 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
 
     @Override
     public List<ReservationDTO> getTodayArrivals() {
-        // BUG 8 FIX: Filter by today's date so only arrivals for today are returned.
+        // Include all BOOKED reservations where dateIn <= today (including past-due arrivals)
         java.time.LocalDate today = java.time.LocalDate.now();
-        return repository.findByStatusAndDateIn(ReservationStatus.BOOKED, today)
+        return repository.findByStatusAndDateInLessThanEqual(ReservationStatus.BOOKED, today)
                 .stream()
                 .map(reservationMapper::toDto)
                 .collect(java.util.stream.Collectors.toList());

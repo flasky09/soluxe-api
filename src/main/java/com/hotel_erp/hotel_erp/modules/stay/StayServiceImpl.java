@@ -194,11 +194,21 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             }
         }
 
-        if (folio != null && folio.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Cannot check out. Outstanding folio balance: " + folio.getTotalAmount()
-            );
+        if (folio != null) {
+            BigDecimal total = folio.getTotalAmount() != null ? folio.getTotalAmount() : BigDecimal.ZERO;
+            if (total.abs().compareTo(new BigDecimal("0.01")) > 0) {
+                if (total.compareTo(BigDecimal.ZERO) > 0) {
+                    throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Cannot check out. Outstanding folio balance: " + total
+                    );
+                } else {
+                    throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Cannot check out. Guest has a credit balance (refund required): " + total
+                    );
+                }
+            }
         }
 
         // Mutate and persist stay
