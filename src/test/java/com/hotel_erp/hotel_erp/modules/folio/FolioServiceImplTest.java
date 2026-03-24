@@ -11,11 +11,14 @@ import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
+import com.hotel_erp.hotel_erp.modules.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class FolioServiceImplTest {
@@ -50,28 +53,19 @@ class FolioServiceImplTest {
     private GuestRepository guestRepository;
     @Mock
     private RoomRepository roomRepository;
+    @Mock
+    private UserRepository userRepository;
 
+    @InjectMocks
     private FolioServiceImpl folioService;
 
     @BeforeEach
     void setUp() {
-        folioService = new FolioServiceImpl(
-                folioRepository,
-                folioChargeRepository,
-                folioPaymentRepository,
-                paymentMethodRepository,
-                folioReceiptRepository,
-                chargeTypeRepository,
-                folioMapper,
-                folioChargeMapper,
-                folioPaymentMapper,
-                paymentMethodMapper,
-                folioReceiptMapper,
-                stayRepository,
-                reservationRepository,
-                guestRepository,
-                roomRepository
-        );
+        // @InjectMocks cannot reach @Autowired fields declared in superclasses.
+        // Inject the mock manually into BaseServiceImpl.userRepository.
+        ReflectionTestUtils.setField(folioService, com.hotel_erp.hotel_erp.shared.BaseServiceImpl.class, "userRepository", userRepository, com.hotel_erp.hotel_erp.modules.user.UserRepository.class);
+        // Stub validateUser so any Long userId is treated as valid
+        when(userRepository.existsById(any())).thenReturn(true);
     }
 
     @Test

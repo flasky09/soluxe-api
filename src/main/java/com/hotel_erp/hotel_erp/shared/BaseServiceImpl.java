@@ -1,5 +1,7 @@
 package com.hotel_erp.hotel_erp.shared;
 
+import com.hotel_erp.hotel_erp.modules.user.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -10,6 +12,9 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, ID_TYPE,
         implements BaseService<ENTITY, ID_TYPE> {
 
     protected final REPOSITORY repository;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     protected BaseServiceImpl(REPOSITORY repository) {
         this.repository = repository;
@@ -37,5 +42,11 @@ public abstract class BaseServiceImpl<ENTITY extends BaseEntity, ID_TYPE,
     @Override
     public void deleteById(ID_TYPE identifier) {
         repository.deleteById(identifier);
+    }
+
+    protected void validateUser(Long userId) {
+        if (userId == null || !userRepository.existsById(userId)) {
+            throw new RuntimeException("Action denied: valid User ID required for audit trail.");
+        }
     }
 }

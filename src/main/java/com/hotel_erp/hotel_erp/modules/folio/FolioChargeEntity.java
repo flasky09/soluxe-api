@@ -33,6 +33,8 @@ public class FolioChargeEntity extends BaseEntity {
     private Long addedBy;
 
     private String referenceId;
+    private LocalDateTime periodStart;
+    private LocalDateTime periodEnd;
     private boolean voided;
     private String voidReason;
     private Long voidedBy;

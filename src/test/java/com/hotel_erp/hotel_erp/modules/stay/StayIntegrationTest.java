@@ -22,6 +22,8 @@ import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeEntity;
 import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
 import com.hotel_erp.hotel_erp.modules.folio.FolioDTO;
 import com.hotel_erp.hotel_erp.modules.folio.FolioPaymentDTO;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,6 +58,9 @@ public class StayIntegrationTest {
 
     @Autowired
     private ChargeTypeRepository chargeTypeRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private ReservationEntity testReservation;
     private Long testRoomId;
@@ -125,12 +130,24 @@ public class StayIntegrationTest {
         StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
         
         // Add Payment to settle folio (Advance Billing posts 10000.00)
+        // We pay in full upfront; checkout will post an early-departure credit if applicable.
         FolioPaymentDTO paymentDto = FolioPaymentDTO.builder()
                 .amount(BigDecimal.valueOf(10000))
                 .folioId(folioRepository.findByStayId(stayDto.getId()).get().getId())
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(paymentDto.getFolioId(), paymentDto, userId);
+
+        // Issue a refund of 5000 so that when checkout applies the -5000 early-departure
+        // credit charge the folio balance will be exactly 0.
+        // Folio state before checkout: charges=10000, payments=10000-5000=5000 → balance=+5000.
+        // checkOut posts credit charge of -5000 → charges total=5000, payments=5000 → balance=0.
+        FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
+                .amount(new BigDecimal("-5000"))
+                .folioId(paymentDto.getFolioId())
+                .recordedBy(userId)
+                .build();
+        folioService.addPayment(refundDto.getFolioId(), refundDto, userId);
 
         // Perform Check-Out
         StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
@@ -151,8 +168,8 @@ public class StayIntegrationTest {
         // 1. Check-in today
         StayDTO stayDto = stayService.checkIn(testReservation.getId(), testRoomId, userId);
         
-        // Verify default dateOut is at 11:00 AM
-        LocalDateTime expectedDateOut = testReservation.getDateOut().atTime(11, 0);
+        // Verify default dateOut is at 12:00 (noon) — set by StayServiceImpl
+        LocalDateTime expectedDateOut = testReservation.getDateOut().atTime(12, 0);
         assertEquals(expectedDateOut, stayDto.getDateOut());
         assertEquals(StayStatus.ACTIVE, stayDto.getStatus());
 
@@ -160,16 +177,20 @@ public class StayIntegrationTest {
         StayEntity stay = stayRepository.findById(stayDto.getId()).get();
         stay.setDateOut(LocalDate.now().atTime(23, 59));
         stayRepository.save(stay);
+        entityManager.flush(); // Ensure REQUIRES_NEW sub-transaction in StayFlagService sees the change
 
-        // Run autoFlagOverstays - should become DUE_CHECKOUT because it's departure day and currently 06:17 AM
+        // Run autoFlagOverstays - should become DUE_CHECKOUT because dateOut is today
         stayService.autoFlagOverstays();
         
         StayEntity updatedStay = stayRepository.findById(stayDto.getId()).get();
         assertEquals(StayStatus.DUE_CHECKOUT, updatedStay.getStatus());
 
-        // 3. Simulate past 11:00 AM (set dateOut to 1 hour ago)
-        stay.setDateOut(LocalDateTime.now().minusHours(1));
+        // 3. Simulate a past departure date (yesterday) — OVERSTAY triggers when dateOut is before today,
+        //    regardless of current hour of day. Using 'now - 1h' fails before 11am.
+        stay = stayRepository.findById(stayDto.getId()).get();
+        stay.setDateOut(LocalDate.now().minusDays(1).atTime(23, 59));
         stayRepository.save(stay);
+        entityManager.flush();
 
         stayService.autoFlagOverstays();
 

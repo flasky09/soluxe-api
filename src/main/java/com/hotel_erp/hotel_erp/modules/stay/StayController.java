@@ -60,7 +60,7 @@ public class StayController {
             @RequestParam("newDateOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate newDateOut,
             @RequestParam("userId") Long userId) {
         // Convert date-only input (from frontend date picker) to 11:00 AM checkout time
-        return stayService.extendStay(id, newDateOut.atTime(11, 0), userId);
+        return stayService.extendStay(id, newDateOut.atTime(12, 0), userId);
     }
 
     @PostMapping("/reservations/{reservationId}/no-show")

@@ -131,6 +131,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Override
     @Transactional
     public FolioChargeDTO addCharge(Long folioId, FolioChargeDTO chargeDto, Long userId) {
+        validateUser(userId);
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
@@ -218,6 +219,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Override
     @Transactional
     public FolioPaymentDTO addPayment(Long folioId, FolioPaymentDTO paymentDto, Long userId) {
+        validateUser(userId);
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
@@ -268,6 +270,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Override
     @Transactional
     public FolioDTO closeFolio(Long folioId, Long userId) {
+        validateUser(userId);
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
@@ -275,10 +278,14 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
             throw new RuntimeException("Folio is already closed");
         }
 
-        // In a real ERP, we'd check if balance is exactly zero.
-        // For now, we allow closing if the totalAmount (balance) is <= 0
-        if (folio.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {
-            throw new RuntimeException("Cannot close folio with outstanding balance: " + folio.getTotalAmount());
+        // Use epsilon to handle floating point rounding across multiple charges/payments
+        BigDecimal total = folio.getTotalAmount() != null ? folio.getTotalAmount() : BigDecimal.ZERO;
+        if (total.abs().compareTo(new BigDecimal("0.01")) > 0) {
+            if (total.compareTo(BigDecimal.ZERO) > 0) {
+                throw new RuntimeException("Cannot close folio with outstanding balance: " + total);
+            } else {
+                throw new RuntimeException("Cannot close folio with negative balance (refund required): " + total);
+            }
         }
 
         folio.setStatus(FolioStatus.CLOSED);
@@ -290,6 +297,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Override
     @Transactional
     public void voidFolio(Long folioId, Long userId) {
+        validateUser(userId);
         // BUG 4 FIX: Properly void a folio by posting a credit reversal for each charge
         // and then closing the folio so it no longer shows as outstanding.
         FolioEntity folio = repository.findById(folioId)
