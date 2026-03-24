@@ -23,6 +23,13 @@ public class TenantFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // Skip tenant resolution for CORS preflight requests — they carry no auth
+        // and must pass through so the CORS filter can respond with the correct headers.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Extract subdomain from Host header (e.g. "hotelerp.mflowpos.com")
         String host = request.getServerName(); // strips port automatically
 
