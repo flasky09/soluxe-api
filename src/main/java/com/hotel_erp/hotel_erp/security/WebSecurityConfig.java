@@ -33,6 +33,7 @@ public class WebSecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
+    private final com.hotel_erp.hotel_erp.config.tenant.TenantFilter tenantFilter;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -63,11 +64,7 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(List.of(
-            "https://soluxe.mflowpos.com",
-            "http://localhost:5173",
-            "http://localhost:3000"
-        ));
+        configuration.setAllowedOriginPatterns(List.of("*"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -101,7 +98,8 @@ public class WebSecurityConfig {
             );
 
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(authenticationJwtTokenFilter(), com.hotel_erp.hotel_erp.config.tenant.TenantFilter.class);
 
         return http.build();
     }
