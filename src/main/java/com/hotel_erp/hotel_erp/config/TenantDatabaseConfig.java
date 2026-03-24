@@ -33,10 +33,14 @@ public class TenantDatabaseConfig {
             EntityManagerFactoryBuilder builder,
             @Qualifier("tenantRoutingDataSource") DataSource tenantRoutingDataSource) {
         
+        java.util.Map<String, Object> properties = new java.util.HashMap<>();
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+
         return builder
                 .dataSource(tenantRoutingDataSource)
                 .packages("com.hotel_erp.hotel_erp.modules")
                 .persistenceUnit("tenant")
+                .properties(properties)
                 .build();
     }
 

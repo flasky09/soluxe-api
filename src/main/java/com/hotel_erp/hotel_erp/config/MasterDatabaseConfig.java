@@ -27,10 +27,14 @@ public class MasterDatabaseConfig {
             EntityManagerFactoryBuilder builder,
             @Qualifier("masterDataSource") DataSource masterDataSource) {
         
+        java.util.Map<String, Object> properties = new java.util.HashMap<>();
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+
         return builder
                 .dataSource(masterDataSource)
                 .packages("com.hotel_erp.hotel_erp.modules.master")
                 .persistenceUnit("master")
+                .properties(properties)
                 .build();
     }
 

@@ -20,10 +20,48 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.hotel_erp.hotel_erp.modules.master.TenantConfigRepository tenantConfigRepository;
 
-    @Override
     public void run(String... args) throws Exception {
-        seedDepartmentAndSuperAdmin();
+        seedTenantConfigs();
+        
+        java.util.List<com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity> tenants = tenantConfigRepository.findAll();
+        for (com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity tenant : tenants) {
+            try {
+                com.hotel_erp.hotel_erp.config.tenant.TenantContext.setCurrentTenant(tenant.getDbKey());
+                seedDepartmentAndSuperAdmin();
+            } finally {
+                com.hotel_erp.hotel_erp.config.tenant.TenantContext.clear();
+            }
+        }
+    }
+
+    private void seedTenantConfigs() {
+        com.hotel_erp.hotel_erp.config.tenant.TenantContext.clear(); // ensure we're NOT in any tenant context
+        if (tenantConfigRepository.findBySubdomain("soluxe.mflowpos.com").isEmpty()) {
+            com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity soluxe = new com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity();
+            soluxe.setSubdomain("soluxe.mflowpos.com");
+            soluxe.setDbKey("hotel1");
+            soluxe.setHotelName("Soluxe Club Hotel");
+            soluxe.setPrimaryColor("#0f172a");
+            tenantConfigRepository.save(soluxe);
+        }
+        if (tenantConfigRepository.findBySubdomain("hotelerp.mflowpos.com").isEmpty()) {
+            com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity newHotel = new com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity();
+            newHotel.setSubdomain("hotelerp.mflowpos.com");
+            newHotel.setDbKey("hotel3");
+            newHotel.setHotelName("Hotel ERP Demo");
+            newHotel.setPrimaryColor("#059669");
+            tenantConfigRepository.save(newHotel);
+        }
+        if (tenantConfigRepository.findBySubdomain("localhost").isEmpty()) {
+            com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity local = new com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity();
+            local.setSubdomain("localhost");
+            local.setDbKey("hotel1");
+            local.setHotelName("Developer Localhost");
+            local.setPrimaryColor("#0f172a");
+            tenantConfigRepository.save(local);
+        }
     }
 
     private void seedDepartmentAndSuperAdmin() {
