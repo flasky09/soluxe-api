@@ -10,7 +10,6 @@ import com.hotel_erp.hotel_erp.modules.folio.FolioChargeRepository;
 import com.hotel_erp.hotel_erp.modules.folio.FolioDTO;
 import com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO;
 import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
-import com.hotel_erp.hotel_erp.modules.master.TenantConfigRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,7 +30,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
     private final ReservationRepository reservationRepository;
     private final StayMapper stayMapper;
-    private final TenantConfigRepository tenantConfigRepository;
     private final FolioService folioService;
     private final FolioRepository folioRepository;
     private final RoomRepository roomRepository;
@@ -42,7 +40,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     public StayServiceImpl(StayRepository repository,
                            ReservationRepository reservationRepository,
                            StayMapper stayMapper,
-                           TenantConfigRepository tenantConfigRepository,
                            FolioService folioService,
                            FolioRepository folioRepository,
                            RoomRepository roomRepository,
@@ -52,7 +49,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         super(repository);
         this.reservationRepository = reservationRepository;
         this.stayMapper = stayMapper;
-        this.tenantConfigRepository = tenantConfigRepository;
         this.folioService = folioService;
         this.folioRepository = folioRepository;
         this.roomRepository = roomRepository;
@@ -357,22 +353,13 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Scheduled(cron = "0 0 * * * *") // Every hour
     public void autoFlagOverstays() {
         LocalDateTime now = LocalDateTime.now();
-        java.util.List<com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity> tenants = tenantConfigRepository.findAll();
-        
-        for (com.hotel_erp.hotel_erp.modules.master.TenantConfigEntity tenant : tenants) {
+        List<StayEntity> activeStays = repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.DUE_CHECKOUT));
+        for (StayEntity stay : activeStays) {
             try {
-                com.hotel_erp.hotel_erp.config.tenant.TenantContext.setCurrentTenant(tenant.getDbKey());
-                List<StayEntity> activeStays = repository.findAllByStatusIn(List.of(StayStatus.ACTIVE, StayStatus.DUE_CHECKOUT));
-                for (StayEntity stay : activeStays) {
-                    try {
-                        stayFlagService.flagStayIfDue(stay.getId(), now);
-                    } catch (Exception e) {
-                        // Log and continue to next stay so one failure doesn't block the whole job
-                        System.err.println("Failed to flag stay " + stay.getId() + " for tenant " + tenant.getDbKey() + ": " + e.getMessage());
-                    }
-                }
-            } finally {
-                com.hotel_erp.hotel_erp.config.tenant.TenantContext.clear();
+                stayFlagService.flagStayIfDue(stay.getId(), now);
+            } catch (Exception e) {
+                // Log and continue to next stay so one failure doesn't block the whole job
+                System.err.println("Failed to flag stay " + stay.getId() + ": " + e.getMessage());
             }
         }
     }

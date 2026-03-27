@@ -1,8 +1,10 @@
 package com.hotel_erp.hotel_erp.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.Customizer;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.filter.CorsFilter;
 
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -33,7 +36,6 @@ public class WebSecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
-    private final com.hotel_erp.hotel_erp.config.tenant.TenantFilter tenantFilter;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -77,6 +79,20 @@ public class WebSecurityConfig {
         return source;
     }
 
+    /**
+     * Servlet-level CORS filter registered at HIGHEST_PRECEDENCE.
+     * This ensures CORS headers are written before any other filter
+     * (including Spring Security) can intercept the
+     * request and return an error response without those headers.
+     */
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
+        FilterRegistrationBean<CorsFilter> bean =
+                new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource()));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -91,7 +107,6 @@ public class WebSecurityConfig {
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/api/folios/**").permitAll()
-                    .requestMatchers("/api/tenant/**").permitAll()
                     .requestMatchers("/error").permitAll()
                     .requestMatchers("/api/admin/reset-password").permitAll() // Temporary reset endpoint
                     .requestMatchers("/api/**").authenticated()
@@ -99,8 +114,9 @@ public class WebSecurityConfig {
             );
 
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(tenantFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(authenticationJwtTokenFilter(), com.hotel_erp.hotel_erp.config.tenant.TenantFilter.class);
+        
+        // Add JWT authentication filter before the UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
