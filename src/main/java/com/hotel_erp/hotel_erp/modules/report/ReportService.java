@@ -307,6 +307,7 @@ public class ReportService {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(c.getChargedAt() != null ? c.getChargedAt() : c.getCreatedAt())
                 .type("REVENUE")
+                .account(c.getChargeType() != null ? c.getChargeType().getName() : "General Charge")
                 .reference("FOLIO #" + c.getFolioId())
                 .description(c.getDescription())
                 .amount(c.getTotalAmount())
@@ -316,9 +317,14 @@ public class ReportService {
 
         // Add Payments
         for (FolioPaymentEntity p : payments) {
+            String accName = "Payment";
+            if (p.getReferenceNumber() != null && !p.getReferenceNumber().isEmpty()) {
+                accName = "Payment (" + p.getReferenceNumber() + ")";
+            }
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(p.getRecordedAt() != null ? p.getRecordedAt() : p.getCreatedAt())
                 .type("COLLECTION")
+                .account(accName)
                 .reference("REF #" + p.getReferenceNumber())
                 .description("Payment Received")
                 .amount(p.getAmount())
@@ -331,6 +337,7 @@ public class ReportService {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(e.getExpenseDate().atStartOfDay())
                 .type("EXPENSE")
+                .account(e.getExpenseType() != null ? e.getExpenseType().getName() : "General Expense")
                 .reference("REF #" + e.getId())
                 .description(e.getDescription())
                 .amount(e.getAmount())
@@ -344,6 +351,7 @@ public class ReportService {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(po.getOrderDate().atStartOfDay())
                 .type("PROCUREMENT")
+                .account("Procurement / Supplies")
                 .reference("PO #" + po.getId())
                 .description("Order to " + (po.getSupplier() != null ? po.getSupplier().getName() : "Vendor"))
                 .amount(BigDecimal.ZERO)
@@ -364,6 +372,7 @@ public class ReportService {
             tray.add(FinancialAuditItemDTO.builder()
                 .timestamp(m.getMovementDate().atStartOfDay())
                 .type(trayType)
+                .account(m.getType().toString())
                 .reference(m.getType().toString())
                 .description(m.getDescription())
                 .amount(m.getAmount())
