@@ -12,6 +12,7 @@ import com.hotel_erp.hotel_erp.modules.folio.FolioChargeDTO;
 import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
+import com.hotel_erp.hotel_erp.modules.activity.ActivityLogService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     private final ChargeTypeRepository chargeTypeRepository;
     private final StayFlagService stayFlagService;
     private final FolioChargeRepository folioChargeRepository;
+    private final ActivityLogService activityLogService;
 
     public StayServiceImpl(StayRepository repository,
                            ReservationRepository reservationRepository,
@@ -45,7 +47,8 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                            RoomRepository roomRepository,
                            ChargeTypeRepository chargeTypeRepository,
                            StayFlagService stayFlagService,
-                           FolioChargeRepository folioChargeRepository) {
+                           FolioChargeRepository folioChargeRepository,
+                           ActivityLogService activityLogService) {
         super(repository);
         this.reservationRepository = reservationRepository;
         this.stayMapper = stayMapper;
@@ -55,6 +58,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         this.chargeTypeRepository = chargeTypeRepository;
         this.stayFlagService = stayFlagService;
         this.folioChargeRepository = folioChargeRepository;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -121,6 +125,9 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
         // Auto-post Room Charge (Advance Billing)
         postRoomCharge(savedStay, folio.getId(), userId);
+
+        activityLogService.logActivity(userId, "CHECK_IN", 
+            "Checked in Reservation #" + reservationId + " to Room " + room.getRoomNumber());
 
         return stayMapper.toDto(savedStay);
     }
@@ -238,6 +245,9 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             folioService.closeFolio(folio.getId(), userId);
         }
 
+        activityLogService.logActivity(userId, "CHECK_OUT", 
+            "Checked out Stay #" + id + (stay.getRoomId() != null ? " from Room " + stay.getRoomId() : ""));
+
         return stayMapper.toDto(stay);
     }
 
@@ -252,7 +262,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         }
 
         // Validate no existing active stay for this guest
-        if (repository.countByGuestIdAndStatusIn(guestId, List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY)) > 0) {
+        if (repository.countByGuestIdAndStatusIn(guestId, List.of(StayStatus.ACTIVE, StayStatus.OVERSTAY, StayStatus.DUE_CHECKOUT)) > 0) {
             throw new RuntimeException("Guest already has an active stay.");
         }
 
@@ -278,6 +288,9 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
 
         // Auto-post Room Charge (Advance Billing)
         postRoomCharge(stay, folio.getId(), userId);
+
+        activityLogService.logActivity(userId, "DIRECT_CHECK_IN", 
+            "Direct Check-in for Guest #" + guestId + " to Room " + room.getRoomNumber());
 
         return stayMapper.toDto(stay);
     }
@@ -455,6 +468,9 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             stay.setStatus(StayStatus.ACTIVE);
         }
 
+        activityLogService.logActivity(userId, "EXTEND_STAY", 
+            "Extended Stay #" + id + " to new checkout date: " + normalizedNewDateOut.toLocalDate());
+
         return stayMapper.toDto(repository.save(stay));
     }
 
@@ -505,14 +521,17 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
             res.setStatus(ReservationStatus.CANCELLED);
             reservationRepository.save(res);
             
-            roomRepository.findById(res.getRoomId()).ifPresent(room -> {
-                if (room.getStatus() == RoomStatus.OCCUPIED) {
-                    room.setStatus(RoomStatus.AVAILABLE);
-                    roomRepository.save(room);
-                }
-            });
+            // Only attempt to release the room if roomId is set (assigned at check-in)
+            if (res.getRoomId() != null) {
+                roomRepository.findById(res.getRoomId()).ifPresent(room -> {
+                    if (room.getStatus() == RoomStatus.OCCUPIED) {
+                        room.setStatus(RoomStatus.AVAILABLE);
+                        roomRepository.save(room);
+                    }
+                });
+            }
 
-            // Void reservation folio
+            // Void reservation folio if one exists
             folioRepository.findByReservationId(reservationId).ifPresent(folio -> {
                 folioService.voidFolio(folio.getId(), userId);
             });
