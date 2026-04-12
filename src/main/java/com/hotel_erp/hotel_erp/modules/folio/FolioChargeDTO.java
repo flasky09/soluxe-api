@@ -38,4 +38,6 @@ public class FolioChargeDTO {
     private boolean voided;
     private String voidReason;
     private Long voidedBy;
+    private Long createdBy;
+    private Long modifiedBy;
 }

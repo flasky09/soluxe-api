@@ -35,6 +35,12 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     @Override
     @Transactional
     public ReservationDTO createFromDto(ReservationDTO dto) {
+        return createFromDto(dto, null);
+    }
+
+    @Override
+    @Transactional
+    public ReservationDTO createFromDto(ReservationDTO dto, Long userId) {
         // Update guest info if provided
         if (dto.getGuestId() != null) {
             guestRepository.findById(dto.getGuestId()).ifPresent(guest -> {
@@ -71,6 +77,9 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
         if (entity.getStatus() == null) {
             entity.setStatus(ReservationStatus.BOOKED);
         }
+        if (userId != null) {
+            entity.setCreatedBy(userId);
+        }
         return reservationMapper.toDto(repository.save(entity));
     }
 
@@ -78,10 +87,19 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     @Override
     @Transactional
     public ReservationDTO cancel(Long reservationId) {
+        return cancel(reservationId, null);
+    }
+
+    @Override
+    @Transactional
+    public ReservationDTO cancel(Long reservationId, Long userId) {
         ReservationEntity reservation = repository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
         reservation.setStatus(ReservationStatus.CANCELLED);
+        if (userId != null) {
+            reservation.setModifiedBy(userId);
+        }
         repository.save(reservation);
 
         // BUG 7 FIX: Release the room back to AVAILABLE when a reservation is cancelled.
@@ -100,6 +118,12 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     @Override
     @Transactional
     public ReservationDTO updateReservation(Long id, ReservationDTO dto) {
+        return updateReservation(id, dto, null);
+    }
+
+    @Override
+    @Transactional
+    public ReservationDTO updateReservation(Long id, ReservationDTO dto, Long userId) {
         ReservationEntity existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
@@ -171,6 +195,10 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
                 }
                 guestRepository.save(guest);
             });
+        }
+
+        if (userId != null) {
+            existing.setModifiedBy(userId);
         }
 
         return reservationMapper.toDto(repository.save(existing));

@@ -32,4 +32,7 @@ public class UserDTO {
     private String role;
     
     private String password;
+    
+    private Long createdBy;
+    private Long modifiedBy;
 }

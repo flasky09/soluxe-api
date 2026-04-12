@@ -19,4 +19,6 @@ public class FolioDTO {
     private BigDecimal totalAmount;
     private String guestName;
     private String roomNumber;
+    private Long createdBy;
+    private Long modifiedBy;
 }

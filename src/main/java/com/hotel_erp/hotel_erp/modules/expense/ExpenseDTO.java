@@ -13,4 +13,6 @@ public class ExpenseDTO {
     private ExpenseTypeDTO expenseType;
     private String paymentMethod;
     private String referenceNumber;
+    private Long createdBy;
+    private Long modifiedBy;
 }

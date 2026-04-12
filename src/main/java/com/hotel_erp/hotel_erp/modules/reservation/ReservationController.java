@@ -27,18 +27,20 @@ public class ReservationController {
 
 
     @PostMapping("/{reservationIdentifier}/cancel")
-    public ReservationDTO cancelReservation(@PathVariable Long reservationIdentifier) {
-        return reservationService.cancel(reservationIdentifier);
+    public ReservationDTO cancelReservation(@PathVariable Long reservationIdentifier, @RequestParam("userId") Long userId) {
+        return reservationService.cancel(reservationIdentifier, userId);
     }
 
     @PostMapping
-    public ReservationDTO createReservation(@RequestBody ReservationDTO reservationDTO) {
-        return reservationService.createFromDto(reservationDTO);
+    public ReservationDTO createReservation(@RequestBody ReservationDTO reservationDTO, @RequestParam("userId") Long userId) {
+        return reservationService.createFromDto(reservationDTO, userId);
     }
 
     @PutMapping("/{reservationIdentifier}")
-    public ReservationDTO updateReservation(@PathVariable Long reservationIdentifier, @RequestBody ReservationDTO reservationDTO) {
-        return reservationService.updateReservation(reservationIdentifier, reservationDTO);
+    public ReservationDTO updateReservation(@PathVariable Long reservationIdentifier,
+                                            @RequestBody ReservationDTO reservationDTO,
+                                            @RequestParam("userId") Long userId) {
+        return reservationService.updateReservation(reservationIdentifier, reservationDTO, userId);
     }
 
     @GetMapping("/{reservationIdentifier}")

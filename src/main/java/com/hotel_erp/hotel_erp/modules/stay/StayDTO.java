@@ -23,4 +23,6 @@ public class StayDTO {
     private Boolean isComplimentary;
     private BusinessSource businessSource;
     private StayStatus status;
+    private Long createdBy;
+    private Long modifiedBy;
 }

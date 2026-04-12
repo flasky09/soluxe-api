@@ -26,4 +26,6 @@ public class FolioPaymentDTO {
     private String notes;
     private Long recordedBy;
     private LocalDateTime recordedAt;
+    private Long createdBy;
+    private Long modifiedBy;
 }

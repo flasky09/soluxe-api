@@ -94,6 +94,9 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         folio.setStatus(FolioStatus.OPEN);
         folio.setOpenedAt(LocalDateTime.now());
         folio.setTotalAmount(BigDecimal.ZERO);
+        if (userId != null) {
+            folio.setCreatedBy(userId);
+        }
         
         FolioDTO dto = folioMapper.toDto(repository.save(folio));
         activityLogService.logActivity(userId, "CREATE_MASTER_FOLIO", 
@@ -162,6 +165,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         charge.setFolioId(folioId);
         charge.setChargedAt(LocalDateTime.now());
         charge.setAddedBy(userId);
+        charge.setCreatedBy(userId);
         charge.setVoided(chargeDto.isVoided());
         charge.setVoidReason(chargeDto.getVoidReason());
         charge.setVoidedBy(chargeDto.getVoidedBy());
@@ -253,6 +257,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         payment.setFolioId(folioId);
         payment.setRecordedAt(LocalDateTime.now());
         payment.setRecordedBy(userId);
+        payment.setCreatedBy(userId);
         
         // Prevent overpayment — only applies when both payment and balance are positive.
         // Skip guard for refunds (negative amounts) and credit-balance folios.
@@ -314,6 +319,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
 
         folio.setStatus(FolioStatus.CLOSED);
         folio.setClosedAt(LocalDateTime.now());
+        folio.setModifiedBy(userId);
         
         activityLogService.logActivity(userId, "CLOSE_FOLIO", "Closed Folio #" + folioId);
         
@@ -338,12 +344,14 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
             charge.setVoided(true);
             charge.setVoidReason("Folio voided");
             charge.setVoidedBy(userId);
+            charge.setModifiedBy(userId);
             folioChargeRepository.save(charge);
         });
 
         folio.setTotalAmount(BigDecimal.ZERO);
         folio.setStatus(FolioStatus.CLOSED);
         folio.setClosedAt(java.time.LocalDateTime.now());
+        folio.setModifiedBy(userId);
         repository.save(folio);
     }
 

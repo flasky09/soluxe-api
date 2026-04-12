@@ -27,16 +27,32 @@ public class ExpenseService {
 
     @Transactional
     public ExpenseDTO createExpense(ExpenseDTO dto) {
+        return createExpense(dto, null);
+    }
+
+    @Transactional
+    public ExpenseDTO createExpense(ExpenseDTO dto, Long userId) {
         ExpenseEntity entity = new ExpenseEntity();
         mapToEntity(dto, entity);
+        if (userId != null) {
+            entity.setCreatedBy(userId);
+        }
         return mapToDTO(expenseRepository.save(entity));
     }
 
     @Transactional
     public ExpenseDTO updateExpense(Long id, ExpenseDTO dto) {
+        return updateExpense(id, dto, null);
+    }
+
+    @Transactional
+    public ExpenseDTO updateExpense(Long id, ExpenseDTO dto, Long userId) {
         ExpenseEntity entity = expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Expense not found"));
         mapToEntity(dto, entity);
+        if (userId != null) {
+            entity.setModifiedBy(userId);
+        }
         return mapToDTO(expenseRepository.save(entity));
     }
 
@@ -61,6 +77,8 @@ public class ExpenseService {
         
         dto.setPaymentMethod(entity.getPaymentMethod());
         dto.setReferenceNumber(entity.getReferenceNumber());
+        dto.setCreatedBy(entity.getCreatedBy());
+        dto.setModifiedBy(entity.getModifiedBy());
         return dto;
     }
 

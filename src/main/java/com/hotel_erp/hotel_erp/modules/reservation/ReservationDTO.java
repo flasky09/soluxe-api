@@ -35,4 +35,7 @@ public class ReservationDTO {
     private Long tableId;
     private LocalDateTime tableReservationTime;
     private Integer tablePax;
+    
+    private Long createdBy;
+    private Long modifiedBy;
 }

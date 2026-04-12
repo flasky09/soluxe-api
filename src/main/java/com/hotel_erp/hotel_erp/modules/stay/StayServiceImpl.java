@@ -93,6 +93,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setChildren(reservation.getChildren());
         stay.setStatus(StayStatus.ACTIVE);
         stay.setCheckedInBy(userId);
+        stay.setCreatedBy(userId);
         
         final StayEntity savedStay = repository.save(stay);
         
@@ -222,6 +223,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setStatus(StayStatus.CHECKED_OUT);
         stay.setActualDateOut(LocalDateTime.now());
         stay.setCheckedOutBy(userId);
+        stay.setModifiedBy(userId);
         stay = repository.save(stay);
 
         // Update Room Status to DIRTY
@@ -276,6 +278,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         stay.setChildren(children != null ? children : 0);
         stay.setStatus(StayStatus.ACTIVE);
         stay.setCheckedInBy(userId);
+        stay.setCreatedBy(userId);
 
         stay = repository.save(stay);
 
@@ -467,6 +470,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                 && normalizedNewDateOut.isAfter(LocalDateTime.now())) {
             stay.setStatus(StayStatus.ACTIVE);
         }
+        stay.setModifiedBy(userId);
 
         activityLogService.logActivity(userId, "EXTEND_STAY", 
             "Extended Stay #" + id + " to new checkout date: " + normalizedNewDateOut.toLocalDate());
@@ -486,6 +490,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         }
 
         stay.setStatus(StayStatus.VOIDED);
+        stay.setModifiedBy(userId);
         repository.save(stay);
 
         // Revert Room Status to AVAILABLE
@@ -519,6 +524,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         validateUser(userId);
         reservationRepository.findById(reservationId).ifPresent(res -> {
             res.setStatus(ReservationStatus.CANCELLED);
+            res.setModifiedBy(userId);
             reservationRepository.save(res);
             
             // Only attempt to release the room if roomId is set (assigned at check-in)

@@ -18,16 +18,27 @@ public class UserService {
     private final DepartmentRepository departmentRepository;
 
     public UserEntity save(UserEntity user, String rawPassword, Long departmentId) {
+        return save(user, rawPassword, departmentId, null);
+    }
+
+    public UserEntity save(UserEntity user, String rawPassword, Long departmentId, Long adminId) {
         if (rawPassword != null && !rawPassword.isEmpty()) {
             user.setPasswordHash(passwordEncoder.encode(rawPassword));
         }
         if (departmentId != null) {
             user.setDepartment(departmentRepository.findById(departmentId).orElse(null));
         }
+        if (adminId != null) {
+            user.setCreatedBy(adminId);
+        }
         return userRepository.save(user);
     }
 
     public UserEntity update(UserEntity existingUser, UserDTO updateDto) {
+        return update(existingUser, updateDto, null);
+    }
+
+    public UserEntity update(UserEntity existingUser, UserDTO updateDto, Long adminId) {
         if (updateDto.getUsername() != null && !updateDto.getUsername().isEmpty()) {
             existingUser.setUsername(updateDto.getUsername());
         }
@@ -46,6 +57,10 @@ public class UserService {
             existingUser.setDepartment(departmentRepository.findById(updateDto.getDepartmentId()).orElse(null));
         } else {
             existingUser.setDepartment(null);
+        }
+        
+        if (adminId != null) {
+            existingUser.setModifiedBy(adminId);
         }
         
         return userRepository.save(existingUser);

@@ -23,13 +23,13 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public ExpenseDTO createExpense(@RequestBody ExpenseDTO dto) {
-        return expenseService.createExpense(dto);
+    public ExpenseDTO createExpense(@RequestBody ExpenseDTO dto, @RequestParam("userId") Long userId) {
+        return expenseService.createExpense(dto, userId);
     }
 
     @PutMapping("/{id}")
-    public ExpenseDTO updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO dto) {
-        return expenseService.updateExpense(id, dto);
+    public ExpenseDTO updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO dto, @RequestParam("userId") Long userId) {
+        return expenseService.updateExpense(id, dto, userId);
     }
 
     @DeleteMapping("/{id}")

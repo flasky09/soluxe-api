@@ -17,18 +17,18 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('HOTEL_ADMIN')")
-    public UserDTO createUser(@Valid @RequestBody UserDTO userDTO) {
+    public UserDTO createUser(@Valid @RequestBody UserDTO userDTO, @RequestParam("userId") Long userId) {
         UserEntity userEntity = userMapper.toEntity(userDTO);
-        UserEntity savedUser = userService.save(userEntity, userDTO.getPassword(), userDTO.getDepartmentId());
+        UserEntity savedUser = userService.save(userEntity, userDTO.getPassword(), userDTO.getDepartmentId(), userId);
         return userMapper.toDto(savedUser);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('HOTEL_ADMIN')")
-    public UserDTO updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+    public UserDTO updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO, @RequestParam("userId") Long userId) {
         UserEntity existingUser = userService.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        UserEntity updatedUser = userService.update(existingUser, userDTO);
+        UserEntity updatedUser = userService.update(existingUser, userDTO, userId);
         return userMapper.toDto(updatedUser);
     }
 
