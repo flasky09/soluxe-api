@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.hotel_erp.hotel_erp.modules.activity.ActivityLogService;
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
@@ -36,6 +37,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     private final ReservationRepository reservationRepository;
     private final GuestRepository guestRepository;
     private final RoomRepository roomRepository;
+    private final ActivityLogService activityLogService;
 
     public FolioServiceImpl(FolioRepository repository,
                              FolioChargeRepository folioChargeRepository,
@@ -51,7 +53,8 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                              StayRepository stayRepository,
                              ReservationRepository reservationRepository,
                              GuestRepository guestRepository,
-                             RoomRepository roomRepository) {
+                             RoomRepository roomRepository,
+                             ActivityLogService activityLogService) {
         super(repository);
         this.folioChargeRepository = folioChargeRepository;
         this.folioPaymentRepository = folioPaymentRepository;
@@ -67,6 +70,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         this.reservationRepository = reservationRepository;
         this.guestRepository = guestRepository;
         this.roomRepository = roomRepository;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -80,6 +84,21 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         folio.setTotalAmount(BigDecimal.ZERO);
         
         return folioMapper.toDto(repository.save(folio));
+    }
+
+    @Override
+    @Transactional
+    public FolioDTO createMasterFolio(String notes, Long userId) {
+        FolioEntity folio = new FolioEntity();
+        folio.setFolioType(FolioType.MASTER);
+        folio.setStatus(FolioStatus.OPEN);
+        folio.setOpenedAt(LocalDateTime.now());
+        folio.setTotalAmount(BigDecimal.ZERO);
+        
+        FolioDTO dto = folioMapper.toDto(repository.save(folio));
+        activityLogService.logActivity(userId, "CREATE_MASTER_FOLIO", 
+            "Created manual Master Folio #" + dto.getId() + (notes != null ? " with notes: " + notes : ""));
+        return dto;
     }
 
     @Override
@@ -186,6 +205,9 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
 
+        activityLogService.logActivity(userId, "POST_CHARGE", 
+            "Posted charge of $" + totalAmount + " to Folio #" + folioId + " (" + chargeDto.getDescription() + ")");
+
         return folioChargeMapper.toDto(charge);
     }
 
@@ -264,6 +286,8 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
 
+        activityLogService.logActivity(userId, "RECORD_PAYMENT", "Recorded payment of $" + paymentDto.getAmount() + " on Folio #" + folioId);
+
         return folioPaymentMapper.toDto(payment);
     }
 
@@ -290,6 +314,8 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
 
         folio.setStatus(FolioStatus.CLOSED);
         folio.setClosedAt(LocalDateTime.now());
+        
+        activityLogService.logActivity(userId, "CLOSE_FOLIO", "Closed Folio #" + folioId);
         
         return folioMapper.toDto(repository.save(folio));
     }

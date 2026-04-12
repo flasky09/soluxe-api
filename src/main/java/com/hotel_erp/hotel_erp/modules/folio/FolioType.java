@@ -4,5 +4,6 @@ public enum FolioType {
     STAY,
     RESERVATION,
     VENUE,
-    DINING
+    DINING,
+    MASTER
 }

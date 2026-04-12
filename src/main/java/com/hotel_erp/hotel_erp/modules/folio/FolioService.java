@@ -11,6 +11,8 @@ public interface FolioService extends BaseService<FolioEntity, Long> {
 
     FolioDTO createFolioForReservation(Long reservationId);
 
+    FolioDTO createMasterFolio(String notes, Long userId);
+
     FolioDTO getOrCreateFolioForReservation(Long reservationId);
 
     FolioDTO linkReservationFolioToStay(Long reservationId, Long stayId);

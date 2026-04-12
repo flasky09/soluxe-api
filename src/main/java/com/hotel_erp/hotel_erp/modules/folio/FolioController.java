@@ -20,6 +20,11 @@ public class FolioController {
         return folioService.addCharge(id, chargeDto, userId);
     }
 
+    @PostMapping
+    public FolioDTO createMasterFolio(@RequestParam(value = "notes", required = false) String notes, @RequestParam("userId") Long userId) {
+        return folioService.createMasterFolio(notes, userId);
+    }
+
     @GetMapping
     public List<FolioDTO> getAllFolios() {
         return folioService.findAllDTOs();
