@@ -27,23 +27,31 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String password,
+    private boolean active;
+
+    public UserDetailsImpl(Long id, String username, String password, boolean active,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.active = active;
         this.authorities = authorities;
     }
 
     public static UserDetailsImpl build(UserEntity user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(
+        List<GrantedAuthority> authorities = Collections.emptyList();
+        
+        if (user.getRole() != null) {
+            authorities = Collections.singletonList(
                 new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
-        );
+            );
+        }
 
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
                 user.getPasswordHash(),
+                user.isActive(),
                 authorities);
     }
 
@@ -79,7 +87,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return active;
     }
 
     @Override
