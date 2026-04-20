@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import com.hotel_erp.hotel_erp.modules.activity.ActivityLogService;
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
@@ -55,6 +56,8 @@ class FolioServiceImplTest {
     private RoomRepository roomRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ActivityLogService activityLogService;
 
     @InjectMocks
     private FolioServiceImpl folioService;
