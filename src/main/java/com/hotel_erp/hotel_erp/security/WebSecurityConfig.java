@@ -20,12 +20,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.config.Customizer;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.CorsFilter;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -45,10 +43,8 @@ public class WebSecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-
         return authProvider;
     }
 
@@ -65,15 +61,15 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList(
-                "https://soluxe.mflowpos.com",
-                "http://localhost:[*]",
-                "https://*.railway.app"
+
+        configuration.setAllowedOriginPatterns(List.of(
+            "https://soluxe.mflowpos.com",
+            "http://localhost:*"
         ));
 
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Auth-Token", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Authorization", "X-Auth-Token", "Content-Type"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -82,12 +78,6 @@ public class WebSecurityConfig {
         return source;
     }
 
-    /**
-     * Servlet-level CORS filter registered at HIGHEST_PRECEDENCE.
-     * This ensures CORS headers are written before any other filter
-     * (including Spring Security) can intercept the
-     * request and return an error response without those headers.
-     */
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
         FilterRegistrationBean<CorsFilter> bean =
@@ -105,20 +95,18 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
                 auth
-                    // Explicitly permit all OPTIONS preflight requests first
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/api/folios/**").permitAll()
                     .requestMatchers("/error").permitAll()
-                    .requestMatchers("/api/admin/reset-password").permitAll() // Temporary reset endpoint
+                    .requestMatchers("/api/admin/reset-password").permitAll()
                     .requestMatchers("/api/**").authenticated()
                     .anyRequest().authenticated()
             );
 
         http.authenticationProvider(authenticationProvider());
-        
-        // Add JWT authentication filter before the UsernamePasswordAuthenticationFilter
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
