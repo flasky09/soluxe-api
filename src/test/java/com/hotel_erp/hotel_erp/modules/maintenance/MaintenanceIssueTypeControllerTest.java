@@ -38,7 +38,7 @@ public class MaintenanceIssueTypeControllerTest {
     @BeforeEach
     void setUp() {
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
-        jdbcTemplate.execute("TRUNCATE TABLE maintenance_tickets");
+        jdbcTemplate.execute("TRUNCATE TABLE maintenance_requests");
         jdbcTemplate.execute("TRUNCATE TABLE maintenance_issue_types");
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
     }

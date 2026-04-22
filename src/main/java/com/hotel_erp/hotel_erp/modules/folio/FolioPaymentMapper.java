@@ -12,5 +12,6 @@ public interface FolioPaymentMapper {
     @Mapping(target = "recordedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "paymentMethod", ignore = true)
     FolioPaymentEntity toEntity(FolioPaymentDTO dto);
 }

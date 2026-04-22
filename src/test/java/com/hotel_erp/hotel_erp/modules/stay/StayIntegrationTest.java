@@ -59,11 +59,15 @@ public class StayIntegrationTest {
     @Autowired
     private ChargeTypeRepository chargeTypeRepository;
 
+    @Autowired
+    private com.hotel_erp.hotel_erp.modules.folio.PaymentMethodRepository paymentMethodRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     private ReservationEntity testReservation;
     private Long testRoomId;
+    private Long testPaymentMethodId;
 
     @BeforeEach
     void setUp() {
@@ -97,6 +101,13 @@ public class StayIntegrationTest {
         testReservation.setAdults(2);
         testReservation.setStatus(ReservationStatus.BOOKED);
         testReservation = reservationRepository.save(testReservation);
+
+        // Create a test payment method
+        com.hotel_erp.hotel_erp.modules.folio.PaymentMethodEntity pMethod = new com.hotel_erp.hotel_erp.modules.folio.PaymentMethodEntity();
+        pMethod.setName("Test Cash " + System.currentTimeMillis());
+        pMethod.setActive(true);
+        pMethod = paymentMethodRepository.save(pMethod);
+        testPaymentMethodId = pMethod.getId();
     }
 
     @Test
@@ -134,6 +145,7 @@ public class StayIntegrationTest {
         FolioPaymentDTO paymentDto = FolioPaymentDTO.builder()
                 .amount(BigDecimal.valueOf(10000))
                 .folioId(folioRepository.findByStayId(stayDto.getId()).get().getId())
+                .paymentMethodId(testPaymentMethodId)
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(paymentDto.getFolioId(), paymentDto, userId);
@@ -145,6 +157,7 @@ public class StayIntegrationTest {
         FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
                 .amount(new BigDecimal("-5000"))
                 .folioId(paymentDto.getFolioId())
+                .paymentMethodId(testPaymentMethodId)
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(refundDto.getFolioId(), refundDto, userId);
@@ -209,6 +222,7 @@ public class StayIntegrationTest {
         FolioPaymentDTO paymentDto = FolioPaymentDTO.builder()
                 .amount(BigDecimal.valueOf(10000))
                 .folioId(folioRepository.findByStayId(stayDto.getId()).get().getId())
+                .paymentMethodId(testPaymentMethodId)
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(paymentDto.getFolioId(), paymentDto, userId);
@@ -241,6 +255,7 @@ public class StayIntegrationTest {
         FolioPaymentDTO refundDto = FolioPaymentDTO.builder()
                 .amount(new BigDecimal("-5000"))
                 .folioId(paymentDto.getFolioId())
+                .paymentMethodId(testPaymentMethodId)
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(refundDto.getFolioId(), refundDto, userId);
@@ -300,6 +315,7 @@ public class StayIntegrationTest {
         FolioPaymentDTO partialPayment = FolioPaymentDTO.builder()
                 .amount(new BigDecimal("10000"))
                 .folioId(folio.getId())
+                .paymentMethodId(testPaymentMethodId)
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(folio.getId(), partialPayment, userId);
@@ -308,6 +324,7 @@ public class StayIntegrationTest {
         FolioPaymentDTO refundPayment = FolioPaymentDTO.builder()
                 .amount(new BigDecimal("-3000")) // Refund
                 .folioId(folio.getId())
+                .paymentMethodId(testPaymentMethodId)
                 .recordedBy(userId)
                 .build();
         folioService.addPayment(folio.getId(), refundPayment, userId);

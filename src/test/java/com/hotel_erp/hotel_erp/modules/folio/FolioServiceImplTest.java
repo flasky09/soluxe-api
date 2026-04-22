@@ -124,13 +124,19 @@ class FolioServiceImplTest {
         FolioPaymentDTO paymentDto = new FolioPaymentDTO();
         paymentDto.setAmount(new BigDecimal("200"));
         paymentDto.setReferenceNumber("REF123");
+        paymentDto.setPaymentMethodId(1L);
 
         FolioPaymentEntity paymentEntity = new FolioPaymentEntity();
         paymentEntity.setAmount(paymentDto.getAmount());
         paymentEntity.setReferenceNumber(paymentDto.getReferenceNumber());
         paymentEntity.setFolioId(folioId);
 
+        PaymentMethodEntity pMethod = new PaymentMethodEntity();
+        pMethod.setId(1L);
+        pMethod.setName("Cash");
+
         when(folioRepository.findById(folioId)).thenReturn(Optional.of(folio));
+        when(paymentMethodRepository.findById(1L)).thenReturn(Optional.of(pMethod));
         when(folioPaymentMapper.toEntity(any(FolioPaymentDTO.class))).thenReturn(paymentEntity);
         when(folioPaymentRepository.save(any(FolioPaymentEntity.class))).thenAnswer(i -> i.getArgument(0));
         // Stub aggregate queries: 500 in charges, 200 paid -> balance 300
