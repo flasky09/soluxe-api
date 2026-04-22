@@ -1,17 +1,21 @@
 package com.hotel_erp.hotel_erp.modules.food;
 
 import com.hotel_erp.hotel_erp.shared.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "menu_items")
 @EqualsAndHashCode(callSuper = true)
@@ -27,13 +31,13 @@ public class MenuItemEntity extends BaseEntity {
     private SpiceLevel spiceLevel;
 
     private String allergens;
-    private boolean isSignature;
+    private boolean signature;
     private Integer prepTimeMins;
     private Integer sortOrder;
     
     @ManyToOne
     private MenuCategoryEntity category;
     
+    @Builder.Default
     private boolean available = true;
 }
-

@@ -3,7 +3,7 @@ package com.hotel_erp.hotel_erp.modules.employee.attendance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface AttendanceRecordMapper {
     @Mapping(source = "employee.id", target = "employeeId")
     @Mapping(source = "recordedBy.id", target = "recordedById")

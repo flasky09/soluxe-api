@@ -3,7 +3,7 @@ package com.hotel_erp.hotel_erp.modules.hotel;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface HotelSettingsMapper {
     HotelSettingsMapper INSTANCE = Mappers.getMapper(HotelSettingsMapper.class);
 

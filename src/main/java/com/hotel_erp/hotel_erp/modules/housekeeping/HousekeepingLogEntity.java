@@ -4,6 +4,10 @@ import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +15,10 @@ import java.time.LocalDateTime;
 @Table(name = "housekeeping_logs")
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class HousekeepingLogEntity extends BaseEntity {
 
     @Column(name = "room_id", nullable = false)

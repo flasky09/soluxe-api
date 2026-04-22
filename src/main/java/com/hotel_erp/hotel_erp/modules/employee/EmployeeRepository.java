@@ -8,6 +8,6 @@ import java.math.BigDecimal;
 
 @Repository
 public interface EmployeeRepository extends BaseRepository<EmployeeEntity, Long> {
-    @Query("SELECT SUM(e.basicSalary) FROM EmployeeEntity e WHERE e.isActive = true")
+    @Query("SELECT SUM(e.basicSalary) FROM EmployeeEntity e WHERE e.active = true")
     BigDecimal getTotalPayroll();
 }

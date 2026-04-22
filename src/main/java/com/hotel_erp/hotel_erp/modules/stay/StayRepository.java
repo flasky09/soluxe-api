@@ -24,4 +24,5 @@ public interface StayRepository extends BaseRepository<StayEntity, Long> {
 
     java.util.Optional<StayEntity> findByReservationIdAndStatus(Long reservationId, StayStatus status);
 
+    List<StayEntity> findAllByRoomId(Long roomId);
 }

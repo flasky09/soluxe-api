@@ -2,11 +2,19 @@ package com.hotel_erp.hotel_erp.modules.guest;
 
 import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "guest_documents")
 @EqualsAndHashCode(callSuper = true)

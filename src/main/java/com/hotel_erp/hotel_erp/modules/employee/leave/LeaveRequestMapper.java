@@ -3,7 +3,7 @@ package com.hotel_erp.hotel_erp.modules.employee.leave;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface LeaveRequestMapper {
     @Mapping(source = "employee.id", target = "employeeId")
     @Mapping(source = "approvedBy.id", target = "approvedById")

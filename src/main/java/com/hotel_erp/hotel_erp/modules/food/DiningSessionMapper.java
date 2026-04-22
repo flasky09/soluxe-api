@@ -3,7 +3,7 @@ package com.hotel_erp.hotel_erp.modules.food;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface DiningSessionMapper {
     @Mapping(source = "table.id", target = "tableId")
     @Mapping(source = "stay.id", target = "stayId")

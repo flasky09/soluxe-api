@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", uses = {RoomTypeMapper.class})
+@Mapper(componentModel = "spring", uses = {RoomTypeMapper.class}, builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface RoomMapper {
     RoomMapper INSTANCE = Mappers.getMapper(RoomMapper.class);
 

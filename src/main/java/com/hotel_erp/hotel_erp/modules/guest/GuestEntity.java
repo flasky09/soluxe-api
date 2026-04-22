@@ -6,17 +6,26 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
 
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
+
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "guests")
+@EqualsAndHashCode(callSuper = true)
 public class GuestEntity extends BaseEntity {
     private String fullName;
 
     @Column(unique = true)
     private String phone;
 
-    @Column(unique = true)
     private String email;
     private String nationality;
     private String address;
@@ -36,5 +45,6 @@ public class GuestEntity extends BaseEntity {
     private String emergencyContactName;
     private String emergencyContactPhone;
     private String imageUrl;
+    @Builder.Default
     private boolean voided = false;
 }

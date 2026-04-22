@@ -3,14 +3,20 @@ package com.hotel_erp.hotel_erp.modules.venue;
 import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Setter;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "venues")
 @EqualsAndHashCode(callSuper = true)

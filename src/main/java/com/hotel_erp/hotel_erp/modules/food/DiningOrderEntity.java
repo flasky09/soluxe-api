@@ -4,6 +4,11 @@ import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +17,10 @@ import java.time.LocalDateTime;
 @Table(name = "dining_orders")
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class DiningOrderEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -5,10 +5,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
-@Data
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "menu_categories")
 @EqualsAndHashCode(callSuper = true)
@@ -19,6 +28,6 @@ public class MenuCategoryEntity extends BaseEntity {
     private Integer sortOrder;
     
     @JsonProperty("isActive")
+    @Builder.Default
     private boolean isActive = true;
 }
-

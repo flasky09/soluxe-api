@@ -5,27 +5,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "hotel_settings")
+@EqualsAndHashCode(callSuper = true)
 public class HotelSettingsEntity extends BaseEntity {
-    private boolean allowWalkIn;
-    private boolean allowComplimentary;
-
-    // Profile & Legal
-    private String kraPin;
-    private String vatStatus;
-    private String companyReg;
-    private String website;
-
-    // Operations
-    private String checkInTime; // e.g. "14:00"
-    private String checkOutTime; // e.g. "10:00"
-
-    // Taxes
-    private java.math.BigDecimal vatPercentage;
-    private java.math.BigDecimal serviceChargePercentage;
-    private java.math.BigDecimal tourismLevyPercentage;
+    private String currency;
+    private String timezone;
+    @Builder.Default
+    private boolean taxEnabled = true;
+    private String dateFormat;
 }

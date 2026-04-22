@@ -4,17 +4,24 @@ import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
-
 import com.hotel_erp.hotel_erp.modules.guest.IdType;
 
 
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "employees")
+@EqualsAndHashCode(callSuper = true)
 public class EmployeeEntity extends BaseEntity {
     private String fullName;
 
@@ -43,6 +50,6 @@ public class EmployeeEntity extends BaseEntity {
 
     private String kraPin;
     
-    private boolean isActive = true;
+    @Builder.Default
+    private boolean active = true;
 }
-

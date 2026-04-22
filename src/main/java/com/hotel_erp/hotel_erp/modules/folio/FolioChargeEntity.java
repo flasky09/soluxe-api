@@ -2,14 +2,21 @@ package com.hotel_erp.hotel_erp.modules.folio;
 
 import com.hotel_erp.hotel_erp.shared.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-
-
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "folio_charges")
 @EqualsAndHashCode(callSuper = true)
@@ -25,7 +32,9 @@ public class FolioChargeEntity extends BaseEntity {
     private String description;
     private BigDecimal quantity;
     private BigDecimal unitPrice;
+    @Builder.Default
     private BigDecimal discountPct = BigDecimal.ZERO;
+    @Builder.Default
     private BigDecimal taxPct = BigDecimal.ZERO;
     private BigDecimal totalAmount;
 

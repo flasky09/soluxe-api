@@ -3,7 +3,7 @@ package com.hotel_erp.hotel_erp.modules.venue;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
 public interface VenueMapper {
     VenueDTO toDto(VenueEntity entity);
 

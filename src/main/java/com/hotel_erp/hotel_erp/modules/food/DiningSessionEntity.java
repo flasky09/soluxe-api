@@ -5,15 +5,23 @@ import com.hotel_erp.hotel_erp.modules.stay.StayEntity;
 import com.hotel_erp.hotel_erp.modules.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "dining_sessions")
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "dining_sessions")
+@EqualsAndHashCode(callSuper = true)
 public class DiningSessionEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

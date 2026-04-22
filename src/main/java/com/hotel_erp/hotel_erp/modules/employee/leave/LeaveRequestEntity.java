@@ -5,14 +5,22 @@ import com.hotel_erp.hotel_erp.modules.employee.EmployeeEntity;
 import com.hotel_erp.hotel_erp.modules.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Setter;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "leave_requests")
 @Getter
 @Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "leave_requests")
+@EqualsAndHashCode(callSuper = true)
 public class LeaveRequestEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

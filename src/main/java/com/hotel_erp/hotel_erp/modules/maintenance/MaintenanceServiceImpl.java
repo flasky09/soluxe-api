@@ -35,9 +35,9 @@ public class MaintenanceServiceImpl extends BaseServiceImpl<MaintenanceEntity, L
         entity.setStatus(MaintenanceStatus.OPEN);
 
         if (dto.getIssueTypeId() != null) {
-            issueTypeRepository.findById(dto.getIssueTypeId())
-                    .ifPresent(entity::setIssueType);
+            entity.setIssueTypeId(dto.getIssueTypeId());
         }
+
         
         if (entity.getPriority() == null) {
             entity.setPriority(MaintenancePriority.MEDIUM);

@@ -1,7 +1,9 @@
 package com.hotel_erp.hotel_erp.modules.room;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -51,5 +54,17 @@ public class RoomController {
         return roomService.findById(roomIdentifier)
                 .map(roomMapper::toDto)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
+    }
+
+    @GetMapping("/{id}/history")
+    public RoomHistoryDTO getRoomHistory(
+            @PathVariable Long id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return roomService.getRoomHistory(id, date);
+    }
+
+    @GetMapping("/{id}/calendar")
+    public List<RoomHistoryItemDTO> getRoomCalendar(@PathVariable Long id) {
+        return roomService.getRoomCalendar(id);
     }
 }
