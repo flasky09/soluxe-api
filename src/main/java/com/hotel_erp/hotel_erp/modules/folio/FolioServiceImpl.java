@@ -258,6 +258,17 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         payment.setRecordedAt(LocalDateTime.now());
         payment.setRecordedBy(userId);
         payment.setCreatedBy(userId);
+
+        // Resolve payment method ID to name string
+        if (paymentDto.getPaymentMethodId() != null) {
+            paymentMethodRepository.findById(paymentDto.getPaymentMethodId())
+                .ifPresent(pmEntity -> payment.setPaymentMethod(pmEntity.getName()));
+        }
+
+        // If still null, default to DTO's name or UNKNOWN
+        if (payment.getPaymentMethod() == null) {
+            payment.setPaymentMethod(paymentDto.getPaymentMethodName() != null ? paymentDto.getPaymentMethodName() : "UNKNOWN");
+        }
         
         // Prevent overpayment — only applies when both payment and balance are positive.
         // Skip guard for refunds (negative amounts) and credit-balance folios.
@@ -274,10 +285,10 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
             );
         }
 
-        payment = folioPaymentRepository.save(payment);
+        FolioPaymentEntity savedPayment = folioPaymentRepository.save(payment);
 
         // Generate receipt
-        generateReceipt(payment);
+        generateReceipt(savedPayment);
 
         // BUG 6 FIX: Recalculate totalAmount from DB aggregates to avoid in-memory race condition.
         BigDecimal totalCharges = folioChargeRepository.sumTotalByFolioId(folioId);

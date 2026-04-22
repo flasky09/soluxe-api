@@ -90,7 +90,7 @@ public class DashboardService {
         Map<String, Long> availableRoomsByType = roomRepository.findAll().stream()
                 .filter(r -> r.getStatus() == RoomStatus.AVAILABLE || r.getStatus() == RoomStatus.INSPECTED)
                 .collect(Collectors.groupingBy(
-                        r -> r.getRoomType().getName(),
+                        r -> (r.getRoomType() != null && r.getRoomType().getName() != null) ? r.getRoomType().getName() : "Unknown",
                         Collectors.counting()
                 ));
 
