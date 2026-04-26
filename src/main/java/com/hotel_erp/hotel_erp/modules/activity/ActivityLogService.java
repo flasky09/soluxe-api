@@ -6,4 +6,6 @@ public interface ActivityLogService {
     void logActivity(Long userId, String action, String description);
     
     List<ActivityLogDTO> getAllActivityLogs();
+
+    List<ActivityLogDTO> getActivityLogsByUser(Long userId);
 }

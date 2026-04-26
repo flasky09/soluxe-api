@@ -1,5 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.expense;
 
+import com.hotel_erp.hotel_erp.modules.activity.ActivityLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseTypeRepository expenseTypeRepository;
+    private final ActivityLogService activityLogService;
 
     public List<ExpenseDTO> getAllExpenses() {
         return expenseRepository.findAll().stream()
@@ -37,7 +39,10 @@ public class ExpenseService {
         if (userId != null) {
             entity.setCreatedBy(userId);
         }
-        return mapToDTO(expenseRepository.save(entity));
+        ExpenseDTO saved = mapToDTO(expenseRepository.save(entity));
+        activityLogService.logActivity(userId, "CREATE_EXPENSE",
+                "Logged expense: " + dto.getDescription() + " - $" + dto.getAmount());
+        return saved;
     }
 
     @Transactional
@@ -53,12 +58,16 @@ public class ExpenseService {
         if (userId != null) {
             entity.setModifiedBy(userId);
         }
-        return mapToDTO(expenseRepository.save(entity));
+        ExpenseDTO saved = mapToDTO(expenseRepository.save(entity));
+        activityLogService.logActivity(userId, "UPDATE_EXPENSE",
+                "Updated expense #" + id + ": " + dto.getDescription() + " - $" + dto.getAmount());
+        return saved;
     }
 
     @Transactional
     public void deleteExpense(Long id) {
         expenseRepository.deleteById(id);
+        activityLogService.logActivity(null, "DELETE_EXPENSE", "Deleted expense #" + id);
     }
 
     private ExpenseDTO mapToDTO(ExpenseEntity entity) {

@@ -19,17 +19,20 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
     private final ReservationMapper reservationMapper;
     private final com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository;
     private final com.hotel_erp.hotel_erp.modules.room.RoomStatus roomStatus = com.hotel_erp.hotel_erp.modules.room.RoomStatus.AVAILABLE;
+    private final com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService;
 
     public ReservationServiceImpl(ReservationRepository repository,
                                   GuestRepository guestRepository,
                                   StayRepository stayRepository,
                                   ReservationMapper reservationMapper,
-                                  com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository) {
+                                  com.hotel_erp.hotel_erp.modules.room.RoomRepository roomRepository,
+                                  com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService) {
         super(repository);
         this.guestRepository = guestRepository;
         this.stayRepository = stayRepository;
         this.reservationMapper = reservationMapper;
         this.roomRepository = roomRepository;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -80,7 +83,10 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
         if (userId != null) {
             entity.setCreatedBy(userId);
         }
-        return reservationMapper.toDto(repository.save(entity));
+        ReservationDTO saved = reservationMapper.toDto(repository.save(entity));
+        activityLogService.logActivity(userId, "CREATE_RESERVATION",
+                "Created reservation for guest ID " + dto.getGuestId() + ", room type " + dto.getRoomTypeId());
+        return saved;
     }
 
 
@@ -101,6 +107,8 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
             reservation.setModifiedBy(userId);
         }
         repository.save(reservation);
+        activityLogService.logActivity(userId, "CANCEL_RESERVATION",
+                "Cancelled reservation #" + reservationId);
 
         // BUG 7 FIX: Release the room back to AVAILABLE when a reservation is cancelled.
         if (reservation.getRoomId() != null) {
@@ -200,8 +208,10 @@ public class ReservationServiceImpl extends BaseServiceImpl<ReservationEntity, L
         if (userId != null) {
             existing.setModifiedBy(userId);
         }
-
-        return reservationMapper.toDto(repository.save(existing));
+        ReservationDTO saved = reservationMapper.toDto(repository.save(existing));
+        activityLogService.logActivity(userId, "UPDATE_RESERVATION",
+                "Updated reservation #" + id);
+        return saved;
     }
 
     @Override

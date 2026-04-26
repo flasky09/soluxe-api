@@ -40,6 +40,13 @@ public class ActivityLogServiceImpl implements ActivityLogService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ActivityLogDTO> getActivityLogsByUser(Long userId) {
+        return repository.findByUserIdOrderByTimestampDesc(userId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     private ActivityLogDTO toDto(ActivityLog log) {
         return ActivityLogDTO.builder()
                 .id(log.getId())
