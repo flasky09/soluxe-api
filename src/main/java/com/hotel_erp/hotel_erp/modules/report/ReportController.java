@@ -31,4 +31,8 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getRevenueReport(startDate, endDate));
     }
 
+    @GetMapping("/user-performance")
+    public ResponseEntity<java.util.List<UserPerformanceDTO>> getUserPerformance() {
+        return ResponseEntity.ok(reportService.getUserPerformanceReport());
+    }
 }

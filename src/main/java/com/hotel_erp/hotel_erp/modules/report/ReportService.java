@@ -15,6 +15,9 @@ import com.hotel_erp.hotel_erp.modules.employee.EmployeeRepository;
 import com.hotel_erp.hotel_erp.modules.finance.CashMovementRepository;
 import com.hotel_erp.hotel_erp.modules.finance.CashMovementEntity;
 import com.hotel_erp.hotel_erp.modules.finance.PettyCashRepository;
+import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
+import com.hotel_erp.hotel_erp.modules.user.UserRepository;
+import com.hotel_erp.hotel_erp.modules.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +27,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +47,8 @@ public class ReportService {
     private final CashMovementRepository cashMovementRepository;
     private final PettyCashRepository pettyCashRepository;
     private final FolioRepository folioRepository;
+    private final StayRepository stayRepository;
+    private final UserRepository userRepository;
 
     public DailyRevenueDTO getDailyRevenue(LocalDate date) {
         // Fetch all charges for the given date
@@ -358,7 +365,6 @@ public class ReportService {
                 .status(po.getStatus().toString())
                 .build());
         }
-
         // Add Cash Movements
         List<CashMovementEntity> movements = cashMovementRepository.findAllByMovementDateBetween(start, end);
         for (CashMovementEntity m : movements) {
@@ -399,6 +405,54 @@ public class ReportService {
         Collections.reverse(sortedTray);
         return sortedTray.stream()
                 .limit(100)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserPerformanceDTO> getUserPerformanceReport() {
+        Map<Long, UserPerformanceDTO> userStats = new HashMap<>();
+
+        // Fetch check-ins
+        List<Map<String, Object>> checkIns = stayRepository.countCheckInsByUser();
+        for (Map<String, Object> map : checkIns) {
+            Long userId = ((Number) map.get("userId")).longValue();
+            long count = ((Number) map.get("total")).longValue();
+            userStats.putIfAbsent(userId, new UserPerformanceDTO(userId, "", "", 0, 0, BigDecimal.ZERO));
+            userStats.get(userId).setCheckIns(count);
+        }
+
+        // Fetch check-outs
+        List<Map<String, Object>> checkOuts = stayRepository.countCheckOutsByUser();
+        for (Map<String, Object> map : checkOuts) {
+            Long userId = ((Number) map.get("userId")).longValue();
+            long count = ((Number) map.get("total")).longValue();
+            userStats.putIfAbsent(userId, new UserPerformanceDTO(userId, "", "", 0, 0, BigDecimal.ZERO));
+            userStats.get(userId).setCheckOuts(count);
+        }
+
+        // Fetch collected payments
+        List<Map<String, Object>> payments = folioPaymentRepository.sumCollectedByUser();
+        for (Map<String, Object> map : payments) {
+            Long userId = ((Number) map.get("userId")).longValue();
+            BigDecimal total = (BigDecimal) map.get("total");
+            userStats.putIfAbsent(userId, new UserPerformanceDTO(userId, "", "", 0, 0, BigDecimal.ZERO));
+            userStats.get(userId).setTotalCollected(total);
+        }
+
+        // Hydrate with user details
+        List<UserPerformanceDTO> result = new ArrayList<>(userStats.values());
+        for (UserPerformanceDTO dto : result) {
+            Optional<UserEntity> userOpt = userRepository.findById(dto.getUserId());
+            if (userOpt.isPresent()) {
+                dto.setUsername(userOpt.get().getUsername());
+                dto.setFullName(userOpt.get().getFullName());
+            } else {
+                dto.setUsername("Unknown");
+                dto.setFullName("Unknown User");
+            }
+        }
+
+        return result.stream()
+                .sorted(Comparator.comparing(UserPerformanceDTO::getTotalCollected).reversed())
                 .collect(Collectors.toList());
     }
 }
