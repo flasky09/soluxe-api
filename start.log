@@ -73,3 +73,8 @@ Audit done.
 2026-04-26T23:03:16.574+03:00  WARN 10063 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
 2026-04-26T23:03:17.528+03:00  INFO 10063 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
 2026-04-26T23:03:17.546+03:00  INFO 10063 --- [           main] c.h.hotel_erp.HotelErpApplication        : Started HotelErpApplication in 41.714 seconds (process running for 42.345)
+2026-04-26T23:10:42.248+03:00  INFO 10063 --- [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-26T23:10:42.256+03:00  INFO 10063 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-04-26T23:10:42.289+03:00  INFO 10063 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-26T23:10:42.300+03:00  INFO 10063 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-26T23:10:42.321+03:00  INFO 10063 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
