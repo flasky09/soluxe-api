@@ -17,5 +17,6 @@ public class UserPerformanceDTO {
     private String fullName;
     private long checkIns;
     private long checkOuts;
+    private long clientsServed;
     private BigDecimal totalCollected;
 }

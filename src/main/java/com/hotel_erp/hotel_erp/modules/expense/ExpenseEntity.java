@@ -34,4 +34,10 @@ public class ExpenseEntity extends BaseEntity {
     
     private String paymentMethod;
     private String referenceNumber;
+    
+    @Column(length = 10)
+    private String currencyCode;
+    
+    @Column(precision = 19, scale = 4)
+    private BigDecimal exchangeRate;
 }

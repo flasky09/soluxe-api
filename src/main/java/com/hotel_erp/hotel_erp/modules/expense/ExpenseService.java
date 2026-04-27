@@ -14,6 +14,7 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseTypeRepository expenseTypeRepository;
     private final ActivityLogService activityLogService;
+    private final com.hotel_erp.hotel_erp.modules.currency.CurrencyRepository currencyRepository;
 
     public List<ExpenseDTO> getAllExpenses() {
         return expenseRepository.findAll().stream()
@@ -85,6 +86,8 @@ public class ExpenseService {
         }
         
         dto.setPaymentMethod(entity.getPaymentMethod());
+        dto.setCurrencyCode(entity.getCurrencyCode());
+        dto.setExchangeRate(entity.getExchangeRate());
         dto.setReferenceNumber(entity.getReferenceNumber());
         dto.setCreatedBy(entity.getCreatedBy());
         dto.setModifiedBy(entity.getModifiedBy());
@@ -93,7 +96,29 @@ public class ExpenseService {
 
     private void mapToEntity(ExpenseDTO dto, ExpenseEntity entity) {
         entity.setDescription(dto.getDescription());
-        entity.setAmount(dto.getAmount());
+        
+        // Handle Currency Conversion
+        String currencyCode = dto.getCurrencyCode() != null ? dto.getCurrencyCode() : "USD";
+        entity.setCurrencyCode(currencyCode);
+        
+        java.math.BigDecimal rate = dto.getExchangeRate();
+        if ("USD".equalsIgnoreCase(currencyCode)) {
+            rate = java.math.BigDecimal.ONE;
+        } else if (rate == null || rate.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            rate = currencyRepository.findByCode(currencyCode)
+                    .map(com.hotel_erp.hotel_erp.modules.currency.CurrencyEntity::getExchangeRate)
+                    .orElse(java.math.BigDecimal.ONE);
+        }
+        entity.setExchangeRate(rate);
+
+        java.math.BigDecimal originalAmount = dto.getAmount() != null ? dto.getAmount() : java.math.BigDecimal.ZERO;
+        if (!"USD".equalsIgnoreCase(currencyCode)) {
+            // Conversion to USD (Base)
+            entity.setAmount(originalAmount.divide(rate, 2, java.math.RoundingMode.HALF_UP));
+        } else {
+            entity.setAmount(originalAmount);
+        }
+
         entity.setExpenseDate(dto.getExpenseDate());
         
         if (dto.getExpenseType() != null && dto.getExpenseType().getId() != null) {

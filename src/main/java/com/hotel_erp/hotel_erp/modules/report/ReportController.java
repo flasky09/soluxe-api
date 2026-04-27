@@ -32,7 +32,16 @@ public class ReportController {
     }
 
     @GetMapping("/user-performance")
-    public ResponseEntity<java.util.List<UserPerformanceDTO>> getUserPerformance() {
-        return ResponseEntity.ok(reportService.getUserPerformanceReport());
+    public ResponseEntity<java.util.List<UserPerformanceDTO>> getUserPerformance(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(reportService.getUserPerformanceReport(startDate, endDate));
+    }
+
+    @GetMapping("/room-report")
+    public ResponseEntity<RoomReportDTO> getRoomReport(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(reportService.getRoomReport(startDate, endDate));
     }
 }

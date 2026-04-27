@@ -19,5 +19,7 @@ public class FinancialAuditItemDTO {
     private BigDecimal amount;
     private BigDecimal runningBalance;
     private String account;
+    private String currency;
+    private String paymentMethod;
     private String status;
 }

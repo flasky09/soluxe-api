@@ -20,4 +20,8 @@ public interface FolioRepository extends BaseRepository<FolioEntity, Long> {
            "(SELECT f2.id FROM FolioEntity f2 WHERE f2.status = 'CLOSED')) " +
            "FROM FolioEntity f WHERE f.status = 'CLOSED'")
     BigDecimal getOutstandingBalanceForClosedFolios();
+
+    @Query("SELECT f FROM FolioEntity f WHERE f.status != 'CLOSED' " +
+           "OR EXISTS (SELECT 1 FROM FolioChargeEntity c WHERE c.folioId = f.id)")
+    java.util.List<FolioEntity> findAllActiveOrWithCharges();
 }

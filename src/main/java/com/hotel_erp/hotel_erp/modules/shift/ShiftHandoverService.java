@@ -1,8 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.shift;
 
 import com.hotel_erp.hotel_erp.modules.folio.FolioPaymentRepository;
-import com.hotel_erp.hotel_erp.modules.employee.EmployeeEntity;
-import com.hotel_erp.hotel_erp.modules.employee.EmployeeRepository;
 import com.hotel_erp.hotel_erp.modules.user.UserEntity;
 import com.hotel_erp.hotel_erp.modules.user.UserRepository;
 import com.hotel_erp.hotel_erp.modules.user.Role;
@@ -24,7 +22,6 @@ public class ShiftHandoverService {
     private final ShiftHandoverRepository shiftHandoverRepository;
     private final FolioPaymentRepository folioPaymentRepository;
     private final UserRepository userRepository;
-    private final EmployeeRepository employeeRepository;
 
     public void validateActiveShift(Long userId) {
         UserEntity user = userRepository.findById(userId)
@@ -40,27 +37,18 @@ public class ShiftHandoverService {
     }
 
     @Transactional
-    public ShiftHandoverDTO clockIn(Long userId, String shiftType, String employeeId) {
+    public ShiftHandoverDTO clockIn(Long userId, String shiftType) {
         // Check if there is already an active shift for this user
         Optional<ShiftHandoverEntity> activeShift = shiftHandoverRepository.findByUserIdAndStatus(userId, ShiftHandoverEntity.ShiftStatus.ACTIVE);
         if (activeShift.isPresent()) {
             throw new RuntimeException("User already has an active shift. Please clock out first.");
         }
 
-        UserEntity user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Use employee ID from table if not provided
-        String finalEmployeeId = employeeId;
-        if (finalEmployeeId == null || finalEmployeeId.isEmpty()) {
-            finalEmployeeId = employeeRepository.findByEmail(user.getEmail())
-                    .map(EmployeeEntity::getIdNumber)
-                    .orElse(null);
-        }
 
         ShiftHandoverEntity shift = ShiftHandoverEntity.builder()
                 .userId(userId)
-                .employeeId(finalEmployeeId)
                 .date(LocalDate.now())
                 .shiftType(shiftType)
                 .clockInTime(LocalDateTime.now())
@@ -109,26 +97,13 @@ public class ShiftHandoverService {
 
     private ShiftHandoverDTO mapToDTO(ShiftHandoverEntity entity) {
         UserEntity user = userRepository.findById(entity.getUserId()).orElse(null);
-        String fullName = "Unknown User";
-        String empId = entity.getEmployeeId();
-
-        if (user != null) {
-            fullName = user.getFullName();
-            Optional<EmployeeEntity> empOpt = employeeRepository.findByEmail(user.getEmail());
-            if (empOpt.isPresent()) {
-                fullName = empOpt.get().getFullName();
-                if (empId == null || empId.isEmpty()) {
-                    empId = empOpt.get().getIdNumber();
-                }
-            }
-        }
+        String fullName = user != null ? user.getFullName() : "Unknown User";
 
         return ShiftHandoverDTO.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
                 .username(user != null ? user.getUsername() : "Unknown")
                 .fullName(fullName)
-                .employeeId(empId)
                 .date(entity.getDate())
                 .shiftType(entity.getShiftType())
                 .clockInTime(entity.getClockInTime())

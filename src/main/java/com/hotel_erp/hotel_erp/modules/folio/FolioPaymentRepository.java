@@ -41,4 +41,22 @@ public interface FolioPaymentRepository extends JpaRepository<FolioPaymentEntity
             @Param("userId") Long userId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
+
+    @Query("SELECT p.recordedBy as userId, COALESCE(SUM(p.amount), 0) as total " +
+           "FROM FolioPaymentEntity p " +
+           "WHERE p.voided = false AND p.recordedBy IS NOT NULL " +
+           "AND p.recordedAt >= :start AND p.recordedAt <= :end " +
+           "GROUP BY p.recordedBy")
+    List<Map<String, Object>> sumCollectedByUserInRangeGlobal(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    @Query("SELECT p.recordedBy as userId, COUNT(DISTINCT p.folioId) as total " +
+           "FROM FolioPaymentEntity p " +
+           "WHERE p.voided = false AND p.recordedBy IS NOT NULL " +
+           "AND p.recordedAt >= :start AND p.recordedAt <= :end " +
+           "GROUP BY p.recordedBy")
+    List<Map<String, Object>> countDistinctFoliosByUserInRangeGlobal(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 }

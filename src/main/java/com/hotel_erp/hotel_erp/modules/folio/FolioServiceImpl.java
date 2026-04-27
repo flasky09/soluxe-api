@@ -40,6 +40,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     private final RoomRepository roomRepository;
     private final ActivityLogService activityLogService;
     private final ShiftHandoverService shiftHandoverService;
+    private final com.hotel_erp.hotel_erp.modules.currency.CurrencyRepository currencyRepository;
 
     public FolioServiceImpl(FolioRepository repository,
                              FolioChargeRepository folioChargeRepository,
@@ -57,7 +58,8 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                              GuestRepository guestRepository,
                              RoomRepository roomRepository,
                              ActivityLogService activityLogService,
-                             ShiftHandoverService shiftHandoverService) {
+                             ShiftHandoverService shiftHandoverService,
+                             com.hotel_erp.hotel_erp.modules.currency.CurrencyRepository currencyRepository) {
         super(repository);
         this.folioChargeRepository = folioChargeRepository;
         this.folioPaymentRepository = folioPaymentRepository;
@@ -75,6 +77,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         this.roomRepository = roomRepository;
         this.activityLogService = activityLogService;
         this.shiftHandoverService = shiftHandoverService;
+        this.currencyRepository = currencyRepository;
     }
 
     @Override
@@ -271,32 +274,54 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                 .ifPresent(pmEntity -> payment.setPaymentMethod(pmEntity.getName()));
         }
 
+        // Handle Currency Conversion
+        String currencyCode = paymentDto.getCurrencyCode() != null ? paymentDto.getCurrencyCode() : "USD";
+        payment.setCurrencyCode(currencyCode);
+        
+        BigDecimal rate = paymentDto.getExchangeRate();
+        if ("USD".equalsIgnoreCase(currencyCode)) {
+            rate = BigDecimal.ONE;
+        } else if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) {
+            rate = currencyRepository.findByCode(currencyCode)
+                    .map(com.hotel_erp.hotel_erp.modules.currency.CurrencyEntity::getExchangeRate)
+                    .orElse(BigDecimal.ONE);
+        }
+        payment.setExchangeRate(rate);
+
+        BigDecimal amountInBalanceCurrency = payment.getAmount();
+        if (!"USD".equalsIgnoreCase(currencyCode)) {
+            // amountInBalanceCurrency = amount / rate
+            amountInBalanceCurrency = payment.getAmount().divide(rate, 4, RoundingMode.HALF_UP);
+        }
+
         // If still null, default to DTO's name or UNKNOWN
         if (payment.getPaymentMethod() == null) {
             payment.setPaymentMethod(paymentDto.getPaymentMethodName() != null ? paymentDto.getPaymentMethodName() : "UNKNOWN");
         }
         
-        // Prevent overpayment — only applies when both payment and balance are positive.
-        // Skip guard for refunds (negative amounts) and credit-balance folios.
+        // Prevent overpayment using the USD-equivalent amount
         BigDecimal liveBalance = Optional.ofNullable(folioChargeRepository.sumTotalByFolioId(folioId))
                 .orElse(BigDecimal.ZERO)
             .subtract(Optional.ofNullable(folioPaymentRepository.sumAmountByFolioId(folioId))
                 .orElse(BigDecimal.ZERO));
 
-        if (payment.getAmount().compareTo(BigDecimal.ZERO) > 0
+        if (amountInBalanceCurrency.compareTo(BigDecimal.ZERO) > 0
                 && liveBalance.compareTo(BigDecimal.ZERO) > 0
-                && payment.getAmount().compareTo(liveBalance) > 0) {
+                && amountInBalanceCurrency.compareTo(liveBalance.add(new BigDecimal("0.01"))) > 0) {
             throw new RuntimeException(
-                "Payment amount (" + payment.getAmount() + ") exceeds outstanding balance (" + liveBalance + ")"
+                "Payment amount covers $" + amountInBalanceCurrency + " which exceeds outstanding balance ($" + liveBalance + ")"
             );
         }
 
+        // We update the payment entity's amount to be the USD amount because the folio logic uses it for balance.
+        // TODO: Store both original amount and USD amount in the entity for better history.
+        // For now, we follow the rule that the repository sum uses 'amount'.
+        payment.setAmount(amountInBalanceCurrency);
         FolioPaymentEntity savedPayment = folioPaymentRepository.save(payment);
 
         // Generate receipt
         generateReceipt(savedPayment);
 
-        // BUG 6 FIX: Recalculate totalAmount from DB aggregates to avoid in-memory race condition.
         BigDecimal totalCharges = folioChargeRepository.sumTotalByFolioId(folioId);
         BigDecimal totalPayments = folioPaymentRepository.sumAmountByFolioId(folioId);
         if (totalCharges == null) {
@@ -305,12 +330,14 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         if (totalPayments == null) {
             totalPayments = BigDecimal.ZERO;
         }
+        
         folio.setTotalAmount(totalCharges.subtract(totalPayments).setScale(2, RoundingMode.HALF_UP));
         repository.save(folio);
 
-        activityLogService.logActivity(userId, "RECORD_PAYMENT", "Recorded payment of $" + paymentDto.getAmount() + " on Folio #" + folioId);
+        activityLogService.logActivity(userId, "RECORD_PAYMENT", 
+            "Recorded payment of " + paymentDto.getAmount() + " " + currencyCode + " ($" + amountInBalanceCurrency + ") on Folio #" + folioId);
 
-        return folioPaymentMapper.toDto(payment);
+        return folioPaymentMapper.toDto(savedPayment);
     }
 
     @Override
@@ -409,6 +436,7 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
 
     public List<FolioDTO> findAllDTOs() {
         return repository.findAll().stream()
+                .filter(f -> !(f.getStatus() == FolioStatus.CLOSED && (f.getTotalAmount() == null || f.getTotalAmount().compareTo(BigDecimal.ZERO) == 0)))
                 .map(folioMapper::toDto)
                 .map(this::enrichFolioDTO)
                 .collect(Collectors.toList());

@@ -18,6 +18,7 @@ import com.hotel_erp.hotel_erp.modules.finance.PettyCashRepository;
 import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
 import com.hotel_erp.hotel_erp.modules.user.UserRepository;
 import com.hotel_erp.hotel_erp.modules.user.UserEntity;
+import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,7 @@ public class ReportService {
     private final FolioRepository folioRepository;
     private final StayRepository stayRepository;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
 
     public DailyRevenueDTO getDailyRevenue(LocalDate date) {
         // Fetch all charges for the given date
@@ -317,6 +319,7 @@ public class ReportService {
                 .account(c.getChargeType() != null ? c.getChargeType().getName() : "General Charge")
                 .reference("FOLIO #" + c.getFolioId())
                 .description(c.getDescription())
+                .currency("USD")
                 .amount(c.getTotalAmount())
                 .status("POSTED")
                 .build());
@@ -334,6 +337,8 @@ public class ReportService {
                 .account(accName)
                 .reference("REF #" + p.getReferenceNumber())
                 .description("Payment Received")
+                .currency(p.getCurrencyCode() != null ? p.getCurrencyCode() : "USD")
+                .paymentMethod(p.getPaymentMethod())
                 .amount(p.getAmount())
                 .status("RECEIVED")
                 .build());
@@ -347,6 +352,7 @@ public class ReportService {
                 .account(e.getExpenseType() != null ? e.getExpenseType().getName() : "General Expense")
                 .reference("REF #" + e.getId())
                 .description(e.getDescription())
+                .currency(e.getCurrencyCode() != null ? e.getCurrencyCode() : "USD")
                 .amount(e.getAmount())
                 .status("PAID")
                 .build());
@@ -408,34 +414,66 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserPerformanceDTO> getUserPerformanceReport() {
+    public List<UserPerformanceDTO> getUserPerformanceReport(LocalDate startDate, LocalDate endDate) {
         Map<Long, UserPerformanceDTO> userStats = new HashMap<>();
+        
+        java.time.LocalDateTime start = startDate != null ? startDate.atStartOfDay() : LocalDate.now().minusMonths(1).atStartOfDay();
+        java.time.LocalDateTime end = endDate != null ? endDate.plusDays(1).atStartOfDay() : LocalDate.now().plusDays(1).atStartOfDay();
 
         // Fetch check-ins
-        List<Map<String, Object>> checkIns = stayRepository.countCheckInsByUser();
+        List<Map<String, Object>> checkIns = stayRepository.countCheckInsByUserInRange(start, end);
         for (Map<String, Object> map : checkIns) {
             Long userId = ((Number) map.get("userId")).longValue();
             long count = ((Number) map.get("total")).longValue();
-            userStats.putIfAbsent(userId, new UserPerformanceDTO(userId, "", "", 0, 0, BigDecimal.ZERO));
+            userStats.putIfAbsent(userId, UserPerformanceDTO.builder()
+                    .userId(userId)
+                    .checkIns(0)
+                    .checkOuts(0)
+                    .clientsServed(0)
+                    .totalCollected(BigDecimal.ZERO)
+                    .build());
             userStats.get(userId).setCheckIns(count);
         }
 
         // Fetch check-outs
-        List<Map<String, Object>> checkOuts = stayRepository.countCheckOutsByUser();
+        List<Map<String, Object>> checkOuts = stayRepository.countCheckOutsByUserInRange(start, end);
         for (Map<String, Object> map : checkOuts) {
             Long userId = ((Number) map.get("userId")).longValue();
             long count = ((Number) map.get("total")).longValue();
-            userStats.putIfAbsent(userId, new UserPerformanceDTO(userId, "", "", 0, 0, BigDecimal.ZERO));
+            userStats.putIfAbsent(userId, UserPerformanceDTO.builder()
+                    .userId(userId)
+                    .checkIns(0)
+                    .checkOuts(0)
+                    .clientsServed(0)
+                    .totalCollected(BigDecimal.ZERO)
+                    .build());
             userStats.get(userId).setCheckOuts(count);
         }
 
         // Fetch collected payments
-        List<Map<String, Object>> payments = folioPaymentRepository.sumCollectedByUser();
+        List<Map<String, Object>> payments = folioPaymentRepository.sumCollectedByUserInRangeGlobal(start, end);
         for (Map<String, Object> map : payments) {
             Long userId = ((Number) map.get("userId")).longValue();
             BigDecimal total = (BigDecimal) map.get("total");
-            userStats.putIfAbsent(userId, new UserPerformanceDTO(userId, "", "", 0, 0, BigDecimal.ZERO));
+            userStats.putIfAbsent(userId, UserPerformanceDTO.builder()
+                    .userId(userId)
+                    .checkIns(0)
+                    .checkOuts(0)
+                    .clientsServed(0)
+                    .totalCollected(BigDecimal.ZERO)
+                    .build());
             userStats.get(userId).setTotalCollected(total);
+        }
+
+        // Fetch unique folios/clients
+        List<Map<String, Object>> clients = folioPaymentRepository.countDistinctFoliosByUserInRangeGlobal(start, end);
+        for (Map<String, Object> map : clients) {
+            Long userId = ((Number) map.get("userId")).longValue();
+            long count = ((Number) map.get("total")).longValue();
+            userStats.computeIfPresent(userId, (id, dto) -> {
+                dto.setClientsServed(count);
+                return dto;
+            });
         }
 
         // Hydrate with user details
@@ -454,5 +492,45 @@ public class ReportService {
         return result.stream()
                 .sorted(Comparator.comparing(UserPerformanceDTO::getTotalCollected).reversed())
                 .collect(Collectors.toList());
+    }
+
+    public RoomReportDTO getRoomReport(LocalDate startDate, LocalDate endDate) {
+        long totalRooms = roomRepository.count(); 
+        
+        java.time.LocalDateTime start = startDate.atStartOfDay();
+        java.time.LocalDateTime end = endDate.plusDays(1).atStartOfDay();
+
+        long occupiedCount = stayRepository.countOccupiedInRange(start, end);
+        long checkIns = stayRepository.findAllByStatusIn(List.of(com.hotel_erp.hotel_erp.modules.stay.StayStatus.ACTIVE))
+                .stream()
+                .filter(s -> s.getDateIn().isAfter(start) && s.getDateIn().isBefore(end))
+                .count();
+        
+        long checkOuts = stayRepository.findAllByStatusIn(List.of(com.hotel_erp.hotel_erp.modules.stay.StayStatus.CHECKED_OUT))
+                .stream()
+                .filter(s -> s.getDateOut() != null && s.getDateOut().isAfter(start) && s.getDateOut().isBefore(end))
+                .count();
+
+        // Total revenue in period
+        BigDecimal revenue = folioChargeRepository.findAllByDateRange(start, end)
+                .stream()
+                .map(FolioChargeEntity::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        double occupancyRate = totalRooms > 0 ? (double) occupiedCount / totalRooms * 100 : 0;
+        BigDecimal adr = occupiedCount > 0 ? revenue.divide(BigDecimal.valueOf(occupiedCount), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+        BigDecimal revPar = totalRooms > 0 ? revenue.divide(BigDecimal.valueOf(totalRooms), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+
+        return RoomReportDTO.builder()
+                .totalRooms(totalRooms)
+                .occupiedRooms(occupiedCount)
+                .availableRooms(Math.max(0, totalRooms - occupiedCount))
+                .occupancyRate(occupancyRate)
+                .totalRevenue(revenue)
+                .adr(adr)
+                .revPar(revPar)
+                .checkIns(checkIns)
+                .checkOuts(checkOuts)
+                .build();
     }
 }

@@ -22,6 +22,8 @@ public class FolioPaymentDTO {
     private String paymentMethodName; 
     @NotNull(message = "Amount is required")
     private BigDecimal amount;
+    private String currencyCode;
+    private BigDecimal exchangeRate;
     private String referenceNumber;
     private String notes;
     private Long recordedBy;

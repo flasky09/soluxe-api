@@ -20,8 +20,7 @@ public class ShiftHandoverController {
     public ResponseEntity<ShiftHandoverDTO> clockIn(Authentication authentication, @RequestBody Map<String, String> request) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         String shiftType = request.get("shiftType");
-        String employeeId = request.get("employeeId");
-        return ResponseEntity.ok(shiftHandoverService.clockIn(userDetails.getId(), shiftType, employeeId));
+        return ResponseEntity.ok(shiftHandoverService.clockIn(userDetails.getId(), shiftType));
     }
 
     @PostMapping("/clock-out/{id}")

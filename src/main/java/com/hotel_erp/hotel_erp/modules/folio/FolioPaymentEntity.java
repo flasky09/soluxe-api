@@ -31,6 +31,12 @@ public class FolioPaymentEntity extends BaseEntity {
     @Column(nullable = false)
     private String paymentMethod;
 
+    @Column(length = 10)
+    private String currencyCode;
+
+    @Column(precision = 19, scale = 4)
+    private BigDecimal exchangeRate;
+
     private String referenceNumber;
     private LocalDateTime recordedAt;
     private Long recordedBy;

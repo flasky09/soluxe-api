@@ -12,6 +12,8 @@ public class ExpenseDTO {
     private LocalDate expenseDate;
     private ExpenseTypeDTO expenseType;
     private String paymentMethod;
+    private String currencyCode;
+    private BigDecimal exchangeRate;
     private String referenceNumber;
     private Long createdBy;
     private Long modifiedBy;
