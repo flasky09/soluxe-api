@@ -64,7 +64,10 @@ public class WebSecurityConfig {
 
         configuration.setAllowedOriginPatterns(List.of(
             "https://soluxe.mflowpos.com",
-            "http://localhost:*"
+            "https://soluxe-frontend.vercel.app",
+            "https://*.up.railway.app",
+            "http://localhost:*",
+            "http://127.0.0.1:*"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
