@@ -1,5 +1,6 @@
 package com.hotel_erp.hotel_erp.modules.room;
 
+import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.maintenance.MaintenanceRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
@@ -20,17 +21,20 @@ public class RoomServiceImpl extends BaseServiceImpl<RoomEntity, Long, RoomRepos
     private final StayRepository stayRepository;
     private final ReservationRepository reservationRepository;
     private final MaintenanceRepository maintenanceRepository;
+    private final GuestRepository guestRepository;
 
     public RoomServiceImpl(RoomRepository repository, 
                            RoomTypeRepository roomTypeRepository,
                            StayRepository stayRepository,
                            ReservationRepository reservationRepository,
-                           MaintenanceRepository maintenanceRepository) {
+                           MaintenanceRepository maintenanceRepository,
+                           GuestRepository guestRepository) {
         super(repository);
         this.roomTypeRepository = roomTypeRepository;
         this.stayRepository = stayRepository;
         this.reservationRepository = reservationRepository;
         this.maintenanceRepository = maintenanceRepository;
+        this.guestRepository = guestRepository;
     }
 
     @Override
@@ -121,5 +125,55 @@ public class RoomServiceImpl extends BaseServiceImpl<RoomEntity, Long, RoomRepos
         });
 
         return calendar;
+    }
+
+    @Override
+    public List<RoomOccupancyDTO> getDailyOccupancy(LocalDate date) {
+        List<RoomOccupancyDTO> occupancyList = new ArrayList<>();
+        List<RoomEntity> allRooms = repository.findAll();
+
+        for (RoomEntity room : allRooms) {
+            RoomOccupancyDTO dto = new RoomOccupancyDTO();
+            dto.setRoomId(room.getId());
+            dto.setRoomNumber(room.getRoomNumber());
+            dto.setRoomTypeName(room.getRoomType() != null ? room.getRoomType().getName() : "Unknown");
+            dto.setStatus("VACANT");
+
+            // Check Stays
+            stayRepository.findAllByRoomId(room.getId()).stream()
+                    .filter(s -> {
+                        LocalDate dateIn = s.getDateIn().toLocalDate();
+                        LocalDate dateOut = s.getDateOut() != null ? s.getDateOut().toLocalDate() : 
+                                            (s.getActualDateOut() != null ? s.getActualDateOut().toLocalDate() : LocalDate.MAX);
+                        return !date.isBefore(dateIn) && !date.isAfter(dateOut);
+                    })
+                    .findFirst()
+                    .ifPresent(stay -> {
+                        dto.setStatus("OCCUPIED");
+                        dto.setStayId(stay.getId());
+                        dto.setGuestName(guestRepository.findById(stay.getGuestId())
+                                .map(g -> g.getFullName())
+                                .orElse("Unknown Guest"));
+                    });
+
+            // If still vacant, check Reservations
+            if ("VACANT".equals(dto.getStatus())) {
+                reservationRepository.findAll().stream()
+                        .filter(r -> r.getRoomId() != null && r.getRoomId().equals(room.getId()))
+                        .filter(r -> !date.isBefore(r.getDateIn()) && !date.isAfter(r.getDateOut()))
+                        .findFirst()
+                        .ifPresent(res -> {
+                            dto.setStatus("RESERVED");
+                            dto.setReservationId(res.getId());
+                            dto.setGuestName(guestRepository.findById(res.getGuestId())
+                                    .map(g -> g.getFullName())
+                                    .orElse("Unknown Guest"));
+                        });
+            }
+
+            occupancyList.add(dto);
+        }
+
+        return occupancyList;
     }
 }

@@ -67,4 +67,10 @@ public class RoomController {
     public List<RoomHistoryItemDTO> getRoomCalendar(@PathVariable Long id) {
         return roomService.getRoomCalendar(id);
     }
+
+    @GetMapping("/occupancy")
+    public List<RoomOccupancyDTO> getDailyOccupancy(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return roomService.getDailyOccupancy(date);
+    }
 }

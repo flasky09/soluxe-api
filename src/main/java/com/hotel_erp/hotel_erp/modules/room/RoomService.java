@@ -10,4 +10,6 @@ public interface RoomService extends BaseService<RoomEntity, Long> {
 
     List<RoomHistoryItemDTO> getRoomCalendar(Long roomId);
 
+    List<RoomOccupancyDTO> getDailyOccupancy(LocalDate date);
+
 }
