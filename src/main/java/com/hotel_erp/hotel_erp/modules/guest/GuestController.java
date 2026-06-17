@@ -3,6 +3,8 @@ package com.hotel_erp.hotel_erp.modules.guest;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 
 import java.util.List;
 
@@ -19,14 +21,18 @@ public class GuestController {
     }
 
     @PostMapping
-    public GuestDTO createGuest(@Valid @RequestBody GuestDTO dto) {
-        return guestService.saveGuest(dto);
+    public GuestDTO createGuest(@Valid @RequestBody GuestDTO dto,
+                                @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
+        return guestService.saveGuest(dto, userId);
     }
 
     @PutMapping("/{id}")
-    public GuestDTO updateGuest(@PathVariable Long id, @Valid @RequestBody GuestDTO dto) {
+    public GuestDTO updateGuest(@PathVariable Long id, @Valid @RequestBody GuestDTO dto,
+                                @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         dto.setId(id);
-        return guestService.saveGuest(dto);
+        return guestService.saveGuest(dto, userId);
     }
 
     @GetMapping("/{id}")

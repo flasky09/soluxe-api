@@ -28,4 +28,7 @@ public class VenueBookingDTO {
     private BookingStatus status;
     private String notes;
     private Long createdBy;
+    private Long modifiedBy;
+    private String createdByName;
+    private String modifiedByName;
 }

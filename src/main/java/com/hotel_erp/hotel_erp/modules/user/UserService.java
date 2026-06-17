@@ -16,6 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DepartmentRepository departmentRepository;
+    private final com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService;
 
     public UserEntity save(UserEntity user, String rawPassword, Long departmentId) {
         return save(user, rawPassword, departmentId, null);
@@ -31,7 +32,9 @@ public class UserService {
         if (adminId != null) {
             user.setCreatedBy(adminId);
         }
-        return userRepository.save(user);
+        UserEntity saved = userRepository.save(user);
+        activityLogService.logActivity(adminId, "CREATE_USER", "Created user profile: " + saved.getUsername());
+        return saved;
     }
 
     public UserEntity update(UserEntity existingUser, UserDTO updateDto) {
@@ -63,7 +66,9 @@ public class UserService {
             existingUser.setModifiedBy(adminId);
         }
         
-        return userRepository.save(existingUser);
+        UserEntity updated = userRepository.save(existingUser);
+        activityLogService.logActivity(adminId, "UPDATE_USER", "Updated user profile: " + updated.getUsername());
+        return updated;
     }
 
     public Optional<UserEntity> findById(Long id) {

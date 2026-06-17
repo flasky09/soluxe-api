@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 
 import java.util.List;
 
@@ -27,14 +29,18 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
-        return ResponseEntity.ok(employeeService.saveEmployee(employeeDTO));
+    public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO,
+                                                      @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
+        return ResponseEntity.ok(employeeService.saveEmployee(employeeDTO, userId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeDTO employeeDTO,
+                                                      @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         employeeDTO.setId(id);
-        return ResponseEntity.ok(employeeService.saveEmployee(employeeDTO));
+        return ResponseEntity.ok(employeeService.saveEmployee(employeeDTO, userId));
     }
 
     @DeleteMapping("/{id}")

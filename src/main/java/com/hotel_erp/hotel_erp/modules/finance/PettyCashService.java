@@ -20,13 +20,12 @@ public class PettyCashService {
 
     @Transactional
     public PettyCashDTO createEntry(PettyCashDTO dto) {
-        PettyCashEntity entity = PettyCashEntity.builder()
-                .amount(dto.getAmount())
-                .expenseDate(dto.getExpenseDate())
-                .description(dto.getDescription())
-                .issuedTo(dto.getIssuedTo())
-                .category(dto.getCategory())
-                .build();
+        PettyCashEntity entity = new PettyCashEntity();
+        entity.setAmount(dto.getAmount());
+        entity.setExpenseDate(dto.getExpenseDate());
+        entity.setDescription(dto.getDescription());
+        entity.setIssuedTo(dto.getIssuedTo());
+        entity.setCategory(dto.getCategory());
         return convertToDTO(repository.save(entity));
     }
 
@@ -36,13 +35,13 @@ public class PettyCashService {
     }
 
     private PettyCashDTO convertToDTO(PettyCashEntity entity) {
-        return PettyCashDTO.builder()
-                .id(entity.getId())
-                .amount(entity.getAmount())
-                .expenseDate(entity.getExpenseDate())
-                .description(entity.getDescription())
-                .issuedTo(entity.getIssuedTo())
-                .category(entity.getCategory())
-                .build();
+        PettyCashDTO dto = new PettyCashDTO();
+        dto.setId(entity.getId());
+        dto.setAmount(entity.getAmount());
+        dto.setExpenseDate(entity.getExpenseDate());
+        dto.setDescription(entity.getDescription());
+        dto.setIssuedTo(entity.getIssuedTo());
+        dto.setCategory(entity.getCategory());
+        return dto;
     }
 }

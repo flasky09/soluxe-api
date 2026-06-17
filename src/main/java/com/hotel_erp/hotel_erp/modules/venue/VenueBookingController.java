@@ -3,6 +3,8 @@ package com.hotel_erp.hotel_erp.modules.venue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -23,9 +25,11 @@ public class VenueBookingController {
     }
 
     @PostMapping
-    public VenueBookingDTO createBooking(@RequestBody VenueBookingDTO bookingDto) {
+    public VenueBookingDTO createBooking(@RequestBody VenueBookingDTO bookingDto,
+                                         @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         VenueBookingEntity entity = venueBookingMapper.toEntity(bookingDto);
-        return venueBookingMapper.toDto(venueBookingService.save(entity));
+        return venueBookingMapper.toDto(venueBookingService.save(entity, userId));
     }
 
     @GetMapping("/{id}")
@@ -36,20 +40,24 @@ public class VenueBookingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VenueBookingDTO> updateBooking(@PathVariable Long id, @RequestBody VenueBookingDTO bookingDto) {
+    public ResponseEntity<VenueBookingDTO> updateBooking(@PathVariable Long id, @RequestBody VenueBookingDTO bookingDto,
+                                                         @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         return venueBookingService.findById(id).map(existing -> {
             VenueBookingEntity updated = venueBookingMapper.toEntity(bookingDto);
             updated.setId(existing.getId());
             updated.setCreatedAt(existing.getCreatedAt());
-            return ResponseEntity.ok(venueBookingMapper.toDto(venueBookingService.save(updated)));
+            return ResponseEntity.ok(venueBookingMapper.toDto(venueBookingService.save(updated, userId)));
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<VenueBookingDTO> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<VenueBookingDTO> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body,
+                                                        @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         return venueBookingService.findById(id).map(existing -> {
             existing.setStatus(BookingStatus.valueOf(body.get("status")));
-            return ResponseEntity.ok(venueBookingMapper.toDto(venueBookingService.save(existing)));
+            return ResponseEntity.ok(venueBookingMapper.toDto(venueBookingService.save(existing, userId)));
         }).orElse(ResponseEntity.notFound().build());
     }
 

@@ -13,9 +13,20 @@ import lombok.RequiredArgsConstructor;
 public class VenueBookingService {
     private final VenueBookingRepository repository;
     private final VenueBookingMapper mapper;
+    private final com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService;
 
-    public VenueBookingEntity save(VenueBookingEntity entity) {
-        return repository.save(entity);
+    public VenueBookingEntity save(VenueBookingEntity entity, Long userId) {
+        if (userId != null) {
+            if (entity.getId() == null) {
+                entity.setCreatedBy(userId);
+            } else {
+                entity.setModifiedBy(userId);
+            }
+        }
+        VenueBookingEntity saved = repository.save(entity);
+        String action = entity.getId() == null ? "CREATE_VENUE_BOOKING" : "UPDATE_VENUE_BOOKING";
+        activityLogService.logActivity(userId, action, "Saved venue booking for: " + saved.getClientName());
+        return saved;
     }
 
     public List<VenueBookingEntity> findAll() {
@@ -26,9 +37,9 @@ public class VenueBookingService {
         repository.deleteById(id);
     }
 
-    public VenueBookingDTO create(VenueBookingDTO dto) {
+    public VenueBookingDTO create(VenueBookingDTO dto, Long userId) {
         VenueBookingEntity entity = mapper.toEntity(dto);
-        return mapper.toDto(repository.save(entity));
+        return mapper.toDto(save(entity, userId));
     }
 
     public Optional<VenueBookingEntity> findById(Long id) {

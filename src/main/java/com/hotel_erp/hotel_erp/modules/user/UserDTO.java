@@ -35,4 +35,6 @@ public class UserDTO {
     
     private Long createdBy;
     private Long modifiedBy;
+    private String createdByName;
+    private String modifiedByName;
 }

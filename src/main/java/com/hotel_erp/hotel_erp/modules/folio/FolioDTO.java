@@ -21,4 +21,14 @@ public class FolioDTO {
     private String roomNumber;
     private Long createdBy;
     private Long modifiedBy;
+    private String createdByName;
+    private String modifiedByName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

@@ -1,7 +1,9 @@
 package com.hotel_erp.hotel_erp.modules.maintenance;
 
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +35,11 @@ public class MaintenanceController {
     }
 
     @PostMapping
-    public MaintenanceDTO createTicket(@RequestBody MaintenanceDTO dto, @RequestParam Long userId) {
-        return maintenanceService.reportIssue(dto, userId);
+    public MaintenanceDTO createTicket(@RequestBody MaintenanceDTO dto,
+                                       @RequestParam(value = "userId", required = false) Long userId,
+                                       @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return maintenanceService.reportIssue(dto, resolvedUserId);
     }
 
     @PutMapping("/{id}/assign")

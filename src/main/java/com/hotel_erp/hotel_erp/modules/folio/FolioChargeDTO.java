@@ -40,4 +40,8 @@ public class FolioChargeDTO {
     private Long voidedBy;
     private Long createdBy;
     private Long modifiedBy;
-}
+
+    public boolean isVoided() { return voided; }
+    public String getVoidReason() { return voidReason; }
+    public Long getVoidedBy() { return voidedBy; }
+    public Long getChargeTypeId() { return chargeTypeId; }

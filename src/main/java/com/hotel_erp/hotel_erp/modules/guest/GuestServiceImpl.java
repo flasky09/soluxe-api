@@ -16,13 +16,16 @@ public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRe
     
     private final GuestMapper mapper;
     private final StayRepository stayRepository;
+    private final com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService;
 
     public GuestServiceImpl(GuestRepository repository,
                             GuestMapper mapper,
-                            StayRepository stayRepository) {
+                            StayRepository stayRepository,
+                            com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService) {
         super(repository);
         this.mapper = mapper;
         this.stayRepository = stayRepository;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -40,9 +43,22 @@ public class GuestServiceImpl extends BaseServiceImpl<GuestEntity, Long, GuestRe
 
     @Override
     @Transactional
-    public GuestDTO saveGuest(GuestDTO dto) {
+    public GuestDTO saveGuest(GuestDTO dto, Long userId) {
         GuestEntity entity = mapper.toEntity(dto);
+        
+        if (userId != null) {
+            if (entity.getId() == null) {
+                entity.setCreatedBy(userId);
+            } else {
+                entity.setModifiedBy(userId);
+            }
+        }
+        
         entity = repository.save(entity);
+        
+        String action = dto.getId() == null ? "CREATE_GUEST" : "UPDATE_GUEST";
+        activityLogService.logActivity(userId, action, "Saved guest profile: " + entity.getFullName());
+        
         return mapper.toDto(entity);
     }
 

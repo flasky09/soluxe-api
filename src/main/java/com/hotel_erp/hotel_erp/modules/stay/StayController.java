@@ -1,8 +1,10 @@
 package com.hotel_erp.hotel_erp.modules.stay;
 
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.time.LocalDate;
@@ -48,29 +50,37 @@ public class StayController {
 
     @PostMapping("/{id}/check-out")
     public StayDTO checkOut(@PathVariable("id") Long id,
-            @RequestParam("userId") Long userId,
-            @RequestParam(name = "approveAdjustment", required = false, defaultValue = "false") boolean approveAdjustment) {
-        // BUG 1 FIX: Call through the interface directly; checkOut(Long, Long, boolean) is now declared on StayService.
-        return stayService.checkOut(id, userId, approveAdjustment);
+            @RequestParam(value = "userId", required = false) Long userId,
+            @RequestParam(name = "approveAdjustment", required = false, defaultValue = "false") boolean approveAdjustment,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return stayService.checkOut(id, resolvedUserId, approveAdjustment);
     }
 
     @PostMapping("/{id}/extend")
     public StayDTO extendStay(
             @PathVariable("id") Long id,
             @RequestParam("newDateOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate newDateOut,
-            @RequestParam("userId") Long userId) {
-        // Convert date-only input (from frontend date picker) to 11:00 AM checkout time
-        return stayService.extendStay(id, newDateOut.atTime(12, 0), userId);
+            @RequestParam(value = "userId", required = false) Long userId,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return stayService.extendStay(id, newDateOut.atTime(12, 0), resolvedUserId);
     }
 
     @PostMapping("/reservations/{reservationId}/no-show")
-    public void markNoShow(@PathVariable("reservationId") Long reservationId, @RequestParam("userId") Long userId) {
-        stayService.markNoShow(reservationId, userId);
+    public void markNoShow(@PathVariable("reservationId") Long reservationId,
+                           @RequestParam(value = "userId", required = false) Long userId,
+                           @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        stayService.markNoShow(reservationId, resolvedUserId);
     }
 
     @PostMapping("/{id}/void")
-    public void voidStay(@PathVariable("id") Long id, @RequestParam("userId") Long userId) {
-        stayService.voidStay(id, userId);
+    public void voidStay(@PathVariable("id") Long id,
+                         @RequestParam(value = "userId", required = false) Long userId,
+                         @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        stayService.voidStay(id, resolvedUserId);
     }
 
     @Data

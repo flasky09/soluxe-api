@@ -34,4 +34,8 @@ public class GuestDTO {
     private String emergencyContactPhone;
     private String imageUrl;
     private boolean voided;
+    private Long createdBy;
+    private Long modifiedBy;
+    private String createdByName;
+    private String modifiedByName;
 }

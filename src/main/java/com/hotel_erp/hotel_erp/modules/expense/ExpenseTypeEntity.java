@@ -27,4 +27,20 @@ public class ExpenseTypeEntity extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean isAsset = false;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isAsset() {
+        return isAsset;
+    }
+
+    public void setAsset(boolean isAsset) {
+        this.isAsset = isAsset;
+    }
 }

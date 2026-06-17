@@ -137,6 +137,7 @@ public class RoomServiceImpl extends BaseServiceImpl<RoomEntity, Long, RoomRepos
             dto.setRoomId(room.getId());
             dto.setRoomNumber(room.getRoomNumber());
             dto.setRoomTypeName(room.getRoomType() != null ? room.getRoomType().getName() : "Unknown");
+            dto.setRoomStatus(room.getStatus() != null ? room.getStatus().toString() : "AVAILABLE");
             dto.setStatus("VACANT");
 
             // Check Stays

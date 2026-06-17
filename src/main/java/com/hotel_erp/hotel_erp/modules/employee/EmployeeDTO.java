@@ -34,4 +34,9 @@ public class EmployeeDTO {
     private String idNumber;
 
     private String kraPin;
+    private boolean active = true;
+    private Long createdBy;
+    private Long modifiedBy;
+    private String createdByName;
+    private String modifiedByName;
 }

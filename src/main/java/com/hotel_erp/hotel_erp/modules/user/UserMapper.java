@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
 
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
 
     public UserDTO toDto(UserEntity entity) {
         if (entity == null) {
@@ -24,6 +25,19 @@ public class UserMapper {
         dto.setActive(entity.isActive());
         dto.setRole(entity.getRole() != null ? entity.getRole().name() : null);
         dto.setDepartmentId(entity.getDepartment() != null ? entity.getDepartment().getId() : null);
+        
+        dto.setCreatedBy(entity.getCreatedBy());
+        if (entity.getCreatedBy() != null) {
+            userRepository.findById(entity.getCreatedBy())
+                .ifPresent(u -> dto.setCreatedByName(u.getUsername()));
+        }
+        
+        dto.setModifiedBy(entity.getModifiedBy());
+        if (entity.getModifiedBy() != null) {
+            userRepository.findById(entity.getModifiedBy())
+                .ifPresent(u -> dto.setModifiedByName(u.getUsername()));
+        }
+        
         return dto;
     }
 

@@ -1,6 +1,8 @@
 package com.hotel_erp.hotel_erp.modules.folio;
 
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -16,13 +18,20 @@ public class FolioController {
     private final FolioMapper folioMapper;
 
     @PostMapping("/{id}/charges")
-    public FolioChargeDTO addCharge(@PathVariable("id") Long id, @Valid @RequestBody FolioChargeDTO chargeDto, @RequestParam("userId") Long userId) {
-        return folioService.addCharge(id, chargeDto, userId);
+    public FolioChargeDTO addCharge(@PathVariable("id") Long id,
+                                    @Valid @RequestBody FolioChargeDTO chargeDto,
+                                    @RequestParam(value = "userId", required = false) Long userId,
+                                    @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return folioService.addCharge(id, chargeDto, resolvedUserId);
     }
 
     @PostMapping
-    public FolioDTO createMasterFolio(@RequestParam(value = "notes", required = false) String notes, @RequestParam("userId") Long userId) {
-        return folioService.createMasterFolio(notes, userId);
+    public FolioDTO createMasterFolio(@RequestParam(value = "notes", required = false) String notes,
+                                      @RequestParam(value = "userId", required = false) Long userId,
+                                      @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return folioService.createMasterFolio(notes, resolvedUserId);
     }
 
     @GetMapping
@@ -72,12 +81,19 @@ public class FolioController {
     }
 
     @PostMapping("/{id}/payments")
-    public FolioPaymentDTO addPayment(@PathVariable("id") Long id, @Valid @RequestBody FolioPaymentDTO paymentDto, @RequestParam("userId") Long userId) {
-        return folioService.addPayment(id, paymentDto, userId);
+    public FolioPaymentDTO addPayment(@PathVariable("id") Long id,
+                                      @Valid @RequestBody FolioPaymentDTO paymentDto,
+                                      @RequestParam(value = "userId", required = false) Long userId,
+                                      @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return folioService.addPayment(id, paymentDto, resolvedUserId);
     }
 
     @PostMapping("/{id}/close")
-    public FolioDTO closeFolio(@PathVariable("id") Long id, @RequestParam("userId") Long userId) {
-        return folioService.closeFolio(id, userId);
+    public FolioDTO closeFolio(@PathVariable("id") Long id,
+                               @RequestParam(value = "userId", required = false) Long userId,
+                               @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return folioService.closeFolio(id, resolvedUserId);
     }
 }

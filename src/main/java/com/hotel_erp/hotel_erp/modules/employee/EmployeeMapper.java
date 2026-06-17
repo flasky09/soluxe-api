@@ -4,17 +4,33 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", builder = @org.mapstruct.Builder(disableBuilder = true))
-public interface EmployeeMapper {
-    EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
+import org.springframework.beans.factory.annotation.Autowired;
+import com.hotel_erp.hotel_erp.modules.user.UserRepository;
+
+@Mapper(componentModel = "spring")
+public abstract class EmployeeMapper {
+
+    @Autowired
+    protected UserRepository userRepository;
 
     @Mapping(source = "department.id", target = "departmentId")
-    EmployeeDTO toDto(EmployeeEntity entity);
+    public abstract EmployeeDTO toDto(EmployeeEntity entity);
 
-    @Mapping(target = "active", ignore = true)
+    @org.mapstruct.AfterMapping
+    protected void resolveAuditNames(EmployeeEntity entity, @org.mapstruct.MappingTarget EmployeeDTO dto) {
+        if (entity.getCreatedBy() != null) {
+            userRepository.findById(entity.getCreatedBy())
+                    .ifPresent(u -> dto.setCreatedByName(u.getUsername()));
+        }
+        if (entity.getModifiedBy() != null) {
+            userRepository.findById(entity.getModifiedBy())
+                    .ifPresent(u -> dto.setModifiedByName(u.getUsername()));
+        }
+    }
+
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(source = "departmentId", target = "department.id")
     @Mapping(target = "idType", ignore = true)
-    EmployeeEntity toEntity(EmployeeDTO dto);
+    public abstract EmployeeEntity toEntity(EmployeeDTO dto);
 }

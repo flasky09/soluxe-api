@@ -1,7 +1,9 @@
 package com.hotel_erp.hotel_erp.modules.expense;
 
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,13 +25,19 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public ExpenseDTO createExpense(@RequestBody ExpenseDTO dto, @RequestParam("userId") Long userId) {
-        return expenseService.createExpense(dto, userId);
+    public ExpenseDTO createExpense(@RequestBody ExpenseDTO dto,
+                                    @RequestParam(value = "userId", required = false) Long userId,
+                                    @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return expenseService.createExpense(dto, resolvedUserId);
     }
 
     @PutMapping("/{id}")
-    public ExpenseDTO updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO dto, @RequestParam("userId") Long userId) {
-        return expenseService.updateExpense(id, dto, userId);
+    public ExpenseDTO updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO dto,
+                                    @RequestParam(value = "userId", required = false) Long userId,
+                                    @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long resolvedUserId = userId != null ? userId : (principal != null ? principal.getId() : null);
+        return expenseService.updateExpense(id, dto, resolvedUserId);
     }
 
     @DeleteMapping("/{id}")

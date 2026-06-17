@@ -8,6 +8,7 @@ public class RoomOccupancyDTO {
     private String roomNumber;
     private String roomTypeName;
     private String status; // VACANT, OCCUPIED, RESERVED
+    private String roomStatus; // Actual room status: AVAILABLE, DIRTY, CLEANING, MAINTENANCE, INSPECTED
     
     // Additional occupant info
     private String guestName;

@@ -13,11 +13,14 @@ import java.util.stream.Collectors;
 public class EmployeeServiceImpl extends BaseServiceImpl<EmployeeEntity, Long, EmployeeRepository> implements EmployeeService {
     
     private final EmployeeMapper mapper;
+    private final com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService;
 
     public EmployeeServiceImpl(EmployeeRepository repository, 
-                               EmployeeMapper mapper) {
+                               EmployeeMapper mapper,
+                               com.hotel_erp.hotel_erp.modules.activity.ActivityLogService activityLogService) {
         super(repository);
         this.mapper = mapper;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class EmployeeServiceImpl extends BaseServiceImpl<EmployeeEntity, Long, E
 
     @Override
     @Transactional
-    public EmployeeDTO saveEmployee(EmployeeDTO dto) {
+    public EmployeeDTO saveEmployee(EmployeeDTO dto, Long userId) {
         EmployeeEntity entity = mapper.toEntity(dto);
         
         if (dto.getIdType() != null) {
@@ -45,7 +48,19 @@ public class EmployeeServiceImpl extends BaseServiceImpl<EmployeeEntity, Long, E
             }
         }
 
+        if (userId != null) {
+            if (entity.getId() == null) {
+                entity.setCreatedBy(userId);
+            } else {
+                entity.setModifiedBy(userId);
+            }
+        }
+
         entity = repository.save(entity);
+        
+        String action = dto.getId() == null ? "CREATE_EMPLOYEE" : "UPDATE_EMPLOYEE";
+        activityLogService.logActivity(userId, action, "Saved employee record: " + entity.getFullName());
+        
         return mapper.toDto(entity);
     }
 

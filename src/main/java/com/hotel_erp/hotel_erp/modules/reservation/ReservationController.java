@@ -1,6 +1,8 @@
 package com.hotel_erp.hotel_erp.modules.reservation;
 
+import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,21 +27,25 @@ public class ReservationController {
         return reservationService.getTodayArrivals();
     }
 
-
     @PostMapping("/{reservationIdentifier}/cancel")
-    public ReservationDTO cancelReservation(@PathVariable Long reservationIdentifier, @RequestParam("userId") Long userId) {
+    public ReservationDTO cancelReservation(@PathVariable Long reservationIdentifier,
+                                            @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         return reservationService.cancel(reservationIdentifier, userId);
     }
 
     @PostMapping
-    public ReservationDTO createReservation(@RequestBody ReservationDTO reservationDTO, @RequestParam("userId") Long userId) {
+    public ReservationDTO createReservation(@RequestBody ReservationDTO reservationDTO,
+                                            @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         return reservationService.createFromDto(reservationDTO, userId);
     }
 
     @PutMapping("/{reservationIdentifier}")
     public ReservationDTO updateReservation(@PathVariable Long reservationIdentifier,
                                             @RequestBody ReservationDTO reservationDTO,
-                                            @RequestParam("userId") Long userId) {
+                                            @AuthenticationPrincipal UserDetailsImpl principal) {
+        Long userId = principal != null ? principal.getId() : null;
         return reservationService.updateReservation(reservationIdentifier, reservationDTO, userId);
     }
 

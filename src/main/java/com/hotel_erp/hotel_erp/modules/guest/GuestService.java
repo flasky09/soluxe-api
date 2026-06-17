@@ -8,7 +8,7 @@ public interface GuestService {
 
     Optional<GuestDTO> findGuestById(Long id);
 
-    GuestDTO saveGuest(GuestDTO dto);
+    GuestDTO saveGuest(GuestDTO dto, Long userId);
 
     void deleteById(Long id);
 
