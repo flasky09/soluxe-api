@@ -25,7 +25,7 @@ public class VenueBookingService {
         }
         VenueBookingEntity saved = repository.save(entity);
         String action = entity.getId() == null ? "CREATE_VENUE_BOOKING" : "UPDATE_VENUE_BOOKING";
-        activityLogService.logActivity(userId, action, "Saved venue booking for: " + saved.getClientName());
+        activityLogService.logActivity(userId, action, "Saved venue booking for Guest ID: " + saved.getGuestId());
         return saved;
     }
 

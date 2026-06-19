@@ -38,11 +38,11 @@ public abstract class VenueBookingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     public abstract VenueBookingEntity toEntity(VenueBookingDTO dto);
 
-    default LocalTime toLocalTime(LocalDateTime dt) {
+    protected LocalTime toLocalTime(LocalDateTime dt) {
         return dt != null ? dt.toLocalTime() : null;
     }
 
-    default LocalDateTime toLocalDateTime(LocalTime time) {
+    protected LocalDateTime toLocalDateTime(LocalTime time) {
         return time != null ? LocalDateTime.of(LocalDate.now(), time) : null;
     }
 }

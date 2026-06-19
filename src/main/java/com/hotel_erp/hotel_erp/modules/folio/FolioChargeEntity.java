@@ -48,7 +48,15 @@ public class FolioChargeEntity extends BaseEntity {
     private String voidReason;
     private Long voidedBy;
 
-    public void setFolioId(Long folioId) { this.folioId = folioId; }
-    public void setChargedAt(LocalDateTime chargedAt) { this.chargedAt = chargedAt; }
-    public void setAddedBy(Long addedBy) { this.addedBy = addedBy; }
+    public void setFolioId(Long folioId) {
+        this.folioId = folioId;
+    }
+
+    public void setChargedAt(LocalDateTime chargedAt) {
+        this.chargedAt = chargedAt;
+    }
+
+    public void setAddedBy(Long addedBy) {
+        this.addedBy = addedBy;
+    }
 }
