@@ -13,7 +13,6 @@ import com.hotel_erp.hotel_erp.modules.folio.ChargeTypeRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomStatus;
 import com.hotel_erp.hotel_erp.modules.activity.ActivityLogService;
-import com.hotel_erp.hotel_erp.modules.shift.ShiftHandoverService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     private final StayFlagService stayFlagService;
     private final FolioChargeRepository folioChargeRepository;
     private final ActivityLogService activityLogService;
-    private final ShiftHandoverService shiftHandoverService;
 
     public StayServiceImpl(StayRepository repository,
                            ReservationRepository reservationRepository,
@@ -50,8 +48,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                            ChargeTypeRepository chargeTypeRepository,
                            StayFlagService stayFlagService,
                            FolioChargeRepository folioChargeRepository,
-                           ActivityLogService activityLogService,
-                           ShiftHandoverService shiftHandoverService) {
+                           ActivityLogService activityLogService) {
         super(repository);
         this.reservationRepository = reservationRepository;
         this.stayMapper = stayMapper;
@@ -62,14 +59,12 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
         this.stayFlagService = stayFlagService;
         this.folioChargeRepository = folioChargeRepository;
         this.activityLogService = activityLogService;
-        this.shiftHandoverService = shiftHandoverService;
     }
 
     @Override
     @Transactional
     public StayDTO checkIn(Long reservationId, Long roomId, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         ReservationEntity reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
@@ -148,7 +143,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Transactional
     public StayDTO checkOut(Long id, Long userId, boolean approveAdjustment) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         StayEntity stay = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Stay not found"));
 
@@ -264,7 +258,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Transactional
     public StayDTO directCheckIn(Long guestId, Long roomId, Integer adults, Integer children, java.time.LocalDate dateOut, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         var room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
         if (room.getStatus() != RoomStatus.AVAILABLE) {
@@ -400,7 +393,6 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     @Transactional
     public StayDTO extendStay(Long id, LocalDateTime newDateOut, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         StayEntity stay = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Stay not found"));
 

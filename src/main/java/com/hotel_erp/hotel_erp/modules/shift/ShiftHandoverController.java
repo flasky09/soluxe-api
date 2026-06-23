@@ -3,6 +3,7 @@ package com.hotel_erp.hotel_erp.modules.shift;
 import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/shifts")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('RECEPTIONIST', 'HOTEL_ADMIN')")
 public class ShiftHandoverController {
 
     private final ShiftHandoverService shiftHandoverService;

@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.hotel_erp.hotel_erp.modules.activity.ActivityLogService;
-import com.hotel_erp.hotel_erp.modules.shift.ShiftHandoverService;
 import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
@@ -59,8 +58,6 @@ class FolioServiceImplTest {
     private UserRepository userRepository;
     @Mock
     private ActivityLogService activityLogService;
-    @Mock
-    private ShiftHandoverService shiftHandoverService;
 
     @InjectMocks
     private FolioServiceImpl folioService;
@@ -72,8 +69,6 @@ class FolioServiceImplTest {
         ReflectionTestUtils.setField(folioService, com.hotel_erp.hotel_erp.shared.BaseServiceImpl.class, "userRepository", userRepository, com.hotel_erp.hotel_erp.modules.user.UserRepository.class);
         // Stub validateUser so any Long userId is treated as valid
         when(userRepository.existsById(any())).thenReturn(true);
-        // Do nothing for shift validation by default
-        doNothing().when(shiftHandoverService).validateActiveShift(anyLong());
     }
 
     @Test

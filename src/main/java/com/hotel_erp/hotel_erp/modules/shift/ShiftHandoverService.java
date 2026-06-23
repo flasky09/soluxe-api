@@ -24,16 +24,7 @@ public class ShiftHandoverService {
     private final UserRepository userRepository;
 
     public void validateActiveShift(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Only enforce for receptionists
-        if (user.getRole() == Role.RECEPTIONIST) {
-            Optional<ShiftHandoverEntity> activeShift = shiftHandoverRepository.findByUserIdAndStatus(userId, ShiftHandoverEntity.ShiftStatus.ACTIVE);
-            if (activeShift.isEmpty()) {
-                throw new RuntimeException("You must be on an active shift to perform this operation. Please clock in first.");
-            }
-        }
+        // Validation disabled as per requirement: "an account should not need to clockin to work"
     }
 
     @Transactional

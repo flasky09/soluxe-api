@@ -13,7 +13,6 @@ import com.hotel_erp.hotel_erp.modules.guest.GuestRepository;
 import com.hotel_erp.hotel_erp.modules.reservation.ReservationRepository;
 import com.hotel_erp.hotel_erp.modules.room.RoomRepository;
 import com.hotel_erp.hotel_erp.modules.stay.StayRepository;
-import com.hotel_erp.hotel_erp.modules.shift.ShiftHandoverService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     private final GuestRepository guestRepository;
     private final RoomRepository roomRepository;
     private final ActivityLogService activityLogService;
-    private final ShiftHandoverService shiftHandoverService;
     private final com.hotel_erp.hotel_erp.modules.currency.CurrencyRepository currencyRepository;
 
     public FolioServiceImpl(FolioRepository repository,
@@ -58,7 +56,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
                              GuestRepository guestRepository,
                              RoomRepository roomRepository,
                              ActivityLogService activityLogService,
-                             ShiftHandoverService shiftHandoverService,
                              com.hotel_erp.hotel_erp.modules.currency.CurrencyRepository currencyRepository) {
         super(repository);
         this.folioChargeRepository = folioChargeRepository;
@@ -76,7 +73,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         this.guestRepository = guestRepository;
         this.roomRepository = roomRepository;
         this.activityLogService = activityLogService;
-        this.shiftHandoverService = shiftHandoverService;
         this.currencyRepository = currencyRepository;
     }
 
@@ -161,7 +157,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Transactional
     public FolioChargeDTO addCharge(Long folioId, FolioChargeDTO chargeDto, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
@@ -254,7 +249,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Transactional
     public FolioPaymentDTO addPayment(Long folioId, FolioPaymentDTO paymentDto, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
@@ -344,7 +338,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Transactional
     public FolioDTO closeFolio(Long folioId, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
@@ -375,7 +368,6 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
     @Transactional
     public void voidFolio(Long folioId, Long userId) {
         validateUser(userId);
-        shiftHandoverService.validateActiveShift(userId);
         // BUG 4 FIX: Properly void a folio by posting a credit reversal for each charge
         // and then closing the folio so it no longer shows as outstanding.
         FolioEntity folio = repository.findById(folioId)

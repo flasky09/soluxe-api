@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/stays")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('RECEPTIONIST', 'HOTEL_ADMIN', 'MANAGER')")
 public class StayController {
 
     private final StayService stayService;

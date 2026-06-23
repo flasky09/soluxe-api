@@ -1,0 +1,99 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.hotel-erp:hotel-erp >-----------------------
+[INFO] Building hotel-erp 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ hotel-erp ---
+[INFO] Deleting /home/bony/Projects/hotel-crm/hotel-erp/target
+[INFO] 
+[INFO] --- checkstyle:3.6.0:check (validate) @ hotel-erp ---
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ hotel-erp ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ hotel-erp ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 328 source files with javac [debug parameters release 21] to target/classes
+[INFO] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/shared/services/CloudinaryService.java: /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/shared/services/CloudinaryService.java uses unchecked or unsafe operations.
+[INFO] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/shared/services/CloudinaryService.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/leave/LeaveTypeEntity.java:[25,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingChargeEntity.java:[31,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingChargeEntity.java:[34,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionEntity.java:[45,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/DepartmentEntity.java:[31,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/stay/StayEntity.java:[53,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/stay/StayEntity.java:[66,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderEntity.java:[57,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/security/UserDetailsImpl.java:[20,5] Not generating getId(): A method with that name already exists
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/MenuCategoryMapper.java:[15,24] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/SupplierMapper.java:[12,20] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueMapper.java:[12,17] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioChargeMapper.java:[12,20] Unmapped target properties: "chargeTypeId, chargeTypeName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioChargeMapper.java:[16,23] Unmapped target property: "chargeType".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/PaymentMethodMapper.java:[13,25] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/EmployeeMapper.java:[17,33] Unmapped target properties: "createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/leave/LeaveRequestMapper.java:[19,24] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioReceiptMapper.java:[14,24] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/attendance/AttendanceRecordMapper.java:[16,28] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/maintenance/MaintenanceMapper.java:[9,20] Unmapped target property: "issueTypeName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/maintenance/MaintenanceMapper.java:[13,23] Unmapped target properties: "createdBy, modifiedBy, venueId, scheduledAt, completedAt".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/purchaseorder/PurchaseOrderMapper.java:[14,25] Unmapped target property: "modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioMapper.java:[16,30] Unmapped target properties: "guestName, roomNumber, createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/room/RoomMapper.java:[18,16] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioPaymentMapper.java:[9,21] Unmapped target property: "paymentMethodId".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioPaymentMapper.java:[16,24] Unmapped target properties: "voided, voidReason".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningSessionMapper.java:[18,25] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/hotel/HotelMapper.java:[15,17] Unmapped target properties: "createdBy, modifiedBy, website, logoUrl".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/guest/GuestMapper.java:[16,30] Unmapped target properties: "createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingMapper.java:[21,37] Unmapped target properties: "venueName, clientName, clientPhone, clientNameZh, depositPaid, clientCompany, eventType, dateIn, dateOut, expectedGuests, setupType, deposit, totalAmount, notes, createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/InventoryItemMapper.java:[17,25] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/purchaseorder/PurchaseOrderItemMapper.java:[16,29] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingChargeMapper.java:[13,30] Unmapped target properties: "createdBy, modifiedBy, paid".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/MenuItemMapper.java:[23,20] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/DepartmentMapper.java:[15,22] Unmapped target properties: "createdBy, modifiedBy, description".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/DiningOrderMapper.java:[16,23] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/room/RoomTypeMapper.java:[15,20] Unmapped target properties: "createdBy, modifiedBy, description, active".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/inventory/InventoryCategoryMapper.java:[12,29] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/hotel/HotelSettingsMapper.java:[10,22] Unmapped target properties: "allowWalkIn, allowComplimentary, kraPin, vatStatus, companyReg, website, checkInTime, checkOutTime, vatPercentage, serviceChargePercentage, tourismLevyPercentage".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/hotel/HotelSettingsMapper.java:[14,25] Unmapped target properties: "createdBy, modifiedBy, currency, timezone, taxEnabled, dateFormat".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/food/RestaurantTableMapper.java:[15,27] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/stay/StayAdditionalGuestMapper.java:[16,31] Unmapped target properties: "createdBy, modifiedBy".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/guest/GuestMapper.java:[16,30] Unmapped target properties: "createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingMapper.java:[21,37] Unmapped target properties: "venueName, clientName, clientPhone, clientNameZh, depositPaid, clientCompany, eventType, dateIn, dateOut, expectedGuests, setupType, deposit, totalAmount, notes, createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingMapper.java:[39,40] Unmapped target properties: "guestId, purpose, pax".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/employee/EmployeeMapper.java:[17,33] Unmapped target properties: "createdByName, modifiedByName".
+[WARNING] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/folio/FolioMapper.java:[16,30] Unmapped target properties: "guestName, roomNumber, createdByName, modifiedByName".
+[INFO] 47 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingService.java:[28,91] cannot find symbol
+  symbol:   method getClientName()
+  location: variable saved of type com.hotel_erp.hotel_erp.modules.venue.VenueBookingEntity
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  32.754 s
+[INFO] Finished at: 2026-06-19T05:43:35+03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile (default-compile) on project hotel-erp: Compilation failure
+[ERROR] /home/bony/Projects/hotel-crm/hotel-erp/src/main/java/com/hotel_erp/hotel_erp/modules/venue/VenueBookingService.java:[28,91] cannot find symbol
+[ERROR]   symbol:   method getClientName()
+[ERROR]   location: variable saved of type com.hotel_erp.hotel_erp.modules.venue.VenueBookingEntity
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

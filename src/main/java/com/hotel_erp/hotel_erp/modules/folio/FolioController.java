@@ -3,6 +3,7 @@ package com.hotel_erp.hotel_erp.modules.folio;
 import com.hotel_erp.hotel_erp.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/folios")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('RECEPTIONIST', 'HOTEL_ADMIN', 'MANAGER', 'ACCOUNTANT')")
 public class FolioController {
 
     private final FolioService folioService;
