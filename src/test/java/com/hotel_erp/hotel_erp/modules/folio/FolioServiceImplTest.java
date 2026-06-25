@@ -169,4 +169,29 @@ class FolioServiceImplTest {
         });
         assertTrue(exception.getMessage().contains("outstanding balance"));
     }
+
+    @Test
+    void testCloseFolio_IdempotentIfAlreadyClosed() {
+        // Arrange
+        Long folioId = 1L;
+        FolioEntity folio = new FolioEntity();
+        folio.setId(folioId);
+        folio.setStatus(FolioStatus.CLOSED);
+
+        FolioDTO folioDto = new FolioDTO();
+        folioDto.setId(folioId);
+        folioDto.setStatus(FolioStatus.CLOSED);
+
+        when(folioRepository.findById(folioId)).thenReturn(Optional.of(folio));
+        when(folioMapper.toDto(folio)).thenReturn(folioDto);
+
+        // Act
+        FolioDTO result = folioService.closeFolio(folioId, 1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(FolioStatus.CLOSED, result.getStatus());
+        verify(folioRepository, never()).save(any());
+        verify(activityLogService, never()).logActivity(any(), any(), any());
+    }
 }

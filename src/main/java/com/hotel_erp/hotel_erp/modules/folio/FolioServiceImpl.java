@@ -341,8 +341,8 @@ public class FolioServiceImpl extends BaseServiceImpl<FolioEntity, Long, FolioRe
         FolioEntity folio = repository.findById(folioId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
 
-        if (folio.getStatus() != FolioStatus.OPEN) {
-            throw new RuntimeException("Folio is already closed");
+        if (folio.getStatus() == FolioStatus.CLOSED) {
+            return folioMapper.toDto(folio);
         }
 
         // Use epsilon to handle floating point rounding across multiple charges/payments
