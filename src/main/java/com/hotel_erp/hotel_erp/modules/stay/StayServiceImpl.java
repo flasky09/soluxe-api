@@ -140,7 +140,7 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = ResponseStatusException.class)
     public StayDTO checkOut(Long id, Long userId, boolean approveAdjustment) {
         validateUser(userId);
         StayEntity stay = repository.findById(id)
@@ -183,6 +183,17 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                     rate = BigDecimal.ZERO;
                 }
                 
+                BigDecimal totalAdjustment = rate.multiply(new BigDecimal(diff));
+
+                if (!approveAdjustment) {
+                    throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Early check-out detected. This stay has an understay of " + diff + " night(s). " +
+                        "This will require a credit adjustment of " + totalAdjustment + ". " +
+                        "Please confirm to apply this adjustment."
+                    );
+                }
+
                 // Post adjustment
                 FolioChargeDTO adjustment = FolioChargeDTO.builder()
                         .folioId(folio.getId())
@@ -197,6 +208,10 @@ public class StayServiceImpl extends BaseServiceImpl<StayEntity, Long, StayRepos
                 chargeTypeRepository.findByName("Room Charge").ifPresent(type -> adjustment.setChargeTypeId(type.getId()));
                 folioService.addCharge(folio.getId(), adjustment, userId);
                 
+                // Update stay expected checkout date to actual checkout date (now) to prevent duplicate adjustment
+                stay.setDateOut(now);
+                repository.save(stay);
+
                 // Refresh folio balance after adjustment
                 folio = folioRepository.findById(folio.getId())
                         .orElseThrow(() -> new RuntimeException("Folio re-fetch failed after adjustment"));

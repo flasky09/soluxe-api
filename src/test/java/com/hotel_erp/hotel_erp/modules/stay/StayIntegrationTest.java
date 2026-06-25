@@ -163,7 +163,7 @@ public class StayIntegrationTest {
         folioService.addPayment(refundDto.getFolioId(), refundDto, userId);
 
         // Perform Check-Out
-        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
+        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId, true);
         
         assertEquals(StayStatus.CHECKED_OUT, checkOutDto.getStatus());
         assertNotNull(checkOutDto.getActualDateOut());
@@ -263,7 +263,7 @@ public class StayIntegrationTest {
         // Folio balance is now +5000.
         // Check-out should apply credit of -5000.
         // Final balance = 0, checkOut should succeed!
-        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
+        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId, true);
         
         assertEquals(StayStatus.CHECKED_OUT, checkOutDto.getStatus());
         FolioEntity closedFolio = folioRepository.findByStayId(stayDto.getId()).get();
@@ -330,7 +330,7 @@ public class StayIntegrationTest {
         folioService.addPayment(folio.getId(), refundPayment, userId);
 
         // 6. Check-Out should now succeed
-        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId);
+        StayDTO checkOutDto = stayService.checkOut(stayDto.getId(), userId, true);
         assertEquals(StayStatus.CHECKED_OUT, checkOutDto.getStatus());
     }
 
@@ -344,7 +344,7 @@ public class StayIntegrationTest {
         // When checking out early, it posts -5000 credit.
         // Balance will be 10000 - 5000 = 5000 > 0.
         org.springframework.web.server.ResponseStatusException ex1 = assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
-            stayService.checkOut(stayDto.getId(), userId);
+            stayService.checkOut(stayDto.getId(), userId, true);
         });
         assertTrue(ex1.getMessage().contains("Outstanding folio balance"));
     }
